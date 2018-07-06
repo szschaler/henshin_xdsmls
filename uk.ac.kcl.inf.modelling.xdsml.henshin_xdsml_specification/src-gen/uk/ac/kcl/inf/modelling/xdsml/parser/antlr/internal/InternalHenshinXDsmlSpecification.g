@@ -76,9 +76,9 @@ ruleHenshinXDsmlSpecification returns [EObject current=null]
 	leaveRule();
 }:
 	(
-		otherlv_0='metamodel'
+		otherlv_0='step'
 		{
-			newLeafNode(otherlv_0, grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelKeyword_0());
+			newLeafNode(otherlv_0, grammarAccess.getHenshinXDsmlSpecificationAccess().getStepKeyword_0());
 		}
 		(
 			(
@@ -87,35 +87,16 @@ ruleHenshinXDsmlSpecification returns [EObject current=null]
 						$current = createModelElement(grammarAccess.getHenshinXDsmlSpecificationRule());
 					}
 				}
-				otherlv_1=RULE_STRING
 				{
-					newLeafNode(otherlv_1, grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelEPackageCrossReference_1_0());
+					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0());
+				}
+				ruleQualifiedName
+				{
+					afterParserOrEnumRuleCall();
 				}
 			)
 		)
-		(
-			otherlv_2='step'
-			{
-				newLeafNode(otherlv_2, grammarAccess.getHenshinXDsmlSpecificationAccess().getStepKeyword_2_0());
-			}
-			(
-				(
-					{
-						if ($current==null) {
-							$current = createModelElement(grammarAccess.getHenshinXDsmlSpecificationRule());
-						}
-					}
-					{
-						newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_2_1_0());
-					}
-					ruleQualifiedName
-					{
-						afterParserOrEnumRuleCall();
-					}
-				)
-			)
-		)+
-	)
+	)+
 ;
 
 // Entry rule entryRuleQualifiedName

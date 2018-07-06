@@ -6,7 +6,6 @@ package uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification;
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
 
 import org.eclipse.emf.henshin.model.Unit;
 
@@ -19,7 +18,6 @@ import org.eclipse.emf.henshin.model.Unit;
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getMetamodel <em>Metamodel</em>}</li>
  *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getUnits <em>Units</em>}</li>
  * </ul>
  *
@@ -29,32 +27,6 @@ import org.eclipse.emf.henshin.model.Unit;
  */
 public interface HenshinXDsmlSpecification extends EObject
 {
-  /**
-   * Returns the value of the '<em><b>Metamodel</b></em>' reference.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Metamodel</em>' reference isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Metamodel</em>' reference.
-   * @see #setMetamodel(EPackage)
-   * @see uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecificationPackage#getHenshinXDsmlSpecification_Metamodel()
-   * @model
-   * @generated
-   */
-  EPackage getMetamodel();
-
-  /**
-   * Sets the value of the '{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getMetamodel <em>Metamodel</em>}' reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Metamodel</em>' reference.
-   * @see #getMetamodel()
-   * @generated
-   */
-  void setMetamodel(EPackage value);
-
   /**
    * Returns the value of the '<em><b>Units</b></em>' reference list.
    * The list contents are of type {@link org.eclipse.emf.henshin.model.Unit}.

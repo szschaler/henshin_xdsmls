@@ -26,6 +26,8 @@ import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification
 
+import static extension uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecificationHelper.*
+
 class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 
 	private val Engine henshinEngine = new EngineImpl

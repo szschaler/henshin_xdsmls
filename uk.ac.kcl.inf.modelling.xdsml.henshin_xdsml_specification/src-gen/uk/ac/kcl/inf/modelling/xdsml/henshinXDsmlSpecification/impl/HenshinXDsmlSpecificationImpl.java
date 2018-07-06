@@ -5,15 +5,10 @@ package uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.impl;
 
 import java.util.Collection;
 
-import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.InternalEObject;
 
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
@@ -31,7 +26,6 @@ import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpeci
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.impl.HenshinXDsmlSpecificationImpl#getMetamodel <em>Metamodel</em>}</li>
  *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.impl.HenshinXDsmlSpecificationImpl#getUnits <em>Units</em>}</li>
  * </ul>
  *
@@ -39,16 +33,6 @@ import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpeci
  */
 public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container implements HenshinXDsmlSpecification
 {
-  /**
-   * The cached value of the '{@link #getMetamodel() <em>Metamodel</em>}' reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getMetamodel()
-   * @generated
-   * @ordered
-   */
-  protected EPackage metamodel;
-
   /**
    * The cached value of the '{@link #getUnits() <em>Units</em>}' reference list.
    * <!-- begin-user-doc -->
@@ -85,49 +69,6 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
    * <!-- end-user-doc -->
    * @generated
    */
-  public EPackage getMetamodel()
-  {
-    if (metamodel != null && metamodel.eIsProxy())
-    {
-      InternalEObject oldMetamodel = (InternalEObject)metamodel;
-      metamodel = (EPackage)eResolveProxy(oldMetamodel);
-      if (metamodel != oldMetamodel)
-      {
-        if (eNotificationRequired())
-          eNotify(new ENotificationImpl(this, Notification.RESOLVE, HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL, oldMetamodel, metamodel));
-      }
-    }
-    return metamodel;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EPackage basicGetMetamodel()
-  {
-    return metamodel;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public void setMetamodel(EPackage newMetamodel)
-  {
-    EPackage oldMetamodel = metamodel;
-    metamodel = newMetamodel;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL, oldMetamodel, metamodel));
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
   public EList<Unit> getUnits()
   {
     if (units == null)
@@ -147,9 +88,6 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL:
-        if (resolve) return getMetamodel();
-        return basicGetMetamodel();
       case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
         return getUnits();
     }
@@ -167,9 +105,6 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL:
-        setMetamodel((EPackage)newValue);
-        return;
       case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
         getUnits().clear();
         getUnits().addAll((Collection<? extends Unit>)newValue);
@@ -188,9 +123,6 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL:
-        setMetamodel((EPackage)null);
-        return;
       case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
         getUnits().clear();
         return;
@@ -208,8 +140,6 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__METAMODEL:
-        return metamodel != null;
       case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
         return units != null && !units.isEmpty();
     }

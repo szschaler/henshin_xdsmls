@@ -21,18 +21,17 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAntlrParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_STRING", "RULE_ID", "RULE_INT", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'metamodel'", "'step'", "'.'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_ID", "RULE_INT", "RULE_STRING", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'step'", "'.'"
     };
-    public static final int RULE_ID=5;
+    public static final int RULE_ID=4;
     public static final int RULE_WS=9;
-    public static final int RULE_STRING=4;
+    public static final int RULE_STRING=6;
     public static final int RULE_ANY_OTHER=10;
     public static final int RULE_SL_COMMENT=8;
-    public static final int RULE_INT=6;
+    public static final int RULE_INT=5;
     public static final int T__11=11;
     public static final int RULE_ML_COMMENT=7;
     public static final int T__12=12;
-    public static final int T__13=13;
     public static final int EOF=-1;
 
     // delegates
@@ -111,91 +110,61 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
 
 
     // $ANTLR start "ruleHenshinXDsmlSpecification"
-    // InternalHenshinXDsmlSpecification.g:71:1: ruleHenshinXDsmlSpecification returns [EObject current=null] : (otherlv_0= 'metamodel' ( (otherlv_1= RULE_STRING ) ) (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+ ) ;
+    // InternalHenshinXDsmlSpecification.g:71:1: ruleHenshinXDsmlSpecification returns [EObject current=null] : (otherlv_0= 'step' ( ( ruleQualifiedName ) ) )+ ;
     public final EObject ruleHenshinXDsmlSpecification() throws RecognitionException {
         EObject current = null;
 
         Token otherlv_0=null;
-        Token otherlv_1=null;
-        Token otherlv_2=null;
 
 
         	enterRule();
 
         try {
-            // InternalHenshinXDsmlSpecification.g:77:2: ( (otherlv_0= 'metamodel' ( (otherlv_1= RULE_STRING ) ) (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+ ) )
-            // InternalHenshinXDsmlSpecification.g:78:2: (otherlv_0= 'metamodel' ( (otherlv_1= RULE_STRING ) ) (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+ )
+            // InternalHenshinXDsmlSpecification.g:77:2: ( (otherlv_0= 'step' ( ( ruleQualifiedName ) ) )+ )
+            // InternalHenshinXDsmlSpecification.g:78:2: (otherlv_0= 'step' ( ( ruleQualifiedName ) ) )+
             {
-            // InternalHenshinXDsmlSpecification.g:78:2: (otherlv_0= 'metamodel' ( (otherlv_1= RULE_STRING ) ) (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+ )
-            // InternalHenshinXDsmlSpecification.g:79:3: otherlv_0= 'metamodel' ( (otherlv_1= RULE_STRING ) ) (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+
-            {
-            otherlv_0=(Token)match(input,11,FOLLOW_3); 
-
-            			newLeafNode(otherlv_0, grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelKeyword_0());
-            		
-            // InternalHenshinXDsmlSpecification.g:83:3: ( (otherlv_1= RULE_STRING ) )
-            // InternalHenshinXDsmlSpecification.g:84:4: (otherlv_1= RULE_STRING )
-            {
-            // InternalHenshinXDsmlSpecification.g:84:4: (otherlv_1= RULE_STRING )
-            // InternalHenshinXDsmlSpecification.g:85:5: otherlv_1= RULE_STRING
-            {
-
-            					if (current==null) {
-            						current = createModelElement(grammarAccess.getHenshinXDsmlSpecificationRule());
-            					}
-            				
-            otherlv_1=(Token)match(input,RULE_STRING,FOLLOW_4); 
-
-            					newLeafNode(otherlv_1, grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelEPackageCrossReference_1_0());
-            				
-
-            }
-
-
-            }
-
-            // InternalHenshinXDsmlSpecification.g:96:3: (otherlv_2= 'step' ( ( ruleQualifiedName ) ) )+
+            // InternalHenshinXDsmlSpecification.g:78:2: (otherlv_0= 'step' ( ( ruleQualifiedName ) ) )+
             int cnt1=0;
             loop1:
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
 
-                if ( (LA1_0==12) ) {
+                if ( (LA1_0==11) ) {
                     alt1=1;
                 }
 
 
                 switch (alt1) {
             	case 1 :
-            	    // InternalHenshinXDsmlSpecification.g:97:4: otherlv_2= 'step' ( ( ruleQualifiedName ) )
+            	    // InternalHenshinXDsmlSpecification.g:79:3: otherlv_0= 'step' ( ( ruleQualifiedName ) )
             	    {
-            	    otherlv_2=(Token)match(input,12,FOLLOW_5); 
+            	    otherlv_0=(Token)match(input,11,FOLLOW_3); 
 
-            	    				newLeafNode(otherlv_2, grammarAccess.getHenshinXDsmlSpecificationAccess().getStepKeyword_2_0());
-            	    			
-            	    // InternalHenshinXDsmlSpecification.g:101:4: ( ( ruleQualifiedName ) )
-            	    // InternalHenshinXDsmlSpecification.g:102:5: ( ruleQualifiedName )
+            	    			newLeafNode(otherlv_0, grammarAccess.getHenshinXDsmlSpecificationAccess().getStepKeyword_0());
+            	    		
+            	    // InternalHenshinXDsmlSpecification.g:83:3: ( ( ruleQualifiedName ) )
+            	    // InternalHenshinXDsmlSpecification.g:84:4: ( ruleQualifiedName )
             	    {
-            	    // InternalHenshinXDsmlSpecification.g:102:5: ( ruleQualifiedName )
-            	    // InternalHenshinXDsmlSpecification.g:103:6: ruleQualifiedName
+            	    // InternalHenshinXDsmlSpecification.g:84:4: ( ruleQualifiedName )
+            	    // InternalHenshinXDsmlSpecification.g:85:5: ruleQualifiedName
             	    {
 
-            	    						if (current==null) {
-            	    							current = createModelElement(grammarAccess.getHenshinXDsmlSpecificationRule());
-            	    						}
-            	    					
+            	    					if (current==null) {
+            	    						current = createModelElement(grammarAccess.getHenshinXDsmlSpecificationRule());
+            	    					}
+            	    				
 
-            	    						newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_2_1_0());
-            	    					
-            	    pushFollow(FOLLOW_6);
+            	    					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0());
+            	    				
+            	    pushFollow(FOLLOW_4);
             	    ruleQualifiedName();
 
             	    state._fsp--;
 
 
-            	    						afterParserOrEnumRuleCall();
-            	    					
+            	    					afterParserOrEnumRuleCall();
+            	    				
 
             	    }
 
@@ -219,9 +188,6 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
             }
 
 
-            }
-
-
             	leaveRule();
 
         }
@@ -238,7 +204,7 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
 
 
     // $ANTLR start "entryRuleQualifiedName"
-    // InternalHenshinXDsmlSpecification.g:122:1: entryRuleQualifiedName returns [String current=null] : iv_ruleQualifiedName= ruleQualifiedName EOF ;
+    // InternalHenshinXDsmlSpecification.g:103:1: entryRuleQualifiedName returns [String current=null] : iv_ruleQualifiedName= ruleQualifiedName EOF ;
     public final String entryRuleQualifiedName() throws RecognitionException {
         String current = null;
 
@@ -246,8 +212,8 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
 
 
         try {
-            // InternalHenshinXDsmlSpecification.g:122:53: (iv_ruleQualifiedName= ruleQualifiedName EOF )
-            // InternalHenshinXDsmlSpecification.g:123:2: iv_ruleQualifiedName= ruleQualifiedName EOF
+            // InternalHenshinXDsmlSpecification.g:103:53: (iv_ruleQualifiedName= ruleQualifiedName EOF )
+            // InternalHenshinXDsmlSpecification.g:104:2: iv_ruleQualifiedName= ruleQualifiedName EOF
             {
              newCompositeNode(grammarAccess.getQualifiedNameRule()); 
             pushFollow(FOLLOW_1);
@@ -274,7 +240,7 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
 
 
     // $ANTLR start "ruleQualifiedName"
-    // InternalHenshinXDsmlSpecification.g:129:1: ruleQualifiedName returns [AntlrDatatypeRuleToken current=new AntlrDatatypeRuleToken()] : (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ ) ;
+    // InternalHenshinXDsmlSpecification.g:110:1: ruleQualifiedName returns [AntlrDatatypeRuleToken current=new AntlrDatatypeRuleToken()] : (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ ) ;
     public final AntlrDatatypeRuleToken ruleQualifiedName() throws RecognitionException {
         AntlrDatatypeRuleToken current = new AntlrDatatypeRuleToken();
 
@@ -286,41 +252,41 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
         	enterRule();
 
         try {
-            // InternalHenshinXDsmlSpecification.g:135:2: ( (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ ) )
-            // InternalHenshinXDsmlSpecification.g:136:2: (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ )
+            // InternalHenshinXDsmlSpecification.g:116:2: ( (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ ) )
+            // InternalHenshinXDsmlSpecification.g:117:2: (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ )
             {
-            // InternalHenshinXDsmlSpecification.g:136:2: (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ )
-            // InternalHenshinXDsmlSpecification.g:137:3: this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+
+            // InternalHenshinXDsmlSpecification.g:117:2: (this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+ )
+            // InternalHenshinXDsmlSpecification.g:118:3: this_ID_0= RULE_ID (kw= '.' this_ID_2= RULE_ID )+
             {
-            this_ID_0=(Token)match(input,RULE_ID,FOLLOW_7); 
+            this_ID_0=(Token)match(input,RULE_ID,FOLLOW_5); 
 
             			current.merge(this_ID_0);
             		
 
             			newLeafNode(this_ID_0, grammarAccess.getQualifiedNameAccess().getIDTerminalRuleCall_0());
             		
-            // InternalHenshinXDsmlSpecification.g:144:3: (kw= '.' this_ID_2= RULE_ID )+
+            // InternalHenshinXDsmlSpecification.g:125:3: (kw= '.' this_ID_2= RULE_ID )+
             int cnt2=0;
             loop2:
             do {
                 int alt2=2;
                 int LA2_0 = input.LA(1);
 
-                if ( (LA2_0==13) ) {
+                if ( (LA2_0==12) ) {
                     alt2=1;
                 }
 
 
                 switch (alt2) {
             	case 1 :
-            	    // InternalHenshinXDsmlSpecification.g:145:4: kw= '.' this_ID_2= RULE_ID
+            	    // InternalHenshinXDsmlSpecification.g:126:4: kw= '.' this_ID_2= RULE_ID
             	    {
-            	    kw=(Token)match(input,13,FOLLOW_5); 
+            	    kw=(Token)match(input,12,FOLLOW_3); 
 
             	    				current.merge(kw);
             	    				newLeafNode(kw, grammarAccess.getQualifiedNameAccess().getFullStopKeyword_1_0());
             	    			
-            	    this_ID_2=(Token)match(input,RULE_ID,FOLLOW_8); 
+            	    this_ID_2=(Token)match(input,RULE_ID,FOLLOW_6); 
 
             	    				current.merge(this_ID_2);
             	    			
@@ -369,10 +335,8 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
     public static final BitSet FOLLOW_1 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_2 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_3 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_4 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_5 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_4 = new BitSet(new long[]{0x0000000000000802L});
+    public static final BitSet FOLLOW_5 = new BitSet(new long[]{0x0000000000001000L});
     public static final BitSet FOLLOW_6 = new BitSet(new long[]{0x0000000000001002L});
-    public static final BitSet FOLLOW_7 = new BitSet(new long[]{0x0000000000002000L});
-    public static final BitSet FOLLOW_8 = new BitSet(new long[]{0x0000000000002002L});
 
 }

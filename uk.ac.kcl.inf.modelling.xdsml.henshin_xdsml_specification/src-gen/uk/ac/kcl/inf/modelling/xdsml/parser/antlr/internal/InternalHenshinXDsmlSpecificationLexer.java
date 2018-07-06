@@ -12,16 +12,15 @@ import java.util.ArrayList;
 
 @SuppressWarnings("all")
 public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
-    public static final int RULE_ID=5;
+    public static final int RULE_ID=4;
     public static final int RULE_WS=9;
-    public static final int RULE_STRING=4;
+    public static final int RULE_STRING=6;
     public static final int RULE_ANY_OTHER=10;
     public static final int RULE_SL_COMMENT=8;
-    public static final int RULE_INT=6;
+    public static final int RULE_INT=5;
     public static final int T__11=11;
     public static final int RULE_ML_COMMENT=7;
     public static final int T__12=12;
-    public static final int T__13=13;
     public static final int EOF=-1;
 
     // delegates
@@ -42,10 +41,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = T__11;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:11:7: ( 'metamodel' )
-            // InternalHenshinXDsmlSpecification.g:11:9: 'metamodel'
+            // InternalHenshinXDsmlSpecification.g:11:7: ( 'step' )
+            // InternalHenshinXDsmlSpecification.g:11:9: 'step'
             {
-            match("metamodel"); 
+            match("step"); 
 
 
             }
@@ -63,29 +62,8 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = T__12;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:12:7: ( 'step' )
-            // InternalHenshinXDsmlSpecification.g:12:9: 'step'
-            {
-            match("step"); 
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__12"
-
-    // $ANTLR start "T__13"
-    public final void mT__13() throws RecognitionException {
-        try {
-            int _type = T__13;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:13:7: ( '.' )
-            // InternalHenshinXDsmlSpecification.g:13:9: '.'
+            // InternalHenshinXDsmlSpecification.g:12:7: ( '.' )
+            // InternalHenshinXDsmlSpecification.g:12:9: '.'
             {
             match('.'); 
 
@@ -97,17 +75,17 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "T__13"
+    // $ANTLR end "T__12"
 
     // $ANTLR start "RULE_ID"
     public final void mRULE_ID() throws RecognitionException {
         try {
             int _type = RULE_ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:161:9: ( ( '^' )? ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
-            // InternalHenshinXDsmlSpecification.g:161:11: ( '^' )? ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // InternalHenshinXDsmlSpecification.g:142:9: ( ( '^' )? ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
+            // InternalHenshinXDsmlSpecification.g:142:11: ( '^' )? ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             {
-            // InternalHenshinXDsmlSpecification.g:161:11: ( '^' )?
+            // InternalHenshinXDsmlSpecification.g:142:11: ( '^' )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -116,7 +94,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // InternalHenshinXDsmlSpecification.g:161:11: '^'
+                    // InternalHenshinXDsmlSpecification.g:142:11: '^'
                     {
                     match('^'); 
 
@@ -134,7 +112,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // InternalHenshinXDsmlSpecification.g:161:40: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // InternalHenshinXDsmlSpecification.g:142:40: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             loop2:
             do {
                 int alt2=2;
@@ -183,10 +161,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:163:10: ( ( '0' .. '9' )+ )
-            // InternalHenshinXDsmlSpecification.g:163:12: ( '0' .. '9' )+
+            // InternalHenshinXDsmlSpecification.g:144:10: ( ( '0' .. '9' )+ )
+            // InternalHenshinXDsmlSpecification.g:144:12: ( '0' .. '9' )+
             {
-            // InternalHenshinXDsmlSpecification.g:163:12: ( '0' .. '9' )+
+            // InternalHenshinXDsmlSpecification.g:144:12: ( '0' .. '9' )+
             int cnt3=0;
             loop3:
             do {
@@ -200,7 +178,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // InternalHenshinXDsmlSpecification.g:163:13: '0' .. '9'
+            	    // InternalHenshinXDsmlSpecification.g:144:13: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -232,10 +210,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:165:13: ( ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' ) )
-            // InternalHenshinXDsmlSpecification.g:165:15: ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' )
+            // InternalHenshinXDsmlSpecification.g:146:13: ( ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' ) )
+            // InternalHenshinXDsmlSpecification.g:146:15: ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' )
             {
-            // InternalHenshinXDsmlSpecification.g:165:15: ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' )
+            // InternalHenshinXDsmlSpecification.g:146:15: ( '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"' | '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\'' )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -253,10 +231,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
             }
             switch (alt6) {
                 case 1 :
-                    // InternalHenshinXDsmlSpecification.g:165:16: '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"'
+                    // InternalHenshinXDsmlSpecification.g:146:16: '\"' ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )* '\"'
                     {
                     match('\"'); 
-                    // InternalHenshinXDsmlSpecification.g:165:20: ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )*
+                    // InternalHenshinXDsmlSpecification.g:146:20: ( '\\\\' . | ~ ( ( '\\\\' | '\"' ) ) )*
                     loop4:
                     do {
                         int alt4=3;
@@ -272,7 +250,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
                         switch (alt4) {
                     	case 1 :
-                    	    // InternalHenshinXDsmlSpecification.g:165:21: '\\\\' .
+                    	    // InternalHenshinXDsmlSpecification.g:146:21: '\\\\' .
                     	    {
                     	    match('\\'); 
                     	    matchAny(); 
@@ -280,7 +258,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                     	    }
                     	    break;
                     	case 2 :
-                    	    // InternalHenshinXDsmlSpecification.g:165:28: ~ ( ( '\\\\' | '\"' ) )
+                    	    // InternalHenshinXDsmlSpecification.g:146:28: ~ ( ( '\\\\' | '\"' ) )
                     	    {
                     	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
                     	        input.consume();
@@ -305,10 +283,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // InternalHenshinXDsmlSpecification.g:165:48: '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\''
+                    // InternalHenshinXDsmlSpecification.g:146:48: '\\'' ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )* '\\''
                     {
                     match('\''); 
-                    // InternalHenshinXDsmlSpecification.g:165:53: ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )*
+                    // InternalHenshinXDsmlSpecification.g:146:53: ( '\\\\' . | ~ ( ( '\\\\' | '\\'' ) ) )*
                     loop5:
                     do {
                         int alt5=3;
@@ -324,7 +302,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
                         switch (alt5) {
                     	case 1 :
-                    	    // InternalHenshinXDsmlSpecification.g:165:54: '\\\\' .
+                    	    // InternalHenshinXDsmlSpecification.g:146:54: '\\\\' .
                     	    {
                     	    match('\\'); 
                     	    matchAny(); 
@@ -332,7 +310,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                     	    }
                     	    break;
                     	case 2 :
-                    	    // InternalHenshinXDsmlSpecification.g:165:61: ~ ( ( '\\\\' | '\\'' ) )
+                    	    // InternalHenshinXDsmlSpecification.g:146:61: ~ ( ( '\\\\' | '\\'' ) )
                     	    {
                     	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
                     	        input.consume();
@@ -375,12 +353,12 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_ML_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:167:17: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // InternalHenshinXDsmlSpecification.g:167:19: '/*' ( options {greedy=false; } : . )* '*/'
+            // InternalHenshinXDsmlSpecification.g:148:17: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // InternalHenshinXDsmlSpecification.g:148:19: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // InternalHenshinXDsmlSpecification.g:167:24: ( options {greedy=false; } : . )*
+            // InternalHenshinXDsmlSpecification.g:148:24: ( options {greedy=false; } : . )*
             loop7:
             do {
                 int alt7=2;
@@ -405,7 +383,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // InternalHenshinXDsmlSpecification.g:167:52: .
+            	    // InternalHenshinXDsmlSpecification.g:148:52: .
             	    {
             	    matchAny(); 
 
@@ -435,12 +413,12 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_SL_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:169:17: ( '//' (~ ( ( '\\n' | '\\r' ) ) )* ( ( '\\r' )? '\\n' )? )
-            // InternalHenshinXDsmlSpecification.g:169:19: '//' (~ ( ( '\\n' | '\\r' ) ) )* ( ( '\\r' )? '\\n' )?
+            // InternalHenshinXDsmlSpecification.g:150:17: ( '//' (~ ( ( '\\n' | '\\r' ) ) )* ( ( '\\r' )? '\\n' )? )
+            // InternalHenshinXDsmlSpecification.g:150:19: '//' (~ ( ( '\\n' | '\\r' ) ) )* ( ( '\\r' )? '\\n' )?
             {
             match("//"); 
 
-            // InternalHenshinXDsmlSpecification.g:169:24: (~ ( ( '\\n' | '\\r' ) ) )*
+            // InternalHenshinXDsmlSpecification.g:150:24: (~ ( ( '\\n' | '\\r' ) ) )*
             loop8:
             do {
                 int alt8=2;
@@ -453,7 +431,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
                 switch (alt8) {
             	case 1 :
-            	    // InternalHenshinXDsmlSpecification.g:169:24: ~ ( ( '\\n' | '\\r' ) )
+            	    // InternalHenshinXDsmlSpecification.g:150:24: ~ ( ( '\\n' | '\\r' ) )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -473,7 +451,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                 }
             } while (true);
 
-            // InternalHenshinXDsmlSpecification.g:169:40: ( ( '\\r' )? '\\n' )?
+            // InternalHenshinXDsmlSpecification.g:150:40: ( ( '\\r' )? '\\n' )?
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -482,9 +460,9 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
             }
             switch (alt10) {
                 case 1 :
-                    // InternalHenshinXDsmlSpecification.g:169:41: ( '\\r' )? '\\n'
+                    // InternalHenshinXDsmlSpecification.g:150:41: ( '\\r' )? '\\n'
                     {
-                    // InternalHenshinXDsmlSpecification.g:169:41: ( '\\r' )?
+                    // InternalHenshinXDsmlSpecification.g:150:41: ( '\\r' )?
                     int alt9=2;
                     int LA9_0 = input.LA(1);
 
@@ -493,7 +471,7 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                     }
                     switch (alt9) {
                         case 1 :
-                            // InternalHenshinXDsmlSpecification.g:169:41: '\\r'
+                            // InternalHenshinXDsmlSpecification.g:150:41: '\\r'
                             {
                             match('\r'); 
 
@@ -525,10 +503,10 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:171:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
-            // InternalHenshinXDsmlSpecification.g:171:11: ( ' ' | '\\t' | '\\r' | '\\n' )+
+            // InternalHenshinXDsmlSpecification.g:152:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
+            // InternalHenshinXDsmlSpecification.g:152:11: ( ' ' | '\\t' | '\\r' | '\\n' )+
             {
-            // InternalHenshinXDsmlSpecification.g:171:11: ( ' ' | '\\t' | '\\r' | '\\n' )+
+            // InternalHenshinXDsmlSpecification.g:152:11: ( ' ' | '\\t' | '\\r' | '\\n' )+
             int cnt11=0;
             loop11:
             do {
@@ -582,8 +560,8 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
         try {
             int _type = RULE_ANY_OTHER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // InternalHenshinXDsmlSpecification.g:173:16: ( . )
-            // InternalHenshinXDsmlSpecification.g:173:18: .
+            // InternalHenshinXDsmlSpecification.g:154:16: ( . )
+            // InternalHenshinXDsmlSpecification.g:154:18: .
             {
             matchAny(); 
 
@@ -598,8 +576,8 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
     // $ANTLR end "RULE_ANY_OTHER"
 
     public void mTokens() throws RecognitionException {
-        // InternalHenshinXDsmlSpecification.g:1:8: ( T__11 | T__12 | T__13 | RULE_ID | RULE_INT | RULE_STRING | RULE_ML_COMMENT | RULE_SL_COMMENT | RULE_WS | RULE_ANY_OTHER )
-        int alt12=10;
+        // InternalHenshinXDsmlSpecification.g:1:8: ( T__11 | T__12 | RULE_ID | RULE_INT | RULE_STRING | RULE_ML_COMMENT | RULE_SL_COMMENT | RULE_WS | RULE_ANY_OTHER )
+        int alt12=9;
         alt12 = dfa12.predict(input);
         switch (alt12) {
             case 1 :
@@ -617,56 +595,49 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                 }
                 break;
             case 3 :
-                // InternalHenshinXDsmlSpecification.g:1:22: T__13
-                {
-                mT__13(); 
-
-                }
-                break;
-            case 4 :
-                // InternalHenshinXDsmlSpecification.g:1:28: RULE_ID
+                // InternalHenshinXDsmlSpecification.g:1:22: RULE_ID
                 {
                 mRULE_ID(); 
 
                 }
                 break;
-            case 5 :
-                // InternalHenshinXDsmlSpecification.g:1:36: RULE_INT
+            case 4 :
+                // InternalHenshinXDsmlSpecification.g:1:30: RULE_INT
                 {
                 mRULE_INT(); 
 
                 }
                 break;
-            case 6 :
-                // InternalHenshinXDsmlSpecification.g:1:45: RULE_STRING
+            case 5 :
+                // InternalHenshinXDsmlSpecification.g:1:39: RULE_STRING
                 {
                 mRULE_STRING(); 
 
                 }
                 break;
-            case 7 :
-                // InternalHenshinXDsmlSpecification.g:1:57: RULE_ML_COMMENT
+            case 6 :
+                // InternalHenshinXDsmlSpecification.g:1:51: RULE_ML_COMMENT
                 {
                 mRULE_ML_COMMENT(); 
 
                 }
                 break;
-            case 8 :
-                // InternalHenshinXDsmlSpecification.g:1:73: RULE_SL_COMMENT
+            case 7 :
+                // InternalHenshinXDsmlSpecification.g:1:67: RULE_SL_COMMENT
                 {
                 mRULE_SL_COMMENT(); 
 
                 }
                 break;
-            case 9 :
-                // InternalHenshinXDsmlSpecification.g:1:89: RULE_WS
+            case 8 :
+                // InternalHenshinXDsmlSpecification.g:1:83: RULE_WS
                 {
                 mRULE_WS(); 
 
                 }
                 break;
-            case 10 :
-                // InternalHenshinXDsmlSpecification.g:1:97: RULE_ANY_OTHER
+            case 9 :
+                // InternalHenshinXDsmlSpecification.g:1:91: RULE_ANY_OTHER
                 {
                 mRULE_ANY_OTHER(); 
 
@@ -680,49 +651,39 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
 
     protected DFA12 dfa12 = new DFA12(this);
     static final String DFA12_eotS =
-        "\1\uffff\2\15\1\uffff\1\13\2\uffff\3\13\2\uffff\1\15\1\uffff\1\15\6\uffff\3\15\1\32\1\15\1\uffff\3\15\1\37\1\uffff";
+        "\1\uffff\1\14\1\uffff\1\12\2\uffff\3\12\2\uffff\1\14\7\uffff\1\14\1\25\1\uffff";
     static final String DFA12_eofS =
-        "\40\uffff";
+        "\26\uffff";
     static final String DFA12_minS =
-        "\1\0\1\145\1\164\1\uffff\1\101\2\uffff\2\0\1\52\2\uffff\1\164\1\uffff\1\145\6\uffff\1\141\1\160\1\155\1\60\1\157\1\uffff\1\144\1\145\1\154\1\60\1\uffff";
+        "\1\0\1\164\1\uffff\1\101\2\uffff\2\0\1\52\2\uffff\1\145\7\uffff\1\160\1\60\1\uffff";
     static final String DFA12_maxS =
-        "\1\uffff\1\145\1\164\1\uffff\1\172\2\uffff\2\uffff\1\57\2\uffff\1\164\1\uffff\1\145\6\uffff\1\141\1\160\1\155\1\172\1\157\1\uffff\1\144\1\145\1\154\1\172\1\uffff";
+        "\1\uffff\1\164\1\uffff\1\172\2\uffff\2\uffff\1\57\2\uffff\1\145\7\uffff\1\160\1\172\1\uffff";
     static final String DFA12_acceptS =
-        "\3\uffff\1\3\1\uffff\1\4\1\5\3\uffff\1\11\1\12\1\uffff\1\4\1\uffff\1\3\1\5\1\6\1\7\1\10\1\11\5\uffff\1\2\4\uffff\1\1";
+        "\2\uffff\1\2\1\uffff\1\3\1\4\3\uffff\1\10\1\11\1\uffff\1\3\1\2\1\4\1\5\1\6\1\7\1\10\2\uffff\1\1";
     static final String DFA12_specialS =
-        "\1\1\6\uffff\1\2\1\0\27\uffff}>";
+        "\1\0\5\uffff\1\1\1\2\16\uffff}>";
     static final String[] DFA12_transitionS = {
-            "\11\13\2\12\2\13\1\12\22\13\1\12\1\13\1\7\4\13\1\10\6\13\1\3\1\11\12\6\7\13\32\5\3\13\1\4\1\5\1\13\14\5\1\1\5\5\1\2\7\5\uff85\13",
-            "\1\14",
-            "\1\16",
+            "\11\12\2\11\2\12\1\11\22\12\1\11\1\12\1\6\4\12\1\7\6\12\1\2\1\10\12\5\7\12\32\4\3\12\1\3\1\4\1\12\22\4\1\1\7\4\uff85\12",
+            "\1\13",
             "",
-            "\32\15\4\uffff\1\15\1\uffff\32\15",
-            "",
-            "",
-            "\0\21",
-            "\0\21",
-            "\1\22\4\uffff\1\23",
+            "\32\14\4\uffff\1\14\1\uffff\32\14",
             "",
             "",
-            "\1\25",
+            "\0\17",
+            "\0\17",
+            "\1\20\4\uffff\1\21",
             "",
-            "\1\26",
+            "",
+            "\1\23",
             "",
             "",
             "",
             "",
             "",
             "",
-            "\1\27",
-            "\1\30",
-            "\1\31",
-            "\12\15\7\uffff\32\15\4\uffff\1\15\1\uffff\32\15",
-            "\1\33",
             "",
-            "\1\34",
-            "\1\35",
-            "\1\36",
-            "\12\15\7\uffff\32\15\4\uffff\1\15\1\uffff\32\15",
+            "\1\24",
+            "\12\14\7\uffff\32\14\4\uffff\1\14\1\uffff\32\14",
             ""
     };
 
@@ -756,47 +717,45 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
             this.transition = DFA12_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__11 | T__12 | T__13 | RULE_ID | RULE_INT | RULE_STRING | RULE_ML_COMMENT | RULE_SL_COMMENT | RULE_WS | RULE_ANY_OTHER );";
+            return "1:1: Tokens : ( T__11 | T__12 | RULE_ID | RULE_INT | RULE_STRING | RULE_ML_COMMENT | RULE_SL_COMMENT | RULE_WS | RULE_ANY_OTHER );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             IntStream input = _input;
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA12_8 = input.LA(1);
+                        int LA12_0 = input.LA(1);
 
                         s = -1;
-                        if ( ((LA12_8>='\u0000' && LA12_8<='\uFFFF')) ) {s = 17;}
+                        if ( (LA12_0=='s') ) {s = 1;}
 
-                        else s = 11;
+                        else if ( (LA12_0=='.') ) {s = 2;}
+
+                        else if ( (LA12_0=='^') ) {s = 3;}
+
+                        else if ( ((LA12_0>='A' && LA12_0<='Z')||LA12_0=='_'||(LA12_0>='a' && LA12_0<='r')||(LA12_0>='t' && LA12_0<='z')) ) {s = 4;}
+
+                        else if ( ((LA12_0>='0' && LA12_0<='9')) ) {s = 5;}
+
+                        else if ( (LA12_0=='\"') ) {s = 6;}
+
+                        else if ( (LA12_0=='\'') ) {s = 7;}
+
+                        else if ( (LA12_0=='/') ) {s = 8;}
+
+                        else if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0=='\r'||LA12_0==' ') ) {s = 9;}
+
+                        else if ( ((LA12_0>='\u0000' && LA12_0<='\b')||(LA12_0>='\u000B' && LA12_0<='\f')||(LA12_0>='\u000E' && LA12_0<='\u001F')||LA12_0=='!'||(LA12_0>='#' && LA12_0<='&')||(LA12_0>='(' && LA12_0<='-')||(LA12_0>=':' && LA12_0<='@')||(LA12_0>='[' && LA12_0<=']')||LA12_0=='`'||(LA12_0>='{' && LA12_0<='\uFFFF')) ) {s = 10;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA12_0 = input.LA(1);
+                        int LA12_6 = input.LA(1);
 
                         s = -1;
-                        if ( (LA12_0=='m') ) {s = 1;}
+                        if ( ((LA12_6>='\u0000' && LA12_6<='\uFFFF')) ) {s = 15;}
 
-                        else if ( (LA12_0=='s') ) {s = 2;}
-
-                        else if ( (LA12_0=='.') ) {s = 3;}
-
-                        else if ( (LA12_0=='^') ) {s = 4;}
-
-                        else if ( ((LA12_0>='A' && LA12_0<='Z')||LA12_0=='_'||(LA12_0>='a' && LA12_0<='l')||(LA12_0>='n' && LA12_0<='r')||(LA12_0>='t' && LA12_0<='z')) ) {s = 5;}
-
-                        else if ( ((LA12_0>='0' && LA12_0<='9')) ) {s = 6;}
-
-                        else if ( (LA12_0=='\"') ) {s = 7;}
-
-                        else if ( (LA12_0=='\'') ) {s = 8;}
-
-                        else if ( (LA12_0=='/') ) {s = 9;}
-
-                        else if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0=='\r'||LA12_0==' ') ) {s = 10;}
-
-                        else if ( ((LA12_0>='\u0000' && LA12_0<='\b')||(LA12_0>='\u000B' && LA12_0<='\f')||(LA12_0>='\u000E' && LA12_0<='\u001F')||LA12_0=='!'||(LA12_0>='#' && LA12_0<='&')||(LA12_0>='(' && LA12_0<='-')||(LA12_0>=':' && LA12_0<='@')||(LA12_0>='[' && LA12_0<=']')||LA12_0=='`'||(LA12_0>='{' && LA12_0<='\uFFFF')) ) {s = 11;}
+                        else s = 10;
 
                         if ( s>=0 ) return s;
                         break;
@@ -804,9 +763,9 @@ public class InternalHenshinXDsmlSpecificationLexer extends Lexer {
                         int LA12_7 = input.LA(1);
 
                         s = -1;
-                        if ( ((LA12_7>='\u0000' && LA12_7<='\uFFFF')) ) {s = 17;}
+                        if ( ((LA12_7>='\u0000' && LA12_7<='\uFFFF')) ) {s = 15;}
 
-                        else s = 11;
+                        else s = 10;
 
                         if ( s>=0 ) return s;
                         break;

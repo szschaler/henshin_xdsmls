@@ -67,22 +67,13 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
   int HENSHIN_XDSML_SPECIFICATION = 0;
 
   /**
-   * The feature id for the '<em><b>Metamodel</b></em>' reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int HENSHIN_XDSML_SPECIFICATION__METAMODEL = 0;
-
-  /**
    * The feature id for the '<em><b>Units</b></em>' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int HENSHIN_XDSML_SPECIFICATION__UNITS = 1;
+  int HENSHIN_XDSML_SPECIFICATION__UNITS = 0;
 
   /**
    * The number of structural features of the '<em>Henshin XDsml Specification</em>' class.
@@ -91,7 +82,7 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
    * @generated
    * @ordered
    */
-  int HENSHIN_XDSML_SPECIFICATION_FEATURE_COUNT = 2;
+  int HENSHIN_XDSML_SPECIFICATION_FEATURE_COUNT = 1;
 
 
   /**
@@ -103,17 +94,6 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
    * @generated
    */
   EClass getHenshinXDsmlSpecification();
-
-  /**
-   * Returns the meta object for the reference '{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getMetamodel <em>Metamodel</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the reference '<em>Metamodel</em>'.
-   * @see uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getMetamodel()
-   * @see #getHenshinXDsmlSpecification()
-   * @generated
-   */
-  EReference getHenshinXDsmlSpecification_Metamodel();
 
   /**
    * Returns the meta object for the reference list '{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getUnits <em>Units</em>}'.
@@ -158,14 +138,6 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
      * @generated
      */
     EClass HENSHIN_XDSML_SPECIFICATION = eINSTANCE.getHenshinXDsmlSpecification();
-
-    /**
-     * The meta object literal for the '<em><b>Metamodel</b></em>' reference feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference HENSHIN_XDSML_SPECIFICATION__METAMODEL = eINSTANCE.getHenshinXDsmlSpecification_Metamodel();
 
     /**
      * The meta object literal for the '<em><b>Units</b></em>' reference list feature.

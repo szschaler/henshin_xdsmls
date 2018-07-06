@@ -25,49 +25,29 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 	public class HenshinXDsmlSpecificationElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.HenshinXDsmlSpecification");
 		private final Group cGroup = (Group)rule.eContents().get(1);
-		private final Keyword cMetamodelKeyword_0 = (Keyword)cGroup.eContents().get(0);
-		private final Assignment cMetamodelAssignment_1 = (Assignment)cGroup.eContents().get(1);
-		private final CrossReference cMetamodelEPackageCrossReference_1_0 = (CrossReference)cMetamodelAssignment_1.eContents().get(0);
-		private final RuleCall cMetamodelEPackageSTRINGTerminalRuleCall_1_0_1 = (RuleCall)cMetamodelEPackageCrossReference_1_0.eContents().get(1);
-		private final Group cGroup_2 = (Group)cGroup.eContents().get(2);
-		private final Keyword cStepKeyword_2_0 = (Keyword)cGroup_2.eContents().get(0);
-		private final Assignment cUnitsAssignment_2_1 = (Assignment)cGroup_2.eContents().get(1);
-		private final CrossReference cUnitsUnitCrossReference_2_1_0 = (CrossReference)cUnitsAssignment_2_1.eContents().get(0);
-		private final RuleCall cUnitsUnitQualifiedNameParserRuleCall_2_1_0_1 = (RuleCall)cUnitsUnitCrossReference_2_1_0.eContents().get(1);
+		private final Keyword cStepKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Assignment cUnitsAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final CrossReference cUnitsUnitCrossReference_1_0 = (CrossReference)cUnitsAssignment_1.eContents().get(0);
+		private final RuleCall cUnitsUnitQualifiedNameParserRuleCall_1_0_1 = (RuleCall)cUnitsUnitCrossReference_1_0.eContents().get(1);
 		
 		//HenshinXDsmlSpecification:
-		//	'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+;
+		//	('step' units+=[henshin::Unit|QualifiedName])+;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+
+		//('step' units+=[henshin::Unit|QualifiedName])+
 		public Group getGroup() { return cGroup; }
 		
-		//'metamodel'
-		public Keyword getMetamodelKeyword_0() { return cMetamodelKeyword_0; }
-		
-		//metamodel=[ecore::EPackage|STRING]
-		public Assignment getMetamodelAssignment_1() { return cMetamodelAssignment_1; }
-		
-		//[ecore::EPackage|STRING]
-		public CrossReference getMetamodelEPackageCrossReference_1_0() { return cMetamodelEPackageCrossReference_1_0; }
-		
-		//STRING
-		public RuleCall getMetamodelEPackageSTRINGTerminalRuleCall_1_0_1() { return cMetamodelEPackageSTRINGTerminalRuleCall_1_0_1; }
-		
-		//('step' units+=[henshin::Unit|QualifiedName])+
-		public Group getGroup_2() { return cGroup_2; }
-		
 		//'step'
-		public Keyword getStepKeyword_2_0() { return cStepKeyword_2_0; }
+		public Keyword getStepKeyword_0() { return cStepKeyword_0; }
 		
 		//units+=[henshin::Unit|QualifiedName]
-		public Assignment getUnitsAssignment_2_1() { return cUnitsAssignment_2_1; }
+		public Assignment getUnitsAssignment_1() { return cUnitsAssignment_1; }
 		
 		//[henshin::Unit|QualifiedName]
-		public CrossReference getUnitsUnitCrossReference_2_1_0() { return cUnitsUnitCrossReference_2_1_0; }
+		public CrossReference getUnitsUnitCrossReference_1_0() { return cUnitsUnitCrossReference_1_0; }
 		
 		//QualifiedName
-		public RuleCall getUnitsUnitQualifiedNameParserRuleCall_2_1_0_1() { return cUnitsUnitQualifiedNameParserRuleCall_2_1_0_1; }
+		public RuleCall getUnitsUnitQualifiedNameParserRuleCall_1_0_1() { return cUnitsUnitQualifiedNameParserRuleCall_1_0_1; }
 	}
 	public class QualifiedNameElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.QualifiedName");
@@ -142,7 +122,7 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 
 	
 	//HenshinXDsmlSpecification:
-	//	'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+;
+	//	('step' units+=[henshin::Unit|QualifiedName])+;
 	public HenshinXDsmlSpecificationElements getHenshinXDsmlSpecificationAccess() {
 		return pHenshinXDsmlSpecification;
 	}
