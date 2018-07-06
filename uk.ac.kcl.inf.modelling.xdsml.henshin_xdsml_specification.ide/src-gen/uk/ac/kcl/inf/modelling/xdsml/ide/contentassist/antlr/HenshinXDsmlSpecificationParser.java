@@ -32,9 +32,11 @@ public class HenshinXDsmlSpecificationParser extends AbstractContentAssistParser
 				private static final long serialVersionUID = 1L;
 				{
 					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getGroup(), "rule__HenshinXDsmlSpecification__Group__0");
-					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getGroup_4(), "rule__HenshinXDsmlSpecification__Group_4__0");
-					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelAssignment_2(), "rule__HenshinXDsmlSpecification__MetamodelAssignment_2");
-					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_4_1(), "rule__HenshinXDsmlSpecification__UnitsAssignment_4_1");
+					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getGroup_2(), "rule__HenshinXDsmlSpecification__Group_2__0");
+					put(grammarAccess.getQualifiedNameAccess().getGroup(), "rule__QualifiedName__Group__0");
+					put(grammarAccess.getQualifiedNameAccess().getGroup_1(), "rule__QualifiedName__Group_1__0");
+					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getMetamodelAssignment_1(), "rule__HenshinXDsmlSpecification__MetamodelAssignment_1");
+					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_2_1(), "rule__HenshinXDsmlSpecification__UnitsAssignment_2_1");
 				}
 			};
 		}

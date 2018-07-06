@@ -28,4 +28,7 @@ public abstract class AbstractHenshinXDsmlSpecificationProposalProvider extends 
 	public void complete_HenshinXDsmlSpecification(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		// subclasses may override
 	}
+	public void complete_QualifiedName(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		// subclasses may override
+	}
 }

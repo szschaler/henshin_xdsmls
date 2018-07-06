@@ -26,60 +26,80 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.HenshinXDsmlSpecification");
 		private final Group cGroup = (Group)rule.eContents().get(1);
 		private final Keyword cMetamodelKeyword_0 = (Keyword)cGroup.eContents().get(0);
-		private final Keyword cQuotationMarkKeyword_1 = (Keyword)cGroup.eContents().get(1);
-		private final Assignment cMetamodelAssignment_2 = (Assignment)cGroup.eContents().get(2);
-		private final CrossReference cMetamodelEPackageCrossReference_2_0 = (CrossReference)cMetamodelAssignment_2.eContents().get(0);
-		private final RuleCall cMetamodelEPackageIDTerminalRuleCall_2_0_1 = (RuleCall)cMetamodelEPackageCrossReference_2_0.eContents().get(1);
-		private final Keyword cQuotationMarkKeyword_3 = (Keyword)cGroup.eContents().get(3);
-		private final Group cGroup_4 = (Group)cGroup.eContents().get(4);
-		private final Keyword cStepKeyword_4_0 = (Keyword)cGroup_4.eContents().get(0);
-		private final Assignment cUnitsAssignment_4_1 = (Assignment)cGroup_4.eContents().get(1);
-		private final CrossReference cUnitsUnitCrossReference_4_1_0 = (CrossReference)cUnitsAssignment_4_1.eContents().get(0);
-		private final RuleCall cUnitsUnitIDTerminalRuleCall_4_1_0_1 = (RuleCall)cUnitsUnitCrossReference_4_1_0.eContents().get(1);
+		private final Assignment cMetamodelAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final CrossReference cMetamodelEPackageCrossReference_1_0 = (CrossReference)cMetamodelAssignment_1.eContents().get(0);
+		private final RuleCall cMetamodelEPackageSTRINGTerminalRuleCall_1_0_1 = (RuleCall)cMetamodelEPackageCrossReference_1_0.eContents().get(1);
+		private final Group cGroup_2 = (Group)cGroup.eContents().get(2);
+		private final Keyword cStepKeyword_2_0 = (Keyword)cGroup_2.eContents().get(0);
+		private final Assignment cUnitsAssignment_2_1 = (Assignment)cGroup_2.eContents().get(1);
+		private final CrossReference cUnitsUnitCrossReference_2_1_0 = (CrossReference)cUnitsAssignment_2_1.eContents().get(0);
+		private final RuleCall cUnitsUnitQualifiedNameParserRuleCall_2_1_0_1 = (RuleCall)cUnitsUnitCrossReference_2_1_0.eContents().get(1);
 		
 		//HenshinXDsmlSpecification:
-		//	'metamodel' '"' metamodel=[ecore::EPackage] '"' ('step' units+=[henshin::Unit])+;
+		//	'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//'metamodel' '"' metamodel=[ecore::EPackage] '"' ('step' units+=[henshin::Unit])+
+		//'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+
 		public Group getGroup() { return cGroup; }
 		
 		//'metamodel'
 		public Keyword getMetamodelKeyword_0() { return cMetamodelKeyword_0; }
 		
-		//'"'
-		public Keyword getQuotationMarkKeyword_1() { return cQuotationMarkKeyword_1; }
+		//metamodel=[ecore::EPackage|STRING]
+		public Assignment getMetamodelAssignment_1() { return cMetamodelAssignment_1; }
 		
-		//metamodel=[ecore::EPackage]
-		public Assignment getMetamodelAssignment_2() { return cMetamodelAssignment_2; }
+		//[ecore::EPackage|STRING]
+		public CrossReference getMetamodelEPackageCrossReference_1_0() { return cMetamodelEPackageCrossReference_1_0; }
 		
-		//[ecore::EPackage]
-		public CrossReference getMetamodelEPackageCrossReference_2_0() { return cMetamodelEPackageCrossReference_2_0; }
+		//STRING
+		public RuleCall getMetamodelEPackageSTRINGTerminalRuleCall_1_0_1() { return cMetamodelEPackageSTRINGTerminalRuleCall_1_0_1; }
 		
-		//ID
-		public RuleCall getMetamodelEPackageIDTerminalRuleCall_2_0_1() { return cMetamodelEPackageIDTerminalRuleCall_2_0_1; }
-		
-		//'"'
-		public Keyword getQuotationMarkKeyword_3() { return cQuotationMarkKeyword_3; }
-		
-		//('step' units+=[henshin::Unit])+
-		public Group getGroup_4() { return cGroup_4; }
+		//('step' units+=[henshin::Unit|QualifiedName])+
+		public Group getGroup_2() { return cGroup_2; }
 		
 		//'step'
-		public Keyword getStepKeyword_4_0() { return cStepKeyword_4_0; }
+		public Keyword getStepKeyword_2_0() { return cStepKeyword_2_0; }
 		
-		//units+=[henshin::Unit]
-		public Assignment getUnitsAssignment_4_1() { return cUnitsAssignment_4_1; }
+		//units+=[henshin::Unit|QualifiedName]
+		public Assignment getUnitsAssignment_2_1() { return cUnitsAssignment_2_1; }
 		
-		//[henshin::Unit]
-		public CrossReference getUnitsUnitCrossReference_4_1_0() { return cUnitsUnitCrossReference_4_1_0; }
+		//[henshin::Unit|QualifiedName]
+		public CrossReference getUnitsUnitCrossReference_2_1_0() { return cUnitsUnitCrossReference_2_1_0; }
+		
+		//QualifiedName
+		public RuleCall getUnitsUnitQualifiedNameParserRuleCall_2_1_0_1() { return cUnitsUnitQualifiedNameParserRuleCall_2_1_0_1; }
+	}
+	public class QualifiedNameElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.QualifiedName");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final RuleCall cIDTerminalRuleCall_0 = (RuleCall)cGroup.eContents().get(0);
+		private final Group cGroup_1 = (Group)cGroup.eContents().get(1);
+		private final Keyword cFullStopKeyword_1_0 = (Keyword)cGroup_1.eContents().get(0);
+		private final RuleCall cIDTerminalRuleCall_1_1 = (RuleCall)cGroup_1.eContents().get(1);
+		
+		//QualifiedName:
+		//	ID ('.' ID)+;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//ID ('.' ID)+
+		public Group getGroup() { return cGroup; }
 		
 		//ID
-		public RuleCall getUnitsUnitIDTerminalRuleCall_4_1_0_1() { return cUnitsUnitIDTerminalRuleCall_4_1_0_1; }
+		public RuleCall getIDTerminalRuleCall_0() { return cIDTerminalRuleCall_0; }
+		
+		//('.' ID)+
+		public Group getGroup_1() { return cGroup_1; }
+		
+		//'.'
+		public Keyword getFullStopKeyword_1_0() { return cFullStopKeyword_1_0; }
+		
+		//ID
+		public RuleCall getIDTerminalRuleCall_1_1() { return cIDTerminalRuleCall_1_1; }
 	}
 	
 	
 	private final HenshinXDsmlSpecificationElements pHenshinXDsmlSpecification;
+	private final QualifiedNameElements pQualifiedName;
 	
 	private final Grammar grammar;
 	
@@ -91,6 +111,7 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 		this.grammar = internalFindGrammar(grammarProvider);
 		this.gaTerminals = gaTerminals;
 		this.pHenshinXDsmlSpecification = new HenshinXDsmlSpecificationElements();
+		this.pQualifiedName = new QualifiedNameElements();
 	}
 	
 	protected Grammar internalFindGrammar(GrammarProvider grammarProvider) {
@@ -121,13 +142,23 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 
 	
 	//HenshinXDsmlSpecification:
-	//	'metamodel' '"' metamodel=[ecore::EPackage] '"' ('step' units+=[henshin::Unit])+;
+	//	'metamodel' metamodel=[ecore::EPackage|STRING] ('step' units+=[henshin::Unit|QualifiedName])+;
 	public HenshinXDsmlSpecificationElements getHenshinXDsmlSpecificationAccess() {
 		return pHenshinXDsmlSpecification;
 	}
 	
 	public ParserRule getHenshinXDsmlSpecificationRule() {
 		return getHenshinXDsmlSpecificationAccess().getRule();
+	}
+	
+	//QualifiedName:
+	//	ID ('.' ID)+;
+	public QualifiedNameElements getQualifiedNameAccess() {
+		return pQualifiedName;
+	}
+	
+	public ParserRule getQualifiedNameRule() {
+		return getQualifiedNameAccess().getRule();
 	}
 	
 	//terminal ID:

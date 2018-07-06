@@ -43,7 +43,7 @@ public class HenshinXDsmlSpecificationSemanticSequencer extends AbstractDelegati
 	 *     HenshinXDsmlSpecification returns HenshinXDsmlSpecification
 	 *
 	 * Constraint:
-	 *     (metamodel=[EPackage|ID] units+=[Unit|ID]+)
+	 *     (metamodel=[EPackage|STRING] units+=[Unit|QualifiedName]+)
 	 */
 	protected void sequence_HenshinXDsmlSpecification(ISerializationContext context, HenshinXDsmlSpecification semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
