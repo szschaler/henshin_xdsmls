@@ -12,6 +12,7 @@ import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.CoreException
 import org.eclipse.debug.core.ILaunchConfiguration
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
+import org.eclipse.debug.ui.AbstractLaunchConfigurationTab
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
@@ -52,7 +53,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
  */
-class LaunchConfigurationMainTab extends LaunchConfigurationTab {
+class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
 	protected var Composite _parent
 
@@ -75,6 +76,33 @@ class LaunchConfigurationMainTab extends LaunchConfigurationTab {
 	protected var Text modelofexecutionglml_LocationText
 
 	protected var IProject _modelProject
+
+	protected def Group createGroup(Composite parent, String text) {
+		val Group group = new Group(parent, SWT.NULL)
+		group.text = text
+		val GridLayout locationLayout = new GridLayout
+		locationLayout.numColumns = 3;
+		locationLayout.marginHeight = 10;
+		locationLayout.marginWidth = 10;
+		group.layout = locationLayout
+
+		group
+	}
+
+	protected def createTextLabelLayout(Composite parent, String labelString) {
+		val GridData gd = new GridData(GridData.FILL_HORIZONTAL)
+		parent.layoutData = gd
+		val Label inputLabel = new Label(parent, SWT.NONE)
+		inputLabel.text = labelString
+	}
+
+	protected def createTextLabelLayout(Composite parent, String labelString, String toolTipText) {
+		val GridData gd = new GridData(GridData.FILL_HORIZONTAL)
+		parent.layoutData = gd
+		val Label inputLabel = new Label(parent, SWT.NONE)
+		inputLabel.text = labelString
+		inputLabel.toolTipText = toolTipText
+	}
 
 	override void createControl(Composite parent) {
 		_parent = parent
