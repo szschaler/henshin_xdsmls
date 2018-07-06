@@ -2,3 +2,6 @@
 /.HenshinEngineLauncher.java._trace
 /.HenshinExecutionEngine.xtendbin
 /HenshinExecutionEngine.java
+/.HenshinModelExecutionContext.java._trace
+/HenshinModelExecutionContext.java
+/.HenshinModelExecutionContext.xtendbin

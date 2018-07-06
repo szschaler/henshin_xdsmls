@@ -8,7 +8,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.gemoc.commons.eclipse.messagingsystem.api.MessagingSystem
 import org.eclipse.gemoc.commons.eclipse.ui.ViewHelper
-import org.eclipse.gemoc.execution.sequential.javaengine.SequentialModelExecutionContext
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.engine.commons.ModelExecutionContext
 import org.eclipse.gemoc.executionframework.engine.ui.commons.RunConfiguration
@@ -22,6 +21,7 @@ import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionEngine
 import org.eclipse.gemoc.xdsmlframework.api.core.IRunConfiguration
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinExecutionEngine
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinModelExecutionContext
 
 /**
  * Launcher code based on JavaEngine launcher
@@ -34,8 +34,7 @@ class HenshinEngineLauncher extends AbstractSequentialGemocLauncher {
 		ExecutionMode executionMode) throws CoreException, EngineContextException {
 		val IExecutionEngine executionEngine = new HenshinExecutionEngine
 
-		val ModelExecutionContext executioncontext = new SequentialModelExecutionContext(runConfiguration,
-			executionMode)
+		val ModelExecutionContext executioncontext = new HenshinModelExecutionContext(runConfiguration, executionMode)
 		executioncontext.executionPlatform.modelLoader.progressMonitor = launchProgressMonitor
 		executioncontext.initializeResourceModel
 		executionEngine.initialize(executioncontext)
