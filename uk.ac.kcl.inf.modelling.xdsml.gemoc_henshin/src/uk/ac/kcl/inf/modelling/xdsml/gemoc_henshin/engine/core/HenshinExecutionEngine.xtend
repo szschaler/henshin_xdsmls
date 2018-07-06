@@ -78,7 +78,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 		// Load rules and units
 		// We assume entryPoint to be a string with the full workspace path to a file identifying the semantics Henshin rules
 		// We expect this to be a resource that contains a HenshinXDsmlSpecification
-		val entryPoint = executionContext.runConfiguration.executionEntryPoint
+		val entryPoint = executionContext.runConfiguration.languageName
 		// FIXME: This needs injecting!
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
