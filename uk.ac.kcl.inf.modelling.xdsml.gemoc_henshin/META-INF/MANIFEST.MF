@@ -5,18 +5,36 @@ Bundle-SymbolicName: uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 Bundle-Vendor: King's College London
-Require-Bundle: org.eclipse.ui,
+Require-Bundle: fr.inria.diverse.k3.al.annotationprocessor.plugin;bundle-version="3.2.2",
+ fr.inria.diverse.melange.adapters;bundle-version="0.2.1",
+ fr.inria.diverse.melange.resource,
  org.eclipse.core.runtime,
- org.eclipse.gemoc.xdsmlframework.api;bundle-version="3.0.0",
- org.eclipse.gemoc.executionframework.engine;bundle-version="3.0.0",
- org.eclipse.xtext.xbase.lib;bundle-version="2.12.0",
- org.eclipse.gemoc.execution.sequential.javaengine;bundle-version="3.0.0",
+ org.eclipse.debug.ui;bundle-version="3.8.2",
  org.eclipse.emf.henshin.interpreter;bundle-version="1.4.0",
  org.eclipse.emf.henshin.model;bundle-version="1.4.0",
- fr.inria.diverse.melange.adapters;bundle-version="0.2.1",
- org.eclipse.emf.transaction;bundle-version="1.9.0",
- uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification;bundle-version="1.0.0",
- org.eclipse.xtext;bundle-version="2.12.0"
+ org.eclipse.emf.transaction;bundle-version="1.4.0",
+ org.eclipse.gemoc.commons.eclipse;bundle-version="3.0.0",
+ org.eclipse.gemoc.commons.eclipse.messagingsystem.api;bundle-version="2.4.0",
+ org.eclipse.gemoc.commons.eclipse.messagingsystem.ui;bundle-version="2.4.0",
+ org.eclipse.gemoc.commons.eclipse.ui;bundle-version="0.1.0",
+ org.eclipse.gemoc.dsl.debug.ide;bundle-version="1.0.0",
+ org.eclipse.gemoc.dsl.debug.ide.sirius.ui;bundle-version="1.0.0",
+ org.eclipse.gemoc.dsl.debug.ide.ui;bundle-version="1.0.0",
+ org.eclipse.gemoc.execution.sequential.javaengine;bundle-version="0.1.0",
+ org.eclipse.gemoc.executionframework.debugger,
+ org.eclipse.gemoc.executionframework.debugger.ui,
+ org.eclipse.gemoc.executionframework.engine,
+ org.eclipse.gemoc.executionframework.engine.ui,
+ org.eclipse.gemoc.executionframework.ui,
+ org.eclipse.gemoc.xdsmlframework.api,
+ org.eclipse.gemoc.xdsmlframework.ui.utils;bundle-version="3.0.0",
+ org.eclipse.jface,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.workbench,
+ org.eclipse.xtext,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.12.0",
+ uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin
 Bundle-ActivationPolicy: lazy

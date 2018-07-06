@@ -1,9 +1,12 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import fr.inria.diverse.melange.adapters.EObjectAdapter
 import java.util.ArrayList
 import java.util.List
 import java.util.Random
+import org.eclipse.core.runtime.IStatus
+import org.eclipse.core.runtime.Status
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
@@ -19,11 +22,8 @@ import org.eclipse.emf.henshin.model.Unit
 import org.eclipse.emf.transaction.RecordingCommand
 import org.eclipse.gemoc.executionframework.engine.core.AbstractSequentialExecutionEngine
 import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionContext
-import org.eclipse.core.runtime.IStatus
-import org.eclipse.core.runtime.Status
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.emf.common.util.URI
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification
 
 class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
@@ -76,20 +76,20 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 		modelGraph = new EGraphImpl(root)
 
 		// Load rules and units
-				
 		// We assume entryPoint to be a string with the full workspace path to a file identifying the semantics Henshin rules
 		// We expect this to be a resource that contains a HenshinXDsmlSpecification
 		val entryPoint = executionContext.runConfiguration.executionEntryPoint
 		// FIXME: This needs injecting!
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
-		
+
 		// Check validity
 		val semantics = semanticsResource.contents.head as HenshinXDsmlSpecification
-		if (semantics.metamodel !== root.eClass.EPackage) {
-			throw new IllegalArgumentException("Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
+		if (semantics.metamodel !== root.eClass.getEPackage) {
+			throw new IllegalArgumentException(
+				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 		}
-		
+
 		semanticUnits = semantics.units
 	}
 

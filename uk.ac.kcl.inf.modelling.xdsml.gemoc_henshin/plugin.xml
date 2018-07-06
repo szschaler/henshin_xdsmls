@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
+		<launchConfigurationType
+			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.HenshinEngineLauncher"
+			id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher"
+			modes="run"
+			name="Henshin-Based eXecutable Model"
+			public="true"
+			sourceLocatorId="org.eclipse.gemoc.execution.sequential.javaengine.ui.sourceLocator">
+		</launchConfigurationType>
+	</extension>
+	<extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+		<launchConfigurationTabGroup
+        class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.LauncherTabGroup"
+        id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher.tabGroup"
+        type="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher">
+		</launchConfigurationTabGroup>
+	</extension>
 </plugin>
