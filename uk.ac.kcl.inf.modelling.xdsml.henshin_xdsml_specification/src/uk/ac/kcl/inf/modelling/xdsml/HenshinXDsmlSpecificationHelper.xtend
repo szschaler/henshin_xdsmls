@@ -4,7 +4,7 @@ import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpeci
 
 class HenshinXDsmlSpecificationHelper {
 	static def getMetamodel(HenshinXDsmlSpecification spec) {
-		val metamodels = spec.units.map[u | u.module.imports].flatten
+		val metamodels = spec.units.map[u | u.module.imports].flatten.toSet
 		if (metamodels.size > 1) {
 			throw new IllegalArgumentException("Too many metamodels")
 		} else {

@@ -69,9 +69,8 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 	 * This is currently modelled on the implementation in PlainK3ExecutionEngine, but may need adjusting further down the line.
 	 */
 	protected override void prepareEntryPoint(IExecutionContext executionContext) {
-		// We assume mainModelElementURI to point to the model element containing the full model to be simulated, relative to executionContext.resourceModel  
-		val mainModelElementURI = executionContext.runConfiguration.modelEntryPoint
-		root = executionContext.resourceModel.getEObject(mainModelElementURI)
+		// executionContext.resourceModel points to the resource GEMOC loaded for the model to be run  
+		root = executionContext.resourceModel.contents.head
 		if (root instanceof EObjectAdapter<?>) {
 			root = (root as EObjectAdapter<?>).adaptee
 		}
