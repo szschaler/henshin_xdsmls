@@ -376,31 +376,31 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalCon
 
 
     // $ANTLR start "rule__HenshinXDsmlSpecification__Group__1__Impl"
-    // InternalHenshinXDsmlSpecification.g:147:1: rule__HenshinXDsmlSpecification__Group__1__Impl : ( ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 ) ) ;
+    // InternalHenshinXDsmlSpecification.g:147:1: rule__HenshinXDsmlSpecification__Group__1__Impl : ( ( rule__HenshinXDsmlSpecification__RulesAssignment_1 ) ) ;
     public final void rule__HenshinXDsmlSpecification__Group__1__Impl() throws RecognitionException {
 
         		int stackSize = keepStackSize();
         	
         try {
-            // InternalHenshinXDsmlSpecification.g:151:1: ( ( ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 ) ) )
-            // InternalHenshinXDsmlSpecification.g:152:1: ( ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 ) )
+            // InternalHenshinXDsmlSpecification.g:151:1: ( ( ( rule__HenshinXDsmlSpecification__RulesAssignment_1 ) ) )
+            // InternalHenshinXDsmlSpecification.g:152:1: ( ( rule__HenshinXDsmlSpecification__RulesAssignment_1 ) )
             {
-            // InternalHenshinXDsmlSpecification.g:152:1: ( ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 ) )
-            // InternalHenshinXDsmlSpecification.g:153:2: ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 )
+            // InternalHenshinXDsmlSpecification.g:152:1: ( ( rule__HenshinXDsmlSpecification__RulesAssignment_1 ) )
+            // InternalHenshinXDsmlSpecification.g:153:2: ( rule__HenshinXDsmlSpecification__RulesAssignment_1 )
             {
-             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_1()); 
-            // InternalHenshinXDsmlSpecification.g:154:2: ( rule__HenshinXDsmlSpecification__UnitsAssignment_1 )
-            // InternalHenshinXDsmlSpecification.g:154:3: rule__HenshinXDsmlSpecification__UnitsAssignment_1
+             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesAssignment_1()); 
+            // InternalHenshinXDsmlSpecification.g:154:2: ( rule__HenshinXDsmlSpecification__RulesAssignment_1 )
+            // InternalHenshinXDsmlSpecification.g:154:3: rule__HenshinXDsmlSpecification__RulesAssignment_1
             {
             pushFollow(FOLLOW_2);
-            rule__HenshinXDsmlSpecification__UnitsAssignment_1();
+            rule__HenshinXDsmlSpecification__RulesAssignment_1();
 
             state._fsp--;
 
 
             }
 
-             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_1()); 
+             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesAssignment_1()); 
 
             }
 
@@ -765,9 +765,9 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalCon
     // $ANTLR end "rule__QualifiedName__Group_1__1__Impl"
 
 
-    // $ANTLR start "rule__HenshinXDsmlSpecification__UnitsAssignment_1"
-    // InternalHenshinXDsmlSpecification.g:278:1: rule__HenshinXDsmlSpecification__UnitsAssignment_1 : ( ( ruleQualifiedName ) ) ;
-    public final void rule__HenshinXDsmlSpecification__UnitsAssignment_1() throws RecognitionException {
+    // $ANTLR start "rule__HenshinXDsmlSpecification__RulesAssignment_1"
+    // InternalHenshinXDsmlSpecification.g:278:1: rule__HenshinXDsmlSpecification__RulesAssignment_1 : ( ( ruleQualifiedName ) ) ;
+    public final void rule__HenshinXDsmlSpecification__RulesAssignment_1() throws RecognitionException {
 
         		int stackSize = keepStackSize();
         	
@@ -778,21 +778,21 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalCon
             // InternalHenshinXDsmlSpecification.g:283:2: ( ( ruleQualifiedName ) )
             // InternalHenshinXDsmlSpecification.g:284:3: ( ruleQualifiedName )
             {
-             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0()); 
+             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0()); 
             // InternalHenshinXDsmlSpecification.g:285:3: ( ruleQualifiedName )
             // InternalHenshinXDsmlSpecification.g:286:4: ruleQualifiedName
             {
-             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitQualifiedNameParserRuleCall_1_0_1()); 
+             before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleQualifiedNameParserRuleCall_1_0_1()); 
             pushFollow(FOLLOW_2);
             ruleQualifiedName();
 
             state._fsp--;
 
-             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitQualifiedNameParserRuleCall_1_0_1()); 
+             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleQualifiedNameParserRuleCall_1_0_1()); 
 
             }
 
-             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0()); 
+             after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0()); 
 
             }
 
@@ -811,7 +811,7 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalCon
         }
         return ;
     }
-    // $ANTLR end "rule__HenshinXDsmlSpecification__UnitsAssignment_1"
+    // $ANTLR end "rule__HenshinXDsmlSpecification__RulesAssignment_1"
 
     // Delegated rules
 

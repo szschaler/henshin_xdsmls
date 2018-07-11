@@ -111,7 +111,7 @@ public class HenshinXDsmlSpecificationPackageImpl extends EPackageImpl implement
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getHenshinXDsmlSpecification_Units()
+  public EReference getHenshinXDsmlSpecification_Rules()
   {
     return (EReference)henshinXDsmlSpecificationEClass.getEStructuralFeatures().get(0);
   }
@@ -147,7 +147,7 @@ public class HenshinXDsmlSpecificationPackageImpl extends EPackageImpl implement
 
     // Create classes and their features
     henshinXDsmlSpecificationEClass = createEClass(HENSHIN_XDSML_SPECIFICATION);
-    createEReference(henshinXDsmlSpecificationEClass, HENSHIN_XDSML_SPECIFICATION__UNITS);
+    createEReference(henshinXDsmlSpecificationEClass, HENSHIN_XDSML_SPECIFICATION__RULES);
   }
 
   /**
@@ -185,7 +185,7 @@ public class HenshinXDsmlSpecificationPackageImpl extends EPackageImpl implement
 
     // Initialize classes and features; add operations and parameters
     initEClass(henshinXDsmlSpecificationEClass, HenshinXDsmlSpecification.class, "HenshinXDsmlSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getHenshinXDsmlSpecification_Units(), theHenshinPackage.getUnit(), null, "units", null, 0, -1, HenshinXDsmlSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getHenshinXDsmlSpecification_Rules(), theHenshinPackage.getRule(), null, "rules", null, 0, -1, HenshinXDsmlSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     // Create resource
     createResource(eNS_URI);

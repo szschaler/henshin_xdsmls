@@ -88,7 +88,7 @@ ruleHenshinXDsmlSpecification returns [EObject current=null]
 					}
 				}
 				{
-					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0());
+					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0());
 				}
 				ruleQualifiedName
 				{

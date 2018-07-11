@@ -5,7 +5,7 @@ generate henshinXDsmlSpecification "http://www.ac.uk/kcl/inf/modelling/xdsml/Hen
 import "http://www.eclipse.org/emf/2011/Henshin" as henshin
 
 HenshinXDsmlSpecification:
-	('step' units += [henshin::Unit | QualifiedName])+
+	('step' rules += [henshin::Rule | QualifiedName])+
 ;
 
 QualifiedName: ID ('.' ID)+ ;

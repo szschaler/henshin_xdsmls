@@ -155,7 +155,7 @@ public class InternalHenshinXDsmlSpecificationParser extends AbstractInternalAnt
             	    					}
             	    				
 
-            	    					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0());
+            	    					newCompositeNode(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0());
             	    				
             	    pushFollow(FOLLOW_4);
             	    ruleQualifiedName();

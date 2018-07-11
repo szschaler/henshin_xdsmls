@@ -7,7 +7,7 @@
   <genPackages prefix="HenshinXDsmlSpecification" basePackage="uk.ac.kcl.inf.modelling.xdsml"
       disposableProviderFactory="true" fileExtensions="henshin_xdsml" ecorePackage="HenshinXDsmlSpecification.ecore#/">
     <genClasses ecoreClass="HenshinXDsmlSpecification.ecore#//HenshinXDsmlSpecification">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference HenshinXDsmlSpecification.ecore#//HenshinXDsmlSpecification/units"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference HenshinXDsmlSpecification.ecore#//HenshinXDsmlSpecification/rules"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

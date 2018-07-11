@@ -1,7 +1,6 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import fr.inria.diverse.melange.adapters.EObjectAdapter
-import java.util.ArrayList
 import java.util.List
 import java.util.Random
 import org.eclipse.core.runtime.IStatus
@@ -11,15 +10,13 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
 import org.eclipse.emf.henshin.interpreter.RuleApplication
-import org.eclipse.emf.henshin.interpreter.UnitApplication
 import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
 import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
-import org.eclipse.emf.henshin.interpreter.impl.UnitApplicationImpl
-import org.eclipse.emf.henshin.model.HenshinPackage
 import org.eclipse.emf.henshin.model.ParameterKind
-import org.eclipse.emf.henshin.model.Unit
+import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.emf.transaction.RecordingCommand
+import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain
 import org.eclipse.gemoc.executionframework.engine.core.AbstractSequentialExecutionEngine
 import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionContext
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -31,13 +28,13 @@ import static extension uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecificationH
 class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 
 	private val Engine henshinEngine = new EngineImpl
-	private val UnitApplication unitRunner = new UnitApplicationImpl(henshinEngine)
+//	private val UnitApplication unitRunner = new UnitApplicationImpl(henshinEngine)
 	private val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
 
 	private var EObject root
 	private var EGraph modelGraph
 	// May be rules, too
-	private var List<Unit> semanticUnits
+	private var List<Rule> semanticRules
 
 	new() {
 		// Use non-deterministic matching for now to ensure we get a random trace rather than always the same one
@@ -91,7 +88,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 		}
 
-		semanticUnits = semantics.units
+		semanticRules = semantics.rules
 	}
 
 	/**
@@ -106,84 +103,76 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 		}
 	}
 
-	private static class NoRuleMatchedException extends Exception {
+	private static class RuleApplicationException extends Exception {
+	}
+
+	private static class StepCommand extends RecordingCommand {
+		private val RuleApplication runner
+		
+		new (InternalTransactionalEditingDomain editingDomain, Rule rule, RuleApplication runner, EGraph model) {
+			super(editingDomain, "Run a step using rule " + rule.name,
+			'''Runs rule «rule.name» from the set of rules provided as the operational semantics for this language.''')
+			
+			this.runner = runner
+			this.runner.EGraph = model
+			this.runner.rule = rule
+		}
+		
+		override protected doExecute() {	
+			if (!runner.execute(null)) {
+				throw new RuleApplicationException()
+			}
+		}
+		
 	}
 
 	/**
 	 * Perform a single step of model execution
 	 */
 	private def performStep() {
-		var result = true
+		var rule = pickNextRule
 
-		val rc = new RecordingCommand(editingDomain, "Run a rule step",
-			"Runs a randomly picked step from the set of rules and units provided as the operational semantics for this language.") {
-
-			override protected doExecute() {
-				if (!doPerformStep) {
-					throw new NoRuleMatchedException()
+		if (rule !== null) {
+			var result = true
+			
+			val command = new StepCommand (editingDomain, rule, ruleRunner, modelGraph) 
+			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
+			beforeExecutionStep(root, root.eClass.name, rule.name, command)
+	
+			if (command.canExecute) {
+				try {
+					command.execute
+				} catch (RuleApplicationException rae) {
+					editingDomain.activeTransaction.abort(
+						new Status(IStatus.OK, Activator.PLUGIN_ID, '''Error executing semantic rule «rule.name».'''))
+					result = false
 				}
 			}
-
+	
+			afterExecutionStep
+			
+			result
+		} else {
+			false
 		}
-		// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-		beforeExecutionStep(root, root.eClass.name, "invokeRule", rc)
-
-		if (rc.canExecute) {
-			try {
-				rc.execute
-			} catch (NoRuleMatchedException nrme) {
-				editingDomain.activeTransaction.abort(
-					new Status(IStatus.OK, Activator.PLUGIN_ID, "No longer able to apply any semantic rules"))
-				result = false
-			}
-		}
-
-		afterExecutionStep
-
-		result
 	}
 
+	private val rnd = new Random()
+	
 	/**
-	 * Actually perform a single step, unencumbered by the need to fit in with GEMOC machinery. Look through list of units and pick one at 
-	 * random, then try to apply it. Repeat until one actually works out.
+	 * Randomly pick the next rule from those that could be applied
 	 */
-	private def doPerformStep() {
-		val triedUnits = new ArrayList<Unit>()
-		val rnd = new Random()
-
-		while (triedUnits.size < semanticUnits.size) {
-			val remainingUnits = semanticUnits.reject[u|triedUnits.contains(u)]
-
-			if (remainingUnits.empty) {
-				// We didn't find any matches (we should really never get here because of the while condition :-))
-				return false
-			}
-
-			val operator = remainingUnits.get(rnd.nextInt(remainingUnits.size))
-
-			if (operator.checkUnitParamters) {
-				if (operator.eClass === HenshinPackage.Literals.RULE) {
-					if (runRuleOperator(operator, modelGraph)) {
-						println("Ran rule: " + operator.name)
-						return true
-					} else {
-						println("Attempted rule: " + operator.name)
-					}
-				} else {
-					if (runUnitOperator(operator, modelGraph)) {
-						println("Ran unit: " + operator.name)
-						return true
-					}
-				}
-			}
-
-			triedUnits.add(operator)
+	private def pickNextRule() {
+		val applicableRules = semanticRules.filter[r | r.checkParamters].filter[r | ! henshinEngine.findMatches(r, modelGraph, null).empty].toList
+		
+		if (applicableRules.empty) {
+			null
+		} else {
+			applicableRules.get(rnd.nextInt(applicableRules.size))			
 		}
-
-		false
 	}
 
-	private def boolean checkUnitParamters(Unit operator) {
+	private def boolean checkParamters(Rule operator) {
 		if (operator.parameters !== null) {
 			// Currently, we only support units without parameters (other than variables). 
 			// Check to make sure we're not running into problems
@@ -194,19 +183,5 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 		}
 
 		true
-	}
-
-	private def boolean runRuleOperator(Unit operator, EGraph graph) {
-		ruleRunner.EGraph = graph
-		ruleRunner.unit = operator
-
-		ruleRunner.execute(null)
-	}
-
-	private def boolean runUnitOperator(Unit operator, EGraph graph) {
-		unitRunner.EGraph = graph
-		unitRunner.unit = operator
-
-		unitRunner.execute(null)
 	}
 }

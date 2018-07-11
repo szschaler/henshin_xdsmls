@@ -3,7 +3,7 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="henshinXDsmlSpecification" nsURI="http://www.ac.uk/kcl/inf/modelling/xdsml/HenshinXDsmlSpecification"
     nsPrefix="henshinXDsmlSpecification">
   <eClassifiers xsi:type="ecore:EClass" name="HenshinXDsmlSpecification">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="units" unique="false" upperBound="-1"
-        eType="ecore:EClass platform:/resource/org.eclipse.emf.henshin.model/model/henshin.ecore#//Unit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rules" unique="false" upperBound="-1"
+        eType="ecore:EClass platform:/resource/org.eclipse.emf.henshin.model/model/henshin.ecore#//Rule"/>
   </eClassifiers>
 </ecore:EPackage>
