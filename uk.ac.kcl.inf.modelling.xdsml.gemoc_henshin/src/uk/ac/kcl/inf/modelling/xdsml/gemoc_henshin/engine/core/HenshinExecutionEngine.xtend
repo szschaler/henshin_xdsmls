@@ -166,6 +166,8 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 					if (runRuleOperator(operator, modelGraph)) {
 						println("Ran rule: " + operator.name)
 						return true
+					} else {
+						println("Attempted rule: " + operator.name)
 					}
 				} else {
 					if (runUnitOperator(operator, modelGraph)) {
