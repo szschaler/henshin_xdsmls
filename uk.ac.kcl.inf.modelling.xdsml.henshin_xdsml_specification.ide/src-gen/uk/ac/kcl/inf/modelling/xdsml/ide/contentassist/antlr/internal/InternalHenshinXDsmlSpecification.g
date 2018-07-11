@@ -150,9 +150,9 @@ rule__HenshinXDsmlSpecification__Group__1__Impl
 	}
 :
 (
-	{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_1()); }
-	(rule__HenshinXDsmlSpecification__UnitsAssignment_1)
-	{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_1()); }
+	{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesAssignment_1()); }
+	(rule__HenshinXDsmlSpecification__RulesAssignment_1)
+	{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesAssignment_1()); }
 )
 ;
 finally {
@@ -275,19 +275,19 @@ finally {
 }
 
 
-rule__HenshinXDsmlSpecification__UnitsAssignment_1
+rule__HenshinXDsmlSpecification__RulesAssignment_1
 	@init {
 		int stackSize = keepStackSize();
 	}
 :
 	(
-		{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0()); }
+		{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0()); }
 		(
-			{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitQualifiedNameParserRuleCall_1_0_1()); }
+			{ before(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleQualifiedNameParserRuleCall_1_0_1()); }
 			ruleQualifiedName
-			{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitQualifiedNameParserRuleCall_1_0_1()); }
+			{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleQualifiedNameParserRuleCall_1_0_1()); }
 		)
-		{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsUnitCrossReference_1_0()); }
+		{ after(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesRuleCrossReference_1_0()); }
 	)
 ;
 finally {

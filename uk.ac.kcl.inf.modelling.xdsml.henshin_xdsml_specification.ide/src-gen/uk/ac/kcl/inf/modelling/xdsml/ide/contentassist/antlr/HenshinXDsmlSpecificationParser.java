@@ -34,7 +34,7 @@ public class HenshinXDsmlSpecificationParser extends AbstractContentAssistParser
 					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getGroup(), "rule__HenshinXDsmlSpecification__Group__0");
 					put(grammarAccess.getQualifiedNameAccess().getGroup(), "rule__QualifiedName__Group__0");
 					put(grammarAccess.getQualifiedNameAccess().getGroup_1(), "rule__QualifiedName__Group_1__0");
-					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getUnitsAssignment_1(), "rule__HenshinXDsmlSpecification__UnitsAssignment_1");
+					put(grammarAccess.getHenshinXDsmlSpecificationAccess().getRulesAssignment_1(), "rule__HenshinXDsmlSpecification__RulesAssignment_1");
 				}
 			};
 		}

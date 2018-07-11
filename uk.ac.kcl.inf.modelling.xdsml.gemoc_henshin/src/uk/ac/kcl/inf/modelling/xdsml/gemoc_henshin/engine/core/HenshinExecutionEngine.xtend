@@ -88,10 +88,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 		}
 
-		if (semantics.units.exists[u | !(u instanceof Rule)]) {
-			throw new IllegalArgumentException("All semantic rules must be rules. No units supported.")
-		}
-		semanticRules = semantics.units.filter(Rule).toList
+		semanticRules = semantics.rules
 	}
 
 	/**

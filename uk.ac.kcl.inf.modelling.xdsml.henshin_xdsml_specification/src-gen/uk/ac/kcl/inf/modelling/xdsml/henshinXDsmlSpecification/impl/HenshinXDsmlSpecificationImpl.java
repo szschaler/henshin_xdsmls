@@ -13,7 +13,7 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
-import org.eclipse.emf.henshin.model.Unit;
+import org.eclipse.emf.henshin.model.Rule;
 
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification;
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecificationPackage;
@@ -26,7 +26,7 @@ import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpeci
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.impl.HenshinXDsmlSpecificationImpl#getUnits <em>Units</em>}</li>
+ *   <li>{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.impl.HenshinXDsmlSpecificationImpl#getRules <em>Rules</em>}</li>
  * </ul>
  *
  * @generated
@@ -34,14 +34,14 @@ import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpeci
 public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container implements HenshinXDsmlSpecification
 {
   /**
-   * The cached value of the '{@link #getUnits() <em>Units</em>}' reference list.
+   * The cached value of the '{@link #getRules() <em>Rules</em>}' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getUnits()
+   * @see #getRules()
    * @generated
    * @ordered
    */
-  protected EList<Unit> units;
+  protected EList<Rule> rules;
 
   /**
    * <!-- begin-user-doc -->
@@ -69,13 +69,13 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
    * <!-- end-user-doc -->
    * @generated
    */
-  public EList<Unit> getUnits()
+  public EList<Rule> getRules()
   {
-    if (units == null)
+    if (rules == null)
     {
-      units = new EObjectResolvingEList<Unit>(Unit.class, this, HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS);
+      rules = new EObjectResolvingEList<Rule>(Rule.class, this, HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__RULES);
     }
-    return units;
+    return rules;
   }
 
   /**
@@ -88,8 +88,8 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
-        return getUnits();
+      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__RULES:
+        return getRules();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -105,9 +105,9 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
-        getUnits().clear();
-        getUnits().addAll((Collection<? extends Unit>)newValue);
+      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__RULES:
+        getRules().clear();
+        getRules().addAll((Collection<? extends Rule>)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -123,8 +123,8 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
-        getUnits().clear();
+      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__RULES:
+        getRules().clear();
         return;
     }
     super.eUnset(featureID);
@@ -140,8 +140,8 @@ public class HenshinXDsmlSpecificationImpl extends MinimalEObjectImpl.Container 
   {
     switch (featureID)
     {
-      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__UNITS:
-        return units != null && !units.isEmpty();
+      case HenshinXDsmlSpecificationPackage.HENSHIN_XDSML_SPECIFICATION__RULES:
+        return rules != null && !rules.isEmpty();
     }
     return super.eIsSet(featureID);
   }

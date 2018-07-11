@@ -26,28 +26,28 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.HenshinXDsmlSpecification");
 		private final Group cGroup = (Group)rule.eContents().get(1);
 		private final Keyword cStepKeyword_0 = (Keyword)cGroup.eContents().get(0);
-		private final Assignment cUnitsAssignment_1 = (Assignment)cGroup.eContents().get(1);
-		private final CrossReference cUnitsUnitCrossReference_1_0 = (CrossReference)cUnitsAssignment_1.eContents().get(0);
-		private final RuleCall cUnitsUnitQualifiedNameParserRuleCall_1_0_1 = (RuleCall)cUnitsUnitCrossReference_1_0.eContents().get(1);
+		private final Assignment cRulesAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final CrossReference cRulesRuleCrossReference_1_0 = (CrossReference)cRulesAssignment_1.eContents().get(0);
+		private final RuleCall cRulesRuleQualifiedNameParserRuleCall_1_0_1 = (RuleCall)cRulesRuleCrossReference_1_0.eContents().get(1);
 		
 		//HenshinXDsmlSpecification:
-		//	('step' units+=[henshin::Unit|QualifiedName])+;
+		//	('step' rules+=[henshin::Rule|QualifiedName])+;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//('step' units+=[henshin::Unit|QualifiedName])+
+		//('step' rules+=[henshin::Rule|QualifiedName])+
 		public Group getGroup() { return cGroup; }
 		
 		//'step'
 		public Keyword getStepKeyword_0() { return cStepKeyword_0; }
 		
-		//units+=[henshin::Unit|QualifiedName]
-		public Assignment getUnitsAssignment_1() { return cUnitsAssignment_1; }
+		//rules+=[henshin::Rule|QualifiedName]
+		public Assignment getRulesAssignment_1() { return cRulesAssignment_1; }
 		
-		//[henshin::Unit|QualifiedName]
-		public CrossReference getUnitsUnitCrossReference_1_0() { return cUnitsUnitCrossReference_1_0; }
+		//[henshin::Rule|QualifiedName]
+		public CrossReference getRulesRuleCrossReference_1_0() { return cRulesRuleCrossReference_1_0; }
 		
 		//QualifiedName
-		public RuleCall getUnitsUnitQualifiedNameParserRuleCall_1_0_1() { return cUnitsUnitQualifiedNameParserRuleCall_1_0_1; }
+		public RuleCall getRulesRuleQualifiedNameParserRuleCall_1_0_1() { return cRulesRuleQualifiedNameParserRuleCall_1_0_1; }
 	}
 	public class QualifiedNameElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecification.QualifiedName");
@@ -122,7 +122,7 @@ public class HenshinXDsmlSpecificationGrammarAccess extends AbstractGrammarEleme
 
 	
 	//HenshinXDsmlSpecification:
-	//	('step' units+=[henshin::Unit|QualifiedName])+;
+	//	('step' rules+=[henshin::Rule|QualifiedName])+;
 	public HenshinXDsmlSpecificationElements getHenshinXDsmlSpecificationAccess() {
 		return pHenshinXDsmlSpecification;
 	}

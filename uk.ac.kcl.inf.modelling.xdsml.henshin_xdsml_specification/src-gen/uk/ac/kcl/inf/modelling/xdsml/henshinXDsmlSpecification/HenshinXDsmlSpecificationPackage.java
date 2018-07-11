@@ -67,13 +67,13 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
   int HENSHIN_XDSML_SPECIFICATION = 0;
 
   /**
-   * The feature id for the '<em><b>Units</b></em>' reference list.
+   * The feature id for the '<em><b>Rules</b></em>' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int HENSHIN_XDSML_SPECIFICATION__UNITS = 0;
+  int HENSHIN_XDSML_SPECIFICATION__RULES = 0;
 
   /**
    * The number of structural features of the '<em>Henshin XDsml Specification</em>' class.
@@ -96,15 +96,15 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
   EClass getHenshinXDsmlSpecification();
 
   /**
-   * Returns the meta object for the reference list '{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getUnits <em>Units</em>}'.
+   * Returns the meta object for the reference list '{@link uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getRules <em>Rules</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the reference list '<em>Units</em>'.
-   * @see uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getUnits()
+   * @return the meta object for the reference list '<em>Rules</em>'.
+   * @see uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification#getRules()
    * @see #getHenshinXDsmlSpecification()
    * @generated
    */
-  EReference getHenshinXDsmlSpecification_Units();
+  EReference getHenshinXDsmlSpecification_Rules();
 
   /**
    * Returns the factory that creates the instances of the model.
@@ -140,12 +140,12 @@ public interface HenshinXDsmlSpecificationPackage extends EPackage
     EClass HENSHIN_XDSML_SPECIFICATION = eINSTANCE.getHenshinXDsmlSpecification();
 
     /**
-     * The meta object literal for the '<em><b>Units</b></em>' reference list feature.
+     * The meta object literal for the '<em><b>Rules</b></em>' reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference HENSHIN_XDSML_SPECIFICATION__UNITS = eINSTANCE.getHenshinXDsmlSpecification_Units();
+    EReference HENSHIN_XDSML_SPECIFICATION__RULES = eINSTANCE.getHenshinXDsmlSpecification_Rules();
 
   }
 
