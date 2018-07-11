@@ -22,7 +22,7 @@ class HenshinModelExecutionContext extends ModelExecutionContext {
 	 * Need to work around the lookup from GEMOC's language-definition extension point, which doesn't align with how we define a language 
 	 */
 	private static class HenshinLanguageDefinitionExtension extends LanguageDefinitionExtension {
-		new() {
+		new(HenshinModelExecutionContext hmec) {
 			super()
 			_configurationElement = new IConfigurationElement() {
 
@@ -36,7 +36,12 @@ class HenshinModelExecutionContext extends ModelExecutionContext {
 				}
 
 				override getAttribute(String name) throws InvalidRegistryObjectException {
-					throw new UnsupportedOperationException("TODO: auto-generated method stub")
+					switch (name) {
+						case LanguageDefinitionExtensionPoint.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_NAME_ATT:
+							return hmec.runConfiguration.languageName
+						default:
+							throw new UnsupportedOperationException("TODO: auto-generated method stub")
+					}
 				}
 
 				override getAttribute(String attrName, String locale) throws InvalidRegistryObjectException {
@@ -104,7 +109,7 @@ class HenshinModelExecutionContext extends ModelExecutionContext {
 	}
 
 	protected override LanguageDefinitionExtension getLanguageDefinition (String languageName) throws EngineContextException {
-		new HenshinLanguageDefinitionExtension
+		new HenshinLanguageDefinitionExtension(this)
 	}
 
 	override MSEModel getMSEModel() { null }

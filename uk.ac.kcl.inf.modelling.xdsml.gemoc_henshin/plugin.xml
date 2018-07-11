@@ -5,7 +5,7 @@
 		<launchConfigurationType
 			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.HenshinEngineLauncher"
 			id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher"
-			modes="run"
+			modes="run,debug"
 			name="Henshin-Based eXecutable Model"
 			public="true"
 			sourceLocatorId="org.eclipse.gemoc.execution.sequential.javaengine.ui.sourceLocator">
