@@ -9,6 +9,7 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
+import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.emf.henshin.interpreter.RuleApplication
 import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
@@ -109,13 +110,14 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 	private static class StepCommand extends RecordingCommand {
 		private val RuleApplication runner
 		
-		new (InternalTransactionalEditingDomain editingDomain, Rule rule, RuleApplication runner, EGraph model) {
-			super(editingDomain, "Run a step using rule " + rule.name,
-			'''Runs rule «rule.name» from the set of rules provided as the operational semantics for this language.''')
+		new (InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
+			super(editingDomain, "Run a step using rule " + match.rule.name,
+			'''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
 			
 			this.runner = runner
 			this.runner.EGraph = model
-			this.runner.rule = rule
+			this.runner.rule = match.rule
+			this.runner.completeMatch = match
 		}
 		
 		override protected doExecute() {	
@@ -130,21 +132,21 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 	 * Perform a single step of model execution
 	 */
 	private def performStep() {
-		var rule = pickNextRule
+		val match = pickNextMatch
 
-		if (rule !== null) {
+		if (match !== null) {
 			var result = true
 			
-			val command = new StepCommand (editingDomain, rule, ruleRunner, modelGraph) 
+			val command = new StepCommand (editingDomain, match, ruleRunner, modelGraph) 
 			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			beforeExecutionStep(root, root.eClass.name, rule.name, command)
+			beforeExecutionStep(root, root.eClass.name, match.rule.name, command)
 	
 			if (command.canExecute) {
 				try {
 					command.execute
 				} catch (RuleApplicationException rae) {
 					editingDomain.activeTransaction.abort(
-						new Status(IStatus.OK, Activator.PLUGIN_ID, '''Error executing semantic rule «rule.name».'''))
+						new Status(IStatus.OK, Activator.PLUGIN_ID, '''Error executing semantic rule «match.rule.name».'''))
 					result = false
 				}
 			}
@@ -162,14 +164,19 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 	/**
 	 * Randomly pick the next rule from those that could be applied
 	 */
-	private def pickNextRule() {
-		val applicableRules = semanticRules.filter[r | r.checkParamters].filter[r | ! henshinEngine.findMatches(r, modelGraph, null).empty].toList
+	private def pickNextMatch() {
+		var applicableRules = semanticRules.filter[r | r.checkParamters].toList
 		
-		if (applicableRules.empty) {
-			null
-		} else {
-			applicableRules.get(rnd.nextInt(applicableRules.size))			
+		while (!applicableRules.empty) {
+			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
+			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null).head
+			
+			if (match !== null) {
+				return match
+			}
 		}
+		
+		null
 	}
 
 	private def boolean checkParamters(Rule operator) {
