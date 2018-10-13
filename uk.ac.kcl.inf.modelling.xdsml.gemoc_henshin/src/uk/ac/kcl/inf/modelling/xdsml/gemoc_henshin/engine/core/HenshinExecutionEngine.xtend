@@ -14,6 +14,7 @@ import org.eclipse.emf.henshin.interpreter.RuleApplication
 import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
 import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
+import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.emf.transaction.RecordingCommand
@@ -76,20 +77,33 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 
 		// Load rules and units
 		// We assume entryPoint to be a string with the full workspace path to a file identifying the semantics Henshin rules
-		// We expect this to be a resource that contains a HenshinXDsmlSpecification
+		// We expect this to be a resource that contains a HenshinXDsmlSpecification or a Henshin model directly
 		val entryPoint = executionContext.runConfiguration.languageName
 		// FIXME: This needs injecting!
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
 
 		// Check validity
-		val semantics = semanticsResource.contents.head as HenshinXDsmlSpecification
-		if (semantics.metamodel !== root.eClass.getEPackage) {
-			throw new IllegalArgumentException(
-				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
+		if (semanticsResource.contents.head instanceof HenshinXDsmlSpecification) {
+			// Assume a HenshinXDsmlSpecification
+			val semantics = semanticsResource.contents.head as HenshinXDsmlSpecification
+			if (semantics.metamodel !== root.eClass.EPackage) {
+				throw new IllegalArgumentException(
+					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
+			}
+	
+			semanticRules = semantics.rules
+		} else {
+			// Assume a direct link to a Henshin file
+			val semantics = semanticsResource.contents.head as Module
+			
+			if (!semantics.imports.contains(root.eClass.EPackage)) {
+				throw new IllegalArgumentException(
+					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")				
+			}
+			
+			semanticRules = semantics.units.filter(Rule).toList
 		}
-
-		semanticRules = semantics.rules
 	}
 
 	/**
