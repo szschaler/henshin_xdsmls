@@ -278,7 +278,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 				return false
 			}
 			
-			if (! languageName.endsWith(".henshin_xdsml")) {
+			if (! languageName.endsWith(".henshin_xdsml") && ! languageName.endsWith(".henshin")) {
 				errorMessage = "Wrong type of file for language semantics: " + languageName
 				return false
 			}
