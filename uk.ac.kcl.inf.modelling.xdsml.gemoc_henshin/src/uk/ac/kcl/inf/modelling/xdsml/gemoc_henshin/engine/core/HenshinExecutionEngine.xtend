@@ -125,9 +125,8 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 		private val RuleApplication runner
 
 		new(InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
-			super(editingDomain, "Run a step using rule " +
-				match.rule.
-					name, '''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
+			super(editingDomain, "Run a step using rule " + match.rule.name, 
+				'''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
 
 					this.runner = runner
 					this.runner.EGraph = model
