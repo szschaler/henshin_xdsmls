@@ -91,17 +91,17 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 				throw new IllegalArgumentException(
 					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 			}
-	
+
 			semanticRules = semantics.rules
 		} else {
 			// Assume a direct link to a Henshin file
 			val semantics = semanticsResource.contents.head as Module
-			
+
 			if (!semantics.imports.contains(root.eClass.EPackage)) {
 				throw new IllegalArgumentException(
-					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")				
+					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 			}
-			
+
 			semanticRules = semantics.units.filter(Rule).toList
 		}
 	}
@@ -123,86 +123,112 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 
 	private static class StepCommand extends RecordingCommand {
 		private val RuleApplication runner
-		
-		new (InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
-			super(editingDomain, "Run a step using rule " + match.rule.name,
-			'''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
-			
-			this.runner = runner
-			this.runner.EGraph = model
-			this.runner.rule = match.rule
-			this.runner.completeMatch = match
-		}
-		
-		override protected doExecute() {	
-			if (!runner.execute(null)) {
-				throw new RuleApplicationException()
+
+		new(InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
+			super(editingDomain, "Run a step using rule " +
+				match.rule.
+					name, '''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
+
+					this.runner = runner
+					this.runner.EGraph = model
+					this.runner.rule = match.rule
+					this.runner.completeMatch = match
+				}
+
+				override protected doExecute() {
+					if (!runner.execute(null)) {
+						throw new RuleApplicationException()
+					}
+				}
+
 			}
-		}
-		
-	}
 
-	/**
-	 * Perform a single step of model execution
-	 */
-	private def performStep() {
-		val match = pickNextMatch
+			/**
+			 * Perform a single step of model execution
+			 */
+			private def performStep() {
+				val match = pickNextMatch
 
-		if (match !== null) {
-			var result = true
-			
-			val command = new StepCommand (editingDomain, match, ruleRunner, modelGraph) 
-			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			beforeExecutionStep(root, root.eClass.name, match.rule.name, command)
-	
-			if (command.canExecute) {
-				try {
-					command.execute
-				} catch (RuleApplicationException rae) {
-					editingDomain.activeTransaction.abort(
-						new Status(IStatus.OK, Activator.PLUGIN_ID, '''Error executing semantic rule «match.rule.name».'''))
-					result = false
+				if (match !== null) {
+					var result = true
+
+					val command = new StepCommand(editingDomain, match, ruleRunner, modelGraph)
+					// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
+					val target = match.mainObject
+					beforeExecutionStep(target, target.eClass.name, match.operationName, command)
+
+					if (command.canExecute) {
+						try {
+							command.execute
+						} catch (RuleApplicationException rae) {
+							editingDomain.activeTransaction.abort(
+								new Status(IStatus.OK,
+									Activator.PLUGIN_ID, '''Error executing semantic rule «match.rule.name».'''))
+							result = false
+						}
+					}
+
+					afterExecutionStep
+
+					result
+				} else {
+					false
 				}
 			}
-	
-			afterExecutionStep
-			
-			result
-		} else {
-			false
-		}
-	}
 
-	private val rnd = new Random()
-	
-	/**
-	 * Randomly pick the next rule from those that could be applied
-	 */
-	private def pickNextMatch() {
-		var applicableRules = semanticRules.filter[r | r.checkParamters].toList
-		
-		while (!applicableRules.empty) {
-			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null).head
-			
-			if (match !== null) {
-				return match
+			/**
+			 * The object to be used as the fake target when executing this match
+			 */
+			private def mainObject(Match match) {
+				val targetNode = match.rule.lhs.nodes.findFirst [ n |
+					n.annotations.exists[a|a.key == "Target"]
+				]
+
+				if (targetNode !== null) {
+					match.getNodeTarget(targetNode)
+				} else {
+					root
+				}
+			}
+
+			/**
+			 * Generate a fake operation name to be used when executing this match
+			 */
+			private def String operationName(Match match) '''
+				«match.rule.name»
+			'''
+
+			private val rnd = new Random()
+
+			/**
+			 * Randomly pick the next rule from those that could be applied
+			 */
+			private def pickNextMatch() {
+				var applicableRules = semanticRules.filter[r|r.checkParamters].toList
+
+				while (!applicableRules.empty) {
+					val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
+					val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null).head
+
+					if (match !== null) {
+						return match
+					}
+				}
+
+				null
+			}
+
+			private def boolean checkParamters(Rule operator) {
+				if (operator.parameters !== null) {
+					// Currently, we only support units without parameters (other than variables). 
+					// Check to make sure we're not running into problems
+					if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
+						println("Invalid unit with non-var parameters: " + operator.name)
+						return false
+					}
+				}
+
+				true
 			}
 		}
 		
-		null
-	}
-
-	private def boolean checkParamters(Rule operator) {
-		if (operator.parameters !== null) {
-			// Currently, we only support units without parameters (other than variables). 
-			// Check to make sure we're not running into problems
-			if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
-				println("Invalid unit with non-var parameters: " + operator.name)
-				return false
-			}
-		}
-
-		true
-	}
-}
