@@ -11,6 +11,10 @@ This repository contains an execution engine that implements support for operati
 5. Run a runtime instance of GEMOC Studio
 6. Import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
 
+## Features
+
+Annotating any LHS node with `Target` will make the match of that node the target of the rule application for purposes of the GEMOC debugger. This will make for better representation in the GEMOC stack trace. Only LHS nodes and no multi-nodes can be annotated at this point.
+
 ## Publications
 
 1. Steffen Zschaler: Adding a HenshinEngine to GEMOC Studio: An experience report. GEMOC Workshop 2018.
