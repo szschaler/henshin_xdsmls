@@ -126,7 +126,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 
 		new(InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
 			super(editingDomain, "Run a step using rule " + match.rule.name, 
-				'''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
+				'''Runs rule Â«match.rule.nameÂ» from the set of rules provided as the operational semantics for this language.''')
 				
 			this.runner = runner
 			this.runner.EGraph = model
@@ -161,7 +161,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 				} catch (RuleApplicationException rae) {
 					editingDomain.activeTransaction.abort(
 						new Status(IStatus.OK,
-							Activator.PLUGIN_ID, '''Error executing semantic rule «match.rule.name».'''))
+							Activator.PLUGIN_ID, '''Error executing semantic rule Â«match.rule.nameÂ».'''))
 					result = false
 				}
 			}
@@ -193,7 +193,7 @@ class HenshinExecutionEngine extends AbstractSequentialExecutionEngine {
 	 * Generate a fake operation name to be used when executing this match
 	 */
 	private def String operationName(Match match) '''
-		«match.rule.name»
+		Â«match.rule.nameÂ»
 	'''
 
 	private val rnd = new Random()
