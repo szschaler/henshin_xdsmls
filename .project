@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>henshin_xdsmls</name>
+	<comment></comment>
+	<projects>
+		<project>concurrency</project>
+		<project>uk.ac.kcl.inf.henshinsupport</project>
+		<project>uk.ac.kcl.inf.henshinsupport.ui</project>
+		<project>uk.ac.kcl.inf.modelling.pls.model</project>
+		<project>uk.ac.kcl.inf.modelling.pls.model.edit</project>
+		<project>uk.ac.kcl.inf.modelling.pls.model.editor</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification.ide</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification.tests</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification.ui</project>
+		<project>uk.ac.kcl.inf.modelling.xdsml.henshin_xdsml_specification.ui.tests</project>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+</projectDescription>

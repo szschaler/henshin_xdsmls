@@ -14,7 +14,6 @@ import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
 import org.eclipse.gemoc.executionframework.engine.commons.MelangeHelper
-import org.eclipse.gemoc.executionframework.engine.ui.commons.RunConfiguration
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
 import org.eclipse.swt.SWT
@@ -31,6 +30,8 @@ import org.eclipse.swt.widgets.Group
 import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Text
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
+import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
 
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
@@ -73,15 +74,13 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	}
 
 	override void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(RunConfiguration.LAUNCH_DELAY, 1000)
-		configuration.setAttribute(RunConfiguration.LAUNCH_MODEL_ENTRY_POINT, "") // Not used
-		configuration.setAttribute(RunConfiguration.LAUNCH_METHOD_ENTRY_POINT, "") // Not used
-		configuration.setAttribute(RunConfiguration.LAUNCH_SELECTED_LANGUAGE, "") // The semantics specification
-	}
+		configuration.setAttribute(RunConfiguration.LAUNCH_DELAY, 1000);
+		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
+				ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);	}
 
 	override void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			val RunConfiguration runConfiguration = new RunConfiguration(configuration)
+			val ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration)
 			_modelLocationText.text = URIHelper.removePlatformScheme(runConfiguration.getExecutedModelURI())
 
 			if (runConfiguration.getAnimatorURI() !== null) {

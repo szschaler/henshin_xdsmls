@@ -20,7 +20,7 @@ import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionEngine
 import org.eclipse.gemoc.xdsmlframework.api.core.IRunConfiguration
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinExecutionEngine
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinModelExecutionContext
 
 /**
@@ -33,7 +33,7 @@ class HenshinEngineLauncher extends AbstractSequentialGemocLauncher {
 	protected override IExecutionEngine createExecutionEngine(RunConfiguration runConfiguration,
 		ExecutionMode executionMode) throws CoreException, EngineContextException {
 		val IExecutionEngine executionEngine = new HenshinExecutionEngine
-
+	
 		val ModelExecutionContext executioncontext = new HenshinModelExecutionContext(runConfiguration, executionMode)
 		executioncontext.executionPlatform.modelLoader.progressMonitor = launchProgressMonitor
 		executioncontext.initializeResourceModel

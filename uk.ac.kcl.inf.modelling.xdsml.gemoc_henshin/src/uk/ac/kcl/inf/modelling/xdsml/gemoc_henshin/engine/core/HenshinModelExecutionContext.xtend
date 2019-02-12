@@ -113,4 +113,9 @@ class HenshinModelExecutionContext extends ModelExecutionContext {
 	}
 
 	override MSEModel getMSEModel() { null }
+	
+	def IConcurrentRunConfiguration getRunConfiguration() {
+		return runConfiguration
+	}
+	
 }
