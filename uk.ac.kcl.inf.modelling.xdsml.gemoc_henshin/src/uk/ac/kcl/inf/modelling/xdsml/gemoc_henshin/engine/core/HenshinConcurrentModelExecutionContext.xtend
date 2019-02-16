@@ -18,7 +18,6 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrent
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentRunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ILogicalStepDecider
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.languages.ConcurrentLanguageDefinitionExtension
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.languages.ConcurrentLanguageDefinitionExtensionPoint
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.engine.commons.AbstractModelExecutionContext
 import org.eclipse.gemoc.moccml.mapping.feedback.feedback.ActionModel
@@ -33,11 +32,10 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import org.eclipse.emf.common.util.URI
 import fr.inria.diverse.melange.adapters.EObjectAdapter
 import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionContext<IConcurrentRunConfiguration,IConcurrentExecutionPlatform,ConcurrentLanguageDefinitionExtension> implements IConcurrentExecutionContext{
 
-	public String alternativeExecutionModelPath = null
-	protected ActionModel _feedbackModel
 	protected ILogicalStepDecider logicalStepDecider
 	
 	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode) throws EngineContextException {
@@ -65,27 +63,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 		new HenshinLanguageDefinitionExtension(this)
 	}
 	
-	def setUpFeedbackModel(){
-		var feedbackPlatformURI = URI.createPlatformResourceURI(getWorkspace().getMSEModelPath().removeFileExtension().addFileExtension("feedback").toString(),
-				true);
-		try
-		{
-		var root = this.getResourceModel().contents.head
-		if (root instanceof EObjectAdapter<?>) {
-			root = (root as EObjectAdapter<?>).adaptee
-		}
-		var modelGraph = new EGraphImpl(root)
-		_feedbackModel = null;
-		} catch (Exception e){
-			// file will be created later
-		}
-	}
-	
 	override getFeedbackModel() {
-		if(_feedbackModel === null){
-			setUpFeedbackModel();
-		}
-		return _feedbackModel;	
 	}
 	
 	/*
@@ -108,6 +86,8 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 							return new DefaultModelLoader()
 						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_CODEEXECUTOR_ATT:
 							return new HenshinCodeExecutor()
+						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_SOLVER_ATT:
+							return new HenshinSolver()
 						default:
 							return null
 					}

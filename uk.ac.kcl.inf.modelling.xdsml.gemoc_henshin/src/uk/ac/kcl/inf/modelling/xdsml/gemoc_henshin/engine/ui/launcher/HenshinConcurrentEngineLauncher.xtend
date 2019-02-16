@@ -37,8 +37,6 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentR
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.step.LogicalStepsView;
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.stimulimanager.StimuliManagerView;
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionEngine;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver;
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration;
 import org.eclipse.gemoc.executionframework.engine.ui.launcher.AbstractGemocLauncher;
 import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocAnimatorServices;
@@ -56,6 +54,8 @@ import org.eclipse.ui.PlatformUI;
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentExecutionContext> {
 
@@ -82,6 +82,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			// We parse the run configuration
 			var ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration);
 			debug("3333333About to initialize and run the GEMOC Henshin Execution Engine...");
+			debug("aaaa3333333About to initialize and run the GEMOC Henshin Execution Engine...");
 
 			// We detect if we are running in debug mode or not
 			var ExecutionMode executionMode = null;
@@ -98,34 +99,28 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			}
 			
 			debug("5555555About to initialize and run the GEMOC Henshin Execution Engine...");
-			try{
-				var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
+			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
 					runConfiguration, executionMode);
 				debug("CHECKCHECK22222222About to initialize and run the GEMOC Henshin Execution Engine...");
 					 
 				concurrentexecutionContext.initializeResourceModel();
 //				concurrentexecutionContext.initializeResourceModel();
-				_executionEngine = new HenshinConcurrentExecutionEngine(concurrentexecutionContext);
 					
-			}catch(Exception e){
-				e.printStackTrace();
-				throw new Exception("Cannot FSDFGDSGD solver from language definition", e);
-			}
 			
 			debug("66666About to initialize and run the GEMOC Henshin Execution Engine...");
 	
 			debug("77777About to initialize and run the GEMOC Henshin Execution Engine...");
 			
-			//ISolver _solver = null;
-//			try {
-//				_solver = concurrentexecutionContext.getLanguageDefinitionExtension().instanciateSolver();
-//				_solver.prepareBeforeModelLoading(concurrentexecutionContext);
-//				_solver.initialize(concurrentexecutionContext);
-//			} catch (CoreException e) {
-//				throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID,
-//						"Cannot instanciate solver from language definition", e));
-//			}
+			var HenshinSolver _solver
+			try {
+				_solver = concurrentexecutionContext.getLanguageDefinitionExtension().instanciateSolver() as HenshinSolver;
+				//_solver.initialize(concurrentexecutionContext);
+			} catch (CoreException e) {
+				throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID,
+						"Cannot instanciate solver from language definition", e));
+			}
 
+			_executionEngine = new HenshinConcurrentExecutionEngine(concurrentexecutionContext, _solver);
 
 			openViewsRecommandedByAddons(runConfiguration);
 
@@ -140,7 +135,11 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 					if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 						val IEngineAddon animator = AbstractGemocAnimatorServices.getAnimator();
 						var plat = _executionEngine.getExecutionContext().getExecutionPlatform()
-						_executionEngine.getExecutionContext().getExecutionPlatform().addEngineAddon(animator);
+						for (addon : plat.engineAddons) {
+							plat.removeEngineAddon(addon)
+						}
+						//_executionEngine.getExecutionContext().getExecutionPlatform().addEngineAddon(animator);
+						plat.addEngineAddon(animator);
 						try {
 							HenshinConcurrentEngineLauncher.super.launch(configuration, mode, launch, monitor);
 							return new Status(IStatus.OK, getPluginID(), "Execution was launched successfully");

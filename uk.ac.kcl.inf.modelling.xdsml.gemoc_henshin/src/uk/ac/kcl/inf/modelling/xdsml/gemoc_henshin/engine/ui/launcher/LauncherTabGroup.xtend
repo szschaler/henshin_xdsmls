@@ -3,9 +3,8 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup
 import org.eclipse.debug.ui.CommonTab
 import org.eclipse.debug.ui.ILaunchConfigurationDialog
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationAdvancedTab
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationMainTab
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationBackendsTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationMainTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationBackendsTab
 
 class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {
 
@@ -13,9 +12,8 @@ class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {
 		tabs = #[
 			new LaunchConfigurationMainTab,
 			new LaunchConfigurationBackendsTab,
-			new CommonTab,
-			new LaunchConfigurationAdvancedTab
+			new CommonTab
 		]
-	}
+	} 
 
 }
