@@ -42,7 +42,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 		super(runConfiguration, executionMode)
 		debug("dfsdfsd5555555About to initialize and run the GEMOC Henshin Execution Engine...")
 		//logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
-		logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
+		logicalStepDecider = LogicalStepDeciderFactory.createDecider("Step by step user decider", executionMode);	
 	}
 	override protected createExecutionPlatform() throws CoreException {
 		// figure this out  ? ???? 
@@ -86,8 +86,8 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 							return new DefaultModelLoader()
 						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_CODEEXECUTOR_ATT:
 							return new HenshinCodeExecutor()
-						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_SOLVER_ATT:
-							return new HenshinSolver()
+						//case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_SOLVER_ATT:
+						//	return new HenshinSolver()
 						default:
 							return null
 					}

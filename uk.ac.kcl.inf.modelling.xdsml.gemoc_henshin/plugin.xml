@@ -6,9 +6,9 @@
 			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.HenshinConcurrentEngineLauncher"
 			id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher"
 			modes="run,debug"
-			name="Henshin-Based eXecutable Model"
+			name="Henshin-Based Concurrent eXecutable Model"
 			public="true"
-			sourceLocatorId="org.eclipse.gemoc.execution.sequential.javaengine.ui.sourceLocator">
+			sourceLocatorId="org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.sourceLocator">
 		</launchConfigurationType>
 	</extension>
 	<extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">

@@ -56,6 +56,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrent
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocAnimatorServices.GemocModelAnimator
 
 class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentExecutionContext> {
 
@@ -111,16 +112,16 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 	
 			debug("77777About to initialize and run the GEMOC Henshin Execution Engine...");
 			
-			var HenshinSolver _solver
-			try {
-				_solver = concurrentexecutionContext.getLanguageDefinitionExtension().instanciateSolver() as HenshinSolver;
-				//_solver.initialize(concurrentexecutionContext);
-			} catch (CoreException e) {
-				throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID,
-						"Cannot instanciate solver from language definition", e));
-			}
+//			var HenshinSolver _solver
+//			try {
+//				_solver = concurrentexecutionContext.getLanguageDefinitionExtension().instanciateSolver() as HenshinSolver;
+//				//_solver.initialize(concurrentexecutionContext);
+//			} catch (CoreException e) {
+//				throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID,
+//						"Cannot instanciate solver from language definition", e));
+//			}
 
-			_executionEngine = new HenshinConcurrentExecutionEngine(concurrentexecutionContext, _solver);
+			_executionEngine = new HenshinConcurrentExecutionEngine(concurrentexecutionContext);
 
 			openViewsRecommandedByAddons(runConfiguration);
 
@@ -139,6 +140,8 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 							plat.removeEngineAddon(addon)
 						}
 						//_executionEngine.getExecutionContext().getExecutionPlatform().addEngineAddon(animator);
+						
+						(AbstractGemocAnimatorServices.getAnimator() as GemocModelAnimator).addRepresentationToRefresh("Production Line Diagram")
 						plat.addEngineAddon(animator);
 						try {
 							HenshinConcurrentEngineLauncher.super.launch(configuration, mode, launch, monitor);

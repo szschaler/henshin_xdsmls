@@ -57,11 +57,11 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
 	var ILogicalStepDecider _logicalStepDecider
 
-	new(IConcurrentExecutionContext concurrentexecutionContext, HenshinSolver s) {
+	new(IConcurrentExecutionContext concurrentexecutionContext) {
 		super();
 		initialize(concurrentexecutionContext);
 		_logicalStepDecider = concurrentexecutionContext.getLogicalStepDecider()
-		_solver = s
+		//_solver = s
 		// Use non-deterministic matching for now to ensure we get a random trace rather than always the same one
 		henshinEngine.options.put(Engine.OPTION_DETERMINISTIC, false)
 	}
@@ -115,8 +115,8 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 
 			semanticRules = semantics.units.filter(Rule).toList
+			
 		}
-		_solver.configure(modelGraph, henshinEngine, semanticRules)
 	}
 
 	private static class RuleApplicationException extends Exception {
@@ -366,21 +366,21 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	
 	override computePossibleLogicalSteps() {
 		//HERE USE HENSHIN TO CALCULATE STEPS
-//		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
-//		_possibleLogicalSteps = new ArrayList()
-//
-//		while (!applicableRules.empty) {
-//			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-//			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
-//						
-//			for(Match m: match){
-//				val step = new HenshinStep(m,tentativeStepRule)
-//				_possibleLogicalSteps.add(step)
-//				debug(step.toString())
-//			}
-//					
-//		}
-		_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
+		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
+		_possibleLogicalSteps = new ArrayList()
+
+		while (!applicableRules.empty) {
+			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
+			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
+						
+			for(Match m: match){
+				val step = new HenshinStep(m,tentativeStepRule)
+				_possibleLogicalSteps.add(step)
+				debug(step.toString())
+			}
+					
+		}
+		//_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
 	
 	}
 	
