@@ -24,6 +24,13 @@ import org.eclipse.emf.common.util.URI
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification
 import static extension uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecificationHelper.*
 import org.eclipse.emf.henshin.model.Module
+import org.eclipse.gemoc.trace.commons.model.trace.impl.StepImpl
+import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
+import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
+import org.eclipse.gemoc.trace.commons.model.trace.impl.SmallStepImpl
+import org.eclipse.emf.henshin.cpa.CpaByAGG
+import org.eclipse.emf.henshin.cpa.CPAOptions
+import org.eclipse.emf.henshin.cpa.result.CriticalPair
 
 /**
  * A Solver is the visible interface of any constraint solver system that runs
@@ -40,6 +47,9 @@ class HenshinSolver implements ISolver {
 	var EGraph modelGraph
 	// May be rules, too
 	var List<Rule> semanticRules
+	var List<CriticalPair> conflictPairs
+	var CpaByAGG cpa
+	var CPAOptions cpaOptions
 
 	
 	
@@ -52,23 +62,48 @@ class HenshinSolver implements ISolver {
 //				throw new RuntimeException()
 //			}	
 //	}
+
+	new(){
+		super()
+		cpa = new CpaByAGG();
+		cpaOptions = new CPAOptions();
+	}
 	
 	val rnd = new Random()
 	
 	override computeAndGetPossibleLogicalSteps() {
+		var randomMatch = null as Match
 		//HERE USE HENSHIN TO CALCULATE STEPS
 		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
 		var possibleLogicalSteps = new ArrayList()
-
+		var ruleList = new ArrayList<Rule>
 		while(!applicableRules.empty) {
 			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
 			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
-						
 			for(Match m: match){
 				val step = new HenshinStep(m,tentativeStepRule)
+				ruleList.add(tentativeStepRule)
 				possibleLogicalSteps.add(step)
+				randomMatch = m;
 			}
 					
+		}
+		if(!ruleList.isEmpty){
+			var checkedRuleList = new ArrayList<Rule>
+			for(Rule r1: ruleList){
+				checkedRuleList.add(r1);
+				for(Rule r2: ruleList){
+					for(CriticalPair cp: conflictPairs){
+						if((cp.getFirstRule() === r1 && cp.getSecondRule() === r2) 
+							|| (cp.getFirstRule() === r2 && cp.getSecondRule() === r1)){
+								checkedRuleList.remove(r1);
+							}
+					}
+				
+				}
+			}
+			val step = new HenshinStep(checkedRuleList,randomMatch);
+			possibleLogicalSteps.add(step)
 		}
 		possibleLogicalSteps	
 	}
@@ -84,10 +119,15 @@ class HenshinSolver implements ISolver {
 
 		true
 	}
-	def configure(EGraph m, Engine h, List<Rule> s){
-		modelGraph = m
+	def configure(EGraph eg, Engine h, List<Rule> s){
+		modelGraph = eg
 		henshinEngine = h
 		semanticRules = s
+		cpa.init(semanticRules, cpaOptions);
+		//var r = m.runDependencyAnalysis();
+		var result = cpa.runConflictAnalysis();
+		//var aa = r.getCriticalPairs();
+		conflictPairs = result.getCriticalPairs();
 	}
 	
 	override getState() {

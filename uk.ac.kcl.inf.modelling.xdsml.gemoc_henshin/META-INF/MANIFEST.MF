@@ -47,7 +47,9 @@ Require-Bundle: fr.inria.diverse.k3.al.annotationprocessor.plugin;bundle-version
  org.eclipse.gemoc.executionframework.extensions.sirius;bundle-version="4.0.0",
  uk.ac.kcl.inf.modelling.pls.model;bundle-version="0.1.0",
  uk.ac.kcl.inf.modelling.pls.model.edit;bundle-version="1.0.0",
- uk.ac.kcl.inf.modelling.pls.model.editor;bundle-version="1.0.0"
+ uk.ac.kcl.inf.modelling.pls.model.editor;bundle-version="1.0.0",
+ org.eclipse.emf.henshin.cpa;bundle-version="1.4.0",
+ org.eclipse.emf.henshin.cpa.ui;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin
 Bundle-ActivationPolicy: lazy

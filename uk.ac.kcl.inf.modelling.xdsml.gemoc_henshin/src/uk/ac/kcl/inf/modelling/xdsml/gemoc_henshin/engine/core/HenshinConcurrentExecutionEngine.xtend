@@ -41,6 +41,19 @@ import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
 import org.eclipse.emf.transaction.TransactionalEditingDomain
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+import org.eclipse.emf.henshin.cpa.ICriticalPairAnalysis
+import org.eclipse.emf.ecore.EPackage
+import org.eclipse.emf.henshin.cpa.criticalpair.CriticalPair
+import org.eclipse.emf.ecore.EStructuralFeature
+import org.eclipse.emf.ecore.EOperation
+import org.eclipse.emf.common.util.EList
+import java.lang.reflect.InvocationTargetException
+import org.eclipse.emf.common.notify.Notification
+import org.eclipse.emf.henshin.cpa.criticalpair.impl.CriticalpairFactoryImpl
+import org.eclipse.emf.henshin.cpa.UnsupportedRuleException
+import org.eclipse.emf.henshin.cpa.CPAOptions
+import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.emf.henshin.cpa.CpaByAGG
 
 class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurrentExecutionContext, IConcurrentRunConfiguration> implements IConcurrentExecutionEngine {
 
@@ -57,11 +70,11 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
 	var ILogicalStepDecider _logicalStepDecider
 
-	new(IConcurrentExecutionContext concurrentexecutionContext) {
+	new(IConcurrentExecutionContext concurrentexecutionContext, HenshinSolver s) {
 		super();
 		initialize(concurrentexecutionContext);
 		_logicalStepDecider = concurrentexecutionContext.getLogicalStepDecider()
-		//_solver = s
+		_solver = s
 		// Use non-deterministic matching for now to ensure we get a random trace rather than always the same one
 		henshinEngine.options.put(Engine.OPTION_DETERMINISTIC, false)
 	}
@@ -86,6 +99,8 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			root = (root as EObjectAdapter<?>).adaptee
 		}
 		modelGraph = new EGraphImpl(root)
+		
+		//var a = new CriticalPair(r1, r2, root.eClass.EPackage)
 
 		// Load rules and units
 		// We assume entryPoint to be a string with the full workspace path to a file identifying the semantics Henshin rules
@@ -115,8 +130,18 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 
 			semanticRules = semantics.units.filter(Rule).toList
+			//semanticRules.get(0), semanticRules.get(1), root.eClass.EPackage
+//			var a = CriticalpairFactoryImpl.init().createCriticalPair();
+//			a.setFirstRule(semanticRules.get(0));
+//			a.setSecondRule(semanticRules.get(0));
+//			a.setMinimalModel(root.eClass.EPackage);
+			
+			
+			
+			
 			
 		}
+		_solver.configure(modelGraph, henshinEngine, semanticRules)
 	}
 
 	private static class RuleApplicationException extends Exception {
@@ -238,7 +263,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	
 	override protected performStart() {
 		engineStatus.setNbLogicalStepRun(0)
-		val f = executionContext.getFeedbackModel();
 		prepareEntryPoint()
 		try {
 			while (!_isStopped) {
@@ -366,21 +390,21 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	
 	override computePossibleLogicalSteps() {
 		//HERE USE HENSHIN TO CALCULATE STEPS
-		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
-		_possibleLogicalSteps = new ArrayList()
-
-		while (!applicableRules.empty) {
-			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
-						
-			for(Match m: match){
-				val step = new HenshinStep(m,tentativeStepRule)
-				_possibleLogicalSteps.add(step)
-				debug(step.toString())
-			}
-					
-		}
-		//_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
+//		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
+//		_possibleLogicalSteps = new ArrayList()
+//
+//		while (!applicableRules.empty) {
+//			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
+//			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
+//						
+//			for(Match m: match){
+//				val step = new HenshinStep(m,tentativeStepRule)
+//				_possibleLogicalSteps.add(step)
+//				debug(step.toString())
+//			}
+//					
+//		}
+		_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
 	
 	}
 	
@@ -441,9 +465,46 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			//notifyLogicalStepSelected();
 			// run all the event occurrences of this logical
 			// steprent 
-			executeSelectedLogicalStep();
+			if((selectedLogicalStep as HenshinStep).rules === null || ((selectedLogicalStep as HenshinStep).rules).isEmpty){
+				executeSelectedLogicalStep();
+			}else{
+				for(Step step : getPossibleLogicalSteps()){
+					var s = step as HenshinStep
+					if((s.rules === null || s.rules.isEmpty) && (selectedLogicalStep as HenshinStep).rules.contains(s.rule)){
+						executeStep(s);
+						
+					}
+				}
+			}
 		}
 		return selectedLogicalStep;
+	}
+	
+		def executeStep(HenshinStep step) {
+		if (!_isStopped) { 
+			val command = new StepCommand(editingDomain, step.match , ruleRunner, modelGraph)
+			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
+			val target = step.match.mainObject
+			beforeExecutionStep(step,command);
+			//beforeExecutionStep(_selectedLogicalStep);
+
+			if (command.canExecute) {
+				try {
+					command.execute
+				} catch (RuleApplicationException rae) {
+					editingDomain.activeTransaction.abort(
+						new Status(IStatus.OK,
+							Activator.PLUGIN_ID, '''Error executing semantic rule «step.match.rule.name».'''))
+				}
+			}
+
+			afterExecutionStep()
+
+
+		} else {
+			
+			afterExecutionStep();
+		}
 	}
 	
 	override executeSelectedLogicalStep() {

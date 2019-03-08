@@ -23,11 +23,13 @@ import org.eclipse.emf.ecore.impl.EcoreFactoryImpl
 import org.eclipse.emf.ecore.EcoreFactory
 import org.eclipse.emf.ecore.EcorePackage
 import org.eclipse.emf.ecore.EObject
+import java.util.List
 
 class HenshinStep extends GenericSmallStepImpl {
 	
 		public Match match
 		public Rule rule
+		public List<Rule> rules
 
 		new(Match match, Rule rule) {
 			super()
@@ -37,25 +39,50 @@ class HenshinStep extends GenericSmallStepImpl {
 			this.match = match
 			this.rule = rule
 		}
+		new(List<Rule> rules, Match match) {
+			super()
+			this.rules = rules;
+			this.match = match
+		}
 		
 		override getMseoccurrence() {
 			//create it on the fly each time it's called 
 			//so simulate creating MSE object -> with operation same name as rule name
 			//create mse occurrence -> all objects except for the main object
 			//to create mseoccurrence use factory class generated from an ecore file
-			val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
-			mse.setCallerReference(match.mainObject)
-			val eo = EcoreFactory.eINSTANCE.createEOperation()
-			eo.setName(match.getRule().getName())
-			mse.setActionReference(eo);
-			mse.setName(match.toString())
-
-			val mseoc = TracePackage::eINSTANCE.traceFactory.createMSEOccurrence()
-			mseoc.setMse(mse)
-			for(EObject e: match.getNodeTargets()){
-				mseoc.parameters.add(e)
+			if(rules === null || rules.isEmpty){
+				val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
+				mse.setCallerReference(match.mainObject)
+				val eo = EcoreFactory.eINSTANCE.createEOperation()
+				eo.setName(match.getRule().getName())
+				mse.setActionReference(eo);
+				mse.setName(match.toString())
+	
+				val mseoc = TracePackage::eINSTANCE.traceFactory.createMSEOccurrence()
+				mseoc.setMse(mse)
+				for(EObject e: match.getNodeTargets()){
+					mseoc.parameters.add(e)
+				}
+				mseoc
+			}else{
+				var fullName = ''
+				for(Rule r: rules){
+					fullName = fullName + ' ' + r.getName()
+				}
+				val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
+				mse.setCallerReference(match.mainObject)
+				val eo = EcoreFactory.eINSTANCE.createEOperation()
+				eo.setName(fullName)
+				mse.setActionReference(eo);
+				mse.setName(fullName)
+	
+				val mseoc = TracePackage::eINSTANCE.traceFactory.createMSEOccurrence()
+				mseoc.setMse(mse)
+				for(EObject e: match.getNodeTargets()){
+					mseoc.parameters.add(e)
+				}
+				mseoc
 			}
-			mseoc
 			
 		}		
 		
