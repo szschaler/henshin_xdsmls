@@ -11,52 +11,47 @@
  *******************************************************************************/
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
-import java.util.Collection;
-import java.util.List;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.ILaunchGroup;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EcorePackage;
-import org.eclipse.gemoc.commons.eclipse.messagingsystem.api.MessagingSystem;
-import org.eclipse.gemoc.commons.eclipse.ui.ViewHelper;
-import org.eclipse.gemoc.dsl.debug.ide.adapter.IDSLCurrentInstructionListener;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentModelExecutionContext;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.step.LogicalStepsView;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.stimulimanager.StimuliManagerView;
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext;
-import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration;
-import org.eclipse.gemoc.executionframework.engine.ui.launcher.AbstractGemocLauncher;
-import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocAnimatorServices;
-import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocDebuggerServices;
-import org.eclipse.gemoc.executionframework.ui.views.engine.EnginesStatusView;
-import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus.RunStatus;
-import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode;
-import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionEngine;
-import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
+import java.util.Collection
+import java.util.List
+import org.eclipse.core.resources.IResource
+import org.eclipse.core.runtime.CoreException
+import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.core.runtime.IStatus
+import org.eclipse.core.runtime.Status
+import org.eclipse.core.runtime.jobs.Job
+import org.eclipse.debug.core.ILaunch
+import org.eclipse.debug.core.ILaunchConfiguration
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
+import org.eclipse.debug.core.ILaunchManager
+import org.eclipse.debug.ui.DebugUITools
+import org.eclipse.debug.ui.ILaunchGroup
+import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EcorePackage
+import org.eclipse.gemoc.commons.eclipse.ui.ViewHelper
+import org.eclipse.gemoc.dsl.debug.ide.adapter.IDSLCurrentInstructionListener
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.step.LogicalStepsView
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.stimulimanager.StimuliManagerView
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
+import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
+import org.eclipse.gemoc.executionframework.engine.ui.launcher.AbstractGemocLauncher
+import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocAnimatorServices
+import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocDebuggerServices
+import org.eclipse.gemoc.executionframework.ui.views.engine.EnginesStatusView
+import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus.RunStatus
+import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
+import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionEngine
+import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
+import org.eclipse.jface.dialogs.MessageDialog
+import org.eclipse.jface.viewers.ISelection
+import org.eclipse.jface.viewers.StructuredSelection
+import org.eclipse.ui.IEditorPart
+import org.eclipse.ui.PlatformUI
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
-import org.eclipse.gemoc.executionframework.extensions.sirius.services.AbstractGemocAnimatorServices.GemocModelAnimator
 
 class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentExecutionContext> {
 
@@ -77,13 +72,9 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 					ViewHelper.showView(LogicalStepsView.ID);
 				}
 			});
-			debug("aaaa22222222About to initialize and run the GEMOC Henshin Execution Engine...");
-			debug("CHECKCHECK22222222About to initialize and run the GEMOC Henshin Execution Engine...");
 
 			// We parse the run configuration
 			var ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration);
-			debug("3333333About to initialize and run the GEMOC Henshin Execution Engine...");
-			debug("aaaa3333333About to initialize and run the GEMOC Henshin Execution Engine...");
 
 			// We detect if we are running in debug mode or not
 			var ExecutionMode executionMode = null;
@@ -92,25 +83,17 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			} else {
 				executionMode = ExecutionMode.Run;
 			}
-			debug("444444444About to initialize and run the GEMOC Henshin Execution Engine..."); 
 
 			// We stop the launch if an engine is already running for this model
 			if (isEngineAlreadyRunning(runConfiguration.getExecutedModelURI())) {
 				return;
 			}
 			
-			debug("5555555About to initialize and run the GEMOC Henshin Execution Engine...");
 			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
 					runConfiguration, executionMode);
-				debug("CHECKCHECK22222222About to initialize and run the GEMOC Henshin Execution Engine...");
 					 
 				concurrentexecutionContext.initializeResourceModel();
-//				concurrentexecutionContext.initializeResourceModel();
 					
-			
-			debug("66666About to initialize and run the GEMOC Henshin Execution Engine...");
-	
-			debug("77777About to initialize and run the GEMOC Henshin Execution Engine...");
 			
 			var HenshinSolver _solver
 			try {

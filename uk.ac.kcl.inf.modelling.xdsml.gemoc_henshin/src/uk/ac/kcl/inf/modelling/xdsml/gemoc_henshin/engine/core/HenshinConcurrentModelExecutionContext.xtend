@@ -1,37 +1,20 @@
-/*******************************************************************************
- * Copyright (c) 2017 INRIA and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     INRIA - initial API and implementation
- *     I3S Laboratory - API update and bug fix
- *******************************************************************************/
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core;
 
 import org.eclipse.core.runtime.CoreException
+import org.eclipse.core.runtime.IConfigurationElement
+import org.eclipse.core.runtime.InvalidRegistryObjectException
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.DefaultConcurrentExecutionPlatform
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.LogicalStepDeciderFactory
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionPlatform
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentRunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ILogicalStepDecider
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.languages.ConcurrentLanguageDefinitionExtension
-import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.engine.commons.AbstractModelExecutionContext
-import org.eclipse.gemoc.moccml.mapping.feedback.feedback.ActionModel
-import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
-import org.eclipse.core.runtime.IConfigurationElement
-import org.eclipse.gemoc.xdsmlframework.api.extensions.languages.LanguageDefinitionExtensionPoint
+import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.extensions.sirius.modelloader.DefaultModelLoader
-import org.eclipse.core.runtime.InvalidRegistryObjectException
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.DefaultConcurrentExecutionPlatform
-import org.eclipse.gemoc.xdsmlframework.api.core.IRunConfiguration
+import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import org.eclipse.emf.common.util.URI
-import fr.inria.diverse.melange.adapters.EObjectAdapter
-import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionContext<IConcurrentRunConfiguration,IConcurrentExecutionPlatform,ConcurrentLanguageDefinitionExtension> implements IConcurrentExecutionContext{
@@ -40,15 +23,11 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 	
 	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode) throws EngineContextException {
 		super(runConfiguration, executionMode)
-		debug("dfsdfsd5555555About to initialize and run the GEMOC Henshin Execution Engine...")
 		//logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
 		logicalStepDecider = LogicalStepDeciderFactory.createDecider("Step by step user decider", executionMode);	
 	}
 	override protected createExecutionPlatform() throws CoreException {
-		// figure this out  ? ???? 
 		return new DefaultConcurrentExecutionPlatform(_languageDefinition as HenshinLanguageDefinitionExtension , _runConfiguration);
-		//return new DefaultConcurrentExecutionPlatform(_languageDefinition as ConcurrentLanguageDefinitionExtension, _runConfiguration);
-		//return null;
 	}
 	def protected void debug(String message) {
 		getMessagingSystem().debug(message, getPluginID());
@@ -65,15 +44,6 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 	
 	override getFeedbackModel() {
 	}
-	
-	/*
-	 * Need to work around the lookup from GEMOC's language-definition extension point, which doesn't align with how we define a language 
-	 */
-//	private static class HenshinLanguageDefinitionExtension extends ConcurrentLanguageDefinitionExtension {
-//		new(HenshinConcurrentModelExecutionContext hmec) {
-//			super()			
-//		}
-//	}
 	
 	private static class HenshinLanguageDefinitionExtension extends ConcurrentLanguageDefinitionExtension {
 		new(HenshinConcurrentModelExecutionContext hmec) {
@@ -177,5 +147,4 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 		return logicalStepDecider
 	}
 	
-
 }

@@ -2,7 +2,6 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import fr.inria.diverse.melange.adapters.EObjectAdapter
 import java.util.List
-import java.util.Random
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
 import org.eclipse.emf.common.util.URI
@@ -15,11 +14,9 @@ import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
 import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
 import org.eclipse.emf.henshin.model.Module
-import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.emf.transaction.RecordingCommand
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain
-import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionContext
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator;
 import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification
@@ -29,31 +26,15 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrent
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IFutureAction
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ILogicalStepDecider
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
-//import org.eclipse.gemoc.executionframework.engine.Activator
 import org.eclipse.gemoc.executionframework.engine.core.AbstractExecutionEngine
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 
 import static extension uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecificationHelper.*
 import java.util.ArrayList
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dse.IMSEStateController
 import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
 import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
-import org.eclipse.emf.transaction.TransactionalEditingDomain
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
-import org.eclipse.emf.henshin.cpa.ICriticalPairAnalysis
-import org.eclipse.emf.ecore.EPackage
-import org.eclipse.emf.henshin.cpa.criticalpair.CriticalPair
-import org.eclipse.emf.ecore.EStructuralFeature
-import org.eclipse.emf.ecore.EOperation
-import org.eclipse.emf.common.util.EList
-import java.lang.reflect.InvocationTargetException
-import org.eclipse.emf.common.notify.Notification
-import org.eclipse.emf.henshin.cpa.criticalpair.impl.CriticalpairFactoryImpl
-import org.eclipse.emf.henshin.cpa.UnsupportedRuleException
-import org.eclipse.emf.henshin.cpa.CPAOptions
-import org.eclipse.core.runtime.IProgressMonitor
-import org.eclipse.emf.henshin.cpa.CpaByAGG
 
 class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurrentExecutionContext, IConcurrentRunConfiguration> implements IConcurrentExecutionEngine {
 
@@ -63,7 +44,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 	var EObject root
 	var EGraph modelGraph
-	// May be rules, too
 	var List<Rule> semanticRules
 	protected HenshinStep _selectedLogicalStep;
 	var HenshinSolver _solver;
@@ -100,13 +80,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 		modelGraph = new EGraphImpl(root)
 		
-		//var a = new CriticalPair(r1, r2, root.eClass.EPackage)
-
 		// Load rules and units
 		// We assume entryPoint to be a string with the full workspace path to a file identifying the semantics Henshin rules
 		// We expect this to be a resource that contains a HenshinXDsmlSpecification or a Henshin model directly
 		val entryPoint = _executionContext.runConfiguration.languageName
-		// FIXME: This needs injecting!
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
 
@@ -129,28 +106,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 			}
 
-			semanticRules = semantics.units.filter(Rule).toList
-			var s = semanticRules;
-			var mappings = s.get(2).getMappings();
-			var amappings = s.get(2).getAllMappings();
-			var graph = s.get(2).getLhs();
-			var nodes = graph.getNodes();
-			var edges = graph.getEdges();
-			var graph2 = s.get(2).getRhs();
-			var nodes2 = graph2.getNodes();
-			var edges2 = graph2.getEdges();
-			var dif = nodes.size() - nodes2.size();
-			var dif2 = nodes.size() - nodes2.size();
-			//semanticRules.get(0), semanticRules.get(1), root.eClass.EPackage
-//			var a = CriticalpairFactoryImpl.init().createCriticalPair();
-//			a.setFirstRule(semanticRules.get(0));
-//			a.setSecondRule(semanticRules.get(0));
-//			a.setMinimalModel(root.eClass.EPackage);
-			
-			
-			
-			
-			
+			semanticRules = semantics.units.filter(Rule).toList		
 		}
 		_solver.configure(modelGraph, henshinEngine, semanticRules)
 	}
@@ -177,100 +133,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 		}
 	}
-
-	/**
-	 * Perform a single step of model execution
-	 */
-//	private def performStep() {
-//		//val match = pickNextMatch
-//
-//		if (match !== null) {
-//			var result = true
-//
-//			val command = new StepCommand(editingDomain, _selectedLogicalStep.match , ruleRunner, modelGraph)
-//			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-//			val target = _selectedLogicalStep.match.mainObject
-//			beforeExecutionStep(_selectedLogicalStep)
-//
-//			if (command.canExecute) {
-//				try {
-//					command.execute
-//				} catch (RuleApplicationException rae) {
-//					editingDomain.activeTransaction.abort(
-//						new Status(IStatus.OK,
-//							Activator.PLUGIN_ID, '''Error executing semantic rule «_selectedLogicalStep.match.rule.name».'''))
-//					result = false
-//				}
-//			}
-//
-//			afterExecutionStep
-//
-//			result
-//		} else {
-//			false
-//		}
-//	}
-
-	/**
-	 * The object to be used as the fake target when executing this match
-	 */
-	private def mainObject(Match match) {
-		val targetNode = match.rule.lhs.nodes.findFirst [ n |
-			n.annotations.exists[a|a.key == "Target"]
-		]
-
-		if (targetNode !== null) {
-			match.getNodeTarget(targetNode)
-		} else {
-			root
-		}
-	}
-
-	/**
-	 * Generate a fake operation name to be used when executing this match
-	 */
-	private def String operationName(Match match) '''
-		«match.rule.name»
-	'''
-
-	private val rnd = new Random()
-
-	/**
-	 * Randomly pick the next rule from those that could be applied
-	 */
-	private def pickNextMatch() {
-		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
-		_possibleLogicalSteps = new ArrayList()
-
-		while (!applicableRules.empty) {
-			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
-						
-//			for(Match m: match){
-//				//val step = new HenshinStep(m, tentativeStepRule)
-//				_possibleLogicalSteps.add(step)
-//			}
-					
-		}
-
-		_possibleLogicalSteps
-	}
-
-	private def boolean checkParamters(Rule operator) {
-		if (operator.parameters !== null) {
-			// Currently, we only support units without parameters (other than variables). 
-			// Check to make sure we're not running into problems
-			if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
-				println("Invalid unit with non-var parameters: " + operator.name)
-				return false
-			}
-		}
-
-		true
-	}
-	override protected finishDispose() {
-		//throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
 	
 	override protected performStart() {
 		engineStatus.setNbLogicalStepRun(0)
@@ -288,21 +150,16 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	
 	override protected performStop() {
 		setSelectedLogicalHenshinStep(null);
-		if (getLogicalStepDecider() != null) {
+		if (getLogicalStepDecider() !== null) {
 			// unlock decider if this is a user decider
 			getLogicalStepDecider().preempt();
-		}	}
+		}	
+	}
 	
 	override protected performInitialize(IConcurrentExecutionContext executionContext) {
 		if (!(executionContext instanceof HenshinConcurrentModelExecutionContext))
 			throw new IllegalArgumentException(
 					"executionContext must be an HenshinConcurrentExecutionEngine when used in HenshinConcurrentExecutionEngine");
-
-	
-	}
-	
-	override addFutureAction(IFutureAction arg0) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
 	override changeLogicalStepDecider(ILogicalStepDecider newDecider) {
@@ -322,7 +179,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	
 	override getPossibleLogicalSteps() {
-		debug(_possibleLogicalSteps.toString())
 		return _possibleLogicalSteps
 	}
 	
@@ -357,6 +213,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	
 	override notifyLogicalStepSelected() {
+		debug("selected");
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
 				addon.stepSelected(this, getSelectedLogicalStep());
@@ -365,6 +222,8 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 		}
 	}
+	
+	//code that should be here commented out for now coz of GEMOC architecture
 	override notifyAboutToExecuteLogicalStep(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
@@ -372,14 +231,14 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			} catch (EngineStoppedException ese) {
 				debug("Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() + ") has received stop command  with message : " + ese.getMessage());
 				stop();
-				throw ese; // do not continue to execute anything, forward
-							// exception
+				throw ese; 
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
 
+	//code moved here from notifyAboutToExecuteLogicalStep
 	override notifyLogicalStepExecuted(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
@@ -400,57 +259,27 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	
 	
 	override computePossibleLogicalSteps() {
-		//HERE USE HENSHIN TO CALCULATE STEPS
-//		var applicableRules = semanticRules.filter[r|r.checkParamters].toList
-//		_possibleLogicalSteps = new ArrayList()
-//
-//		while (!applicableRules.empty) {
-//			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-//			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
-//						
-//			for(Match m: match){
-//				val step = new HenshinStep(m,tentativeStepRule)
-//				_possibleLogicalSteps.add(step)
-//				debug(step.toString())
-//			}
-//					
-//		}
 		_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
-	
 	}
 	
-	//i think not needed
 	override updatePossibleLogicalSteps() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
 	override performExecutionStep() throws InterruptedException {
-		//switchDeciderIfNecessary();
 		computePossibleLogicalSteps();
-		//updatePossibleLogicalSteps();
 		
 		// 2- select one solution from available logical step /
 		// select interactive vs batch
 		if (_possibleLogicalSteps.size() == 0) {
-			debug("No more LogicalStep to run")
+			debug("No more LogicalSteps to run")
 			stop();
 		} else {
-			// Activator.getDefault().debug("\t\t ---------------- LogicalStep "
-			// + count);
 			val selectedLogicalStep = selectAndExecuteLogicalStep();
-			debug("executed")
-			debug(modelGraph.toString())
+
 			// 3 - run the selected logical step
 			// inform the solver that we will run this step
-			if (selectedLogicalStep != null) {
-				//no solver for now
-				//(getSolver() as HenshinSolver).applyHenshinStep(selectedLogicalStep as HenshinStep);
-
-// only for testing purpose
-//				List<fr.inria.aoste.timesquare.instantrelation.CCSLRelationModel.OccurrenceRelation> res = getSolver().getLastOccurrenceRelations();
-//				System.out.println("/********************DEBUG OCCURRENCE RELATIONS****************\n*  "
-//						+res
-//						+"\n**********************************************************/");
+			if (selectedLogicalStep !== null) {
 				
 				engineStatus.incrementNbLogicalStepRun();
 			} else {
@@ -467,19 +296,18 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		notifyAboutToSelectLogicalStep();
 		
 		val selectedLogicalStep = getLogicalStepDecider().decide(this, getPossibleLogicalSteps());
-		val r = getCodeExecutor();
 		
-		if (selectedLogicalStep != null) {
+		if (selectedLogicalStep !== null) {
 			setSelectedLogicalHenshinStep(selectedLogicalStep as HenshinStep);
 						
 			setEngineStatus(EngineStatus.RunStatus.Running);
-			//notifyLogicalStepSelected();
+			notifyLogicalStepSelected();
 			// run all the event occurrences of this logical
-			// steprent 
+			// step 
 			if((selectedLogicalStep as HenshinStep).matches === null || ((selectedLogicalStep as HenshinStep).matches).isEmpty){
 				executeSelectedLogicalStep();
 			}else{
-				for(Step step : getPossibleLogicalSteps()){
+				for(Step<?> step : getPossibleLogicalSteps()){
 					var s = step as HenshinStep
 					if((s.matches === null || s.matches.isEmpty) && (selectedLogicalStep as HenshinStep).matches.contains(s.match)){
 						executeStep(s);
@@ -491,11 +319,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		return selectedLogicalStep;
 	}
 	
-		def executeStep(HenshinStep step) {
+	def executeStep(HenshinStep step) {
 		if (!_isStopped) { 
 			val command = new StepCommand(editingDomain, step.match , ruleRunner, modelGraph)
 			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			val target = step.match.mainObject
 			beforeExecutionStep(step,command);
 			//beforeExecutionStep(_selectedLogicalStep);
 
@@ -531,16 +358,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 							// stop button when paused in the debugger
 			
 			//perform HENSHIN!! step
-//			val TransactionalEditingDomain editingDomainn = TransactionalEditingDomain.Factory.INSTANCE
-//					.getEditingDomain(getExecutionContext().getResourceModel().getResourceSet());
-//			var e = editingDomain
-//			var a = editingDomain.getResourceSet()
 			val command = new StepCommand(editingDomain, _selectedLogicalStep.match , ruleRunner, modelGraph)
 			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			val target = _selectedLogicalStep.match.mainObject
+			
 			beforeExecutionStep(_selectedLogicalStep,command);
-			//beforeExecutionStep(_selectedLogicalStep);
-
 			if (command.canExecute) {
 				try {
 					command.execute
@@ -550,12 +371,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 							Activator.PLUGIN_ID, '''Error executing semantic rule «_selectedLogicalStep.match.rule.name».'''))
 				}
 			}
-
 			afterExecutionStep()
-
-
-		} else {
 			
+		} else {
 			afterExecutionStep();
 		}
 	}
@@ -579,7 +397,12 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	
 	override protected beforeStart() {
-		debug('before start engine')
+		debug('Running engine setup...')
+	}
+	override protected finishDispose() {
+	}
+	override addFutureAction(IFutureAction arg0) {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
 }
