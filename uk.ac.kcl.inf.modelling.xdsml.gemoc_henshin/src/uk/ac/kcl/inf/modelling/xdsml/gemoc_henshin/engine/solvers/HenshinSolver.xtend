@@ -40,6 +40,7 @@ import org.eclipse.emf.henshin.model.impl.MappingImpl
 import org.eclipse.emf.henshin.model.Mapping
 import org.eclipse.emf.henshin.model.Node
 import java.util.Arrays
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * A Solver is the visible interface of any constraint solver system that runs
@@ -117,29 +118,59 @@ class HenshinSolver implements ISolver {
 		var possibleSequences =  new ArrayList<ArrayList<Match>>;
 		
 		for(Match m1: conflictMatchesList){
-			var currSeq =  new ArrayList<Match>;
-			currSeq.add(m1);
+			var currSeq =  new CopyOnWriteArrayList<ArrayList<Match>>;
+			var oneSeq =  new ArrayList<Match>;
+			oneSeq.add(m1);
+			currSeq.add(oneSeq);
 			for(Match m2: conflictMatchesList){
-				var safeToAdd = true;
-				for(Match alreadyInSeq: currSeq){
-					if(alreadyInSeq === m2 || haveConflicts(alreadyInSeq,m2)){
-						safeToAdd = false;
+				//check if has conflicts with current
+				var safeToAddWithCurr = false;
+				if(!m1.equals(m2) && !haveConflicts(m1,m2)){
+					safeToAddWithCurr = true;
+				}
+				//if it doesnt then check all other elements
+				if(safeToAddWithCurr){
+					for(ArrayList<Match> alreadyInSeq: currSeq){
+						var safeToAdd = true;
+						for(Match currInnerMatch: alreadyInSeq){
+							if(!currInnerMatch.equals(m1) && !currInnerMatch.equals(m2) && haveConflicts(currInnerMatch,m2)){
+								safeToAdd = false;
+								var newSeq =  new ArrayList<Match>;
+								newSeq.add(m1);
+								newSeq.add(m2);
+								currSeq.add(newSeq);
+							}
+							
+						}
+						if(safeToAdd){
+							alreadyInSeq.add(m2);
+						}
 					}
 				}
-				if(safeToAdd){
-					currSeq.add(m2);
-				}
+//				var safeToAdd = true;
+//				for(Match alreadyInSeq: currSeq){
+//					if(alreadyInSeq === m2 || haveConflicts(alreadyInSeq,m2)){
+//						safeToAdd = false;
+//					}
+//				}
+//				if(safeToAdd){
+//					currSeq.add(m2);
+//				}
 			}
-			var alreadyAdded = false;
-			for(ArrayList<Match> arr: possibleSequences){
-				if(arr.containsAll(currSeq)){
-					alreadyAdded = true;
-				}
-			}
-			if(!alreadyAdded){
-				possibleSequences.add(currSeq);
-			}
+			
+			possibleSequences.addAll(currSeq);
+//			var alreadyAdded = false;
+//			for(ArrayList<Match> arr: possibleSequences){
+//				if(arr.containsAll(currSeq)){
+//					alreadyAdded = true;
+//				}
+//			}
+//			if(!alreadyAdded){
+//				possibleSequences.add(currSeq);
+//			}
 		}
+		
+		possibleSequences = removeDuplicates(possibleSequences);
 		
 		for(ArrayList<Match> arr: possibleSequences){
 			var concatArr = new ArrayList<Match>();
@@ -185,6 +216,25 @@ class HenshinSolver implements ISolver {
 
 		possibleLogicalSteps	
 	}
+		
+		def removeDuplicates(ArrayList<ArrayList<Match>> lists) {
+			var noDuplicatesList =  new CopyOnWriteArrayList<ArrayList<Match>>;
+			
+			for(ArrayList<Match> list: lists){
+				var isDuplicate = false;
+				for(ArrayList<Match> alreadyAdded: noDuplicatesList){
+					if(alreadyAdded.containsAll(list)){
+						isDuplicate = true
+					}
+				}
+				if(!isDuplicate){
+					noDuplicatesList.add(list)
+				}
+			}
+			var result =  new ArrayList<ArrayList<Match>>;
+			result.addAll(noDuplicatesList);
+			result
+		}
 		
 	def haveConflicts(Match match1, Match match2) {
 		var deletedNodes1 = getDeletedNodes(match1.getRule());
