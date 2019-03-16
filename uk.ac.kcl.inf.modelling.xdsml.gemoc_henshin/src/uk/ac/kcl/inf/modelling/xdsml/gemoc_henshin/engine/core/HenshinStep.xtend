@@ -28,21 +28,15 @@ import java.util.List
 class HenshinStep extends GenericSmallStepImpl {
 	
 		public Match match
-		public Rule rule
-		public List<Rule> rules
+		public List<Match> matches
 
-		new(Match match, Rule rule) {
+		new(Match match) {
 			super()
-			//this.runner = runner
-			//this.runner.EGraph = model
-			//this.runner.rule = match.rule
 			this.match = match
-			this.rule = rule
 		}
-		new(List<Rule> rules, Match match) {
+		new(List<Match> matches) {
 			super()
-			this.rules = rules;
-			this.match = match
+			this.matches = matches
 		}
 		
 		override getMseoccurrence() {
@@ -50,7 +44,7 @@ class HenshinStep extends GenericSmallStepImpl {
 			//so simulate creating MSE object -> with operation same name as rule name
 			//create mse occurrence -> all objects except for the main object
 			//to create mseoccurrence use factory class generated from an ecore file
-			if(rules === null || rules.isEmpty){
+			if(matches === null || matches.isEmpty){
 				val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
 				mse.setCallerReference(match.mainObject)
 				val eo = EcoreFactory.eINSTANCE.createEOperation()
@@ -66,11 +60,12 @@ class HenshinStep extends GenericSmallStepImpl {
 				mseoc
 			}else{
 				var fullName = ''
-				for(Rule r: rules){
+				for(Match m: matches){
+					var r = m.getRule();
 					fullName = fullName + ' ' + r.getName()
 				}
 				val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
-				mse.setCallerReference(match.mainObject)
+				mse.setCallerReference(matches.get(0).mainObject)
 				val eo = EcoreFactory.eINSTANCE.createEOperation()
 				eo.setName(fullName)
 				mse.setActionReference(eo);
@@ -78,7 +73,7 @@ class HenshinStep extends GenericSmallStepImpl {
 	
 				val mseoc = TracePackage::eINSTANCE.traceFactory.createMSEOccurrence()
 				mseoc.setMse(mse)
-				for(EObject e: match.getNodeTargets()){
+				for(EObject e: matches.get(0).getNodeTargets()){
 					mseoc.parameters.add(e)
 				}
 				mseoc

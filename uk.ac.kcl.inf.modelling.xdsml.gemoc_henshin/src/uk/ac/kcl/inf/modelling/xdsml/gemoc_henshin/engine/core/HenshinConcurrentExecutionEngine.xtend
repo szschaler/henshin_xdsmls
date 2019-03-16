@@ -130,6 +130,17 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 
 			semanticRules = semantics.units.filter(Rule).toList
+			var s = semanticRules;
+			var mappings = s.get(2).getMappings();
+			var amappings = s.get(2).getAllMappings();
+			var graph = s.get(2).getLhs();
+			var nodes = graph.getNodes();
+			var edges = graph.getEdges();
+			var graph2 = s.get(2).getRhs();
+			var nodes2 = graph2.getNodes();
+			var edges2 = graph2.getEdges();
+			var dif = nodes.size() - nodes2.size();
+			var dif2 = nodes.size() - nodes2.size();
 			//semanticRules.get(0), semanticRules.get(1), root.eClass.EPackage
 //			var a = CriticalpairFactoryImpl.init().createCriticalPair();
 //			a.setFirstRule(semanticRules.get(0));
@@ -235,10 +246,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
 			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
 						
-			for(Match m: match){
-				val step = new HenshinStep(m, tentativeStepRule)
-				_possibleLogicalSteps.add(step)
-			}
+//			for(Match m: match){
+//				//val step = new HenshinStep(m, tentativeStepRule)
+//				_possibleLogicalSteps.add(step)
+//			}
 					
 		}
 
@@ -465,12 +476,12 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			//notifyLogicalStepSelected();
 			// run all the event occurrences of this logical
 			// steprent 
-			if((selectedLogicalStep as HenshinStep).rules === null || ((selectedLogicalStep as HenshinStep).rules).isEmpty){
+			if((selectedLogicalStep as HenshinStep).matches === null || ((selectedLogicalStep as HenshinStep).matches).isEmpty){
 				executeSelectedLogicalStep();
 			}else{
 				for(Step step : getPossibleLogicalSteps()){
 					var s = step as HenshinStep
-					if((s.rules === null || s.rules.isEmpty) && (selectedLogicalStep as HenshinStep).rules.contains(s.rule)){
+					if((s.matches === null || s.matches.isEmpty) && (selectedLogicalStep as HenshinStep).matches.contains(s.match)){
 						executeStep(s);
 						
 					}

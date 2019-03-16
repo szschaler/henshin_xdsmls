@@ -31,6 +31,15 @@ import org.eclipse.gemoc.trace.commons.model.trace.impl.SmallStepImpl
 import org.eclipse.emf.henshin.cpa.CpaByAGG
 import org.eclipse.emf.henshin.cpa.CPAOptions
 import org.eclipse.emf.henshin.cpa.result.CriticalPair
+import org.eclipse.emf.henshin.model.Graph
+import java.util.HashMap
+import java.util.HashSet
+import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.emf.henshin.model.impl.NodeImpl
+import org.eclipse.emf.henshin.model.impl.MappingImpl
+import org.eclipse.emf.henshin.model.Mapping
+import org.eclipse.emf.henshin.model.Node
+import java.util.Arrays
 
 /**
  * A Solver is the visible interface of any constraint solver system that runs
@@ -50,6 +59,7 @@ class HenshinSolver implements ISolver {
 	var List<CriticalPair> conflictPairs
 	var CpaByAGG cpa
 	var CPAOptions cpaOptions
+	var HashSet<Rule> conflictRules
 
 	
 	
@@ -72,41 +82,162 @@ class HenshinSolver implements ISolver {
 	val rnd = new Random()
 	
 	override computeAndGetPossibleLogicalSteps() {
+		
+		
 		var randomMatch = null as Match
 		//HERE USE HENSHIN TO CALCULATE STEPS
 		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
 		var possibleLogicalSteps = new ArrayList()
 		var ruleList = new ArrayList<Rule>
+		var matchList = new ArrayList<Match>;
 		while(!applicableRules.empty) {
 			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
 			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
 			for(Match m: match){
-				val step = new HenshinStep(m,tentativeStepRule)
+				val step = new HenshinStep(m);
 				ruleList.add(tentativeStepRule)
 				possibleLogicalSteps.add(step)
 				randomMatch = m;
+				matchList.add(m);
 			}
 					
 		}
-		if(!ruleList.isEmpty){
-			var checkedRuleList = new ArrayList<Rule>
-			for(Rule r1: ruleList){
-				checkedRuleList.add(r1);
-				for(Rule r2: ruleList){
-					for(CriticalPair cp: conflictPairs){
-						if((cp.getFirstRule() === r1 && cp.getSecondRule() === r2) 
-							|| (cp.getFirstRule() === r2 && cp.getSecondRule() === r1)){
-								checkedRuleList.remove(r1);
-							}
+		
+		var conflictMatchesList = new ArrayList<Match>;
+		var conflictFreeMatchesList = new ArrayList<Match>;
+		
+		for(Match m: matchList){
+			if(conflictRules.contains(m.getRule())){
+				conflictMatchesList.add(m);
+			}else{
+				conflictFreeMatchesList.add(m);
+			}
+		}
+		
+		var possibleSequences =  new ArrayList<ArrayList<Match>>;
+		
+		for(Match m1: conflictMatchesList){
+			var currSeq =  new ArrayList<Match>;
+			currSeq.add(m1);
+			for(Match m2: conflictMatchesList){
+				var safeToAdd = true;
+				for(Match alreadyInSeq: currSeq){
+					if(alreadyInSeq === m2 || haveConflicts(alreadyInSeq,m2)){
+						safeToAdd = false;
 					}
-				
+				}
+				if(safeToAdd){
+					currSeq.add(m2);
 				}
 			}
-			val step = new HenshinStep(checkedRuleList,randomMatch);
+			var alreadyAdded = false;
+			for(ArrayList<Match> arr: possibleSequences){
+				if(arr.containsAll(currSeq)){
+					alreadyAdded = true;
+				}
+			}
+			if(!alreadyAdded){
+				possibleSequences.add(currSeq);
+			}
+		}
+		
+		for(ArrayList<Match> arr: possibleSequences){
+			var concatArr = new ArrayList<Match>();
+			concatArr.addAll(conflictFreeMatchesList);
+			concatArr.addAll(arr);
+			var step = new HenshinStep(concatArr);
 			possibleLogicalSteps.add(step)
 		}
+		if(possibleSequences.isEmpty() && !conflictFreeMatchesList.isEmpty()){
+			var step = new HenshinStep(conflictFreeMatchesList);
+			possibleLogicalSteps.add(step)
+		}
+		
+//		if(!ruleList.isEmpty){
+//			var checkedRuleList = new ArrayList<Rule>
+//			for(Rule r1: ruleList){
+//				var flag = true;
+//				for(Rule r2: ruleList){
+//					var g = r1.equals(r2);
+//					var gg = r1 === r2;
+//					var lala = 2;
+//					if(!r1.equals(r2) || checkedRuleList.contains(r2)){
+//					for(CriticalPair cp: conflictPairs){
+//						if((cp.getFirstRule() === r1 && cp.getSecondRule() === r2) 
+//							|| (cp.getFirstRule() === r2 && cp.getSecondRule() === r1)){
+//								//checkedRuleList.remove(r1);
+//								flag = false;
+//							}
+//					}
+//					}		
+//				}
+//				if(flag){
+//					checkedRuleList.add(r1);
+//				}
+//			}
+//			val step = new HenshinStep(checkedRuleList,randomMatch);
+//			possibleLogicalSteps.add(step)
+//		}
+//		for(Match m: ruleMatchMap.keySet()){
+//			var cc = m.getNodeTargets();
+//			var f = 5;
+//		}
+
 		possibleLogicalSteps	
 	}
+		
+	def haveConflicts(Match match1, Match match2) {
+		var deletedNodes1 = getDeletedNodes(match1.getRule());
+		var deletedNodes2 = getDeletedNodes(match2.getRule());
+		
+		var deletedNodeTargets1 = new ArrayList<EObject>();
+		for(Node eo: deletedNodes1){
+			deletedNodeTargets1.add(match1.getNodeTarget(eo));
+		}
+		var deletedNodeTargets2 = new ArrayList<EObject>();
+		for(Node eo: deletedNodes2){
+			deletedNodeTargets2.add(match2.getNodeTarget(eo));
+		}
+		
+		var nodeTargets1 = match1.getNodeTargets();
+		var nodeTargets2 = match2.getNodeTargets();
+		
+		for(EObject eo: deletedNodeTargets1){
+			if(nodeTargets2.contains(eo)){
+				return true;
+			}
+		}
+		for(EObject eo: deletedNodeTargets2){
+			if(nodeTargets1.contains(eo)){
+				return true;
+			}
+		}
+		return false;
+	}
+		
+	def getDeletedNodes(Rule rule) {
+		//if its in mappings get origin then its preserved otherwise it's deleted
+		var lhsNodes = rule.getLhs().getNodes();
+		var mappings = rule.getMappings();
+		var deletedNodes =  new ArrayList<Node>();
+		
+		for(Node eo: lhsNodes){
+			var isDeleted = true;
+			for(Mapping m : mappings){
+				if(m.getOrigin().equals(eo)){
+					isDeleted = false;
+				}
+			}
+			if(isDeleted){
+				deletedNodes.add(eo);
+			}
+		}
+		deletedNodes;
+	}
+	def CheckIfContainsNode(){
+		
+	}
+		
 	private def boolean checkParameters(Rule operator) {
 		if (operator.parameters !== null) {
 			// Currently, we only support units without parameters (other than variables). 
@@ -124,10 +255,18 @@ class HenshinSolver implements ISolver {
 		henshinEngine = h
 		semanticRules = s
 		cpa.init(semanticRules, cpaOptions);
-		//var r = m.runDependencyAnalysis();
+		//var r = cpa.runDependencyAnalysis();
 		var result = cpa.runConflictAnalysis();
 		//var aa = r.getCriticalPairs();
 		conflictPairs = result.getCriticalPairs();
+		conflictRules = new HashSet<Rule>();
+		for(CriticalPair cp: conflictPairs){
+			var first = cp.getFirstRule();
+			var second = cp.getSecondRule();
+			conflictRules.add(first);
+			conflictRules.add(second);
+		}
+		
 	}
 	
 	override getState() {
