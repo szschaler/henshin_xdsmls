@@ -26,10 +26,7 @@ public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigu
 
 	protected LaunchConfigurationDataProcessingTab() {
 		for (EngineAddonSpecificationExtension extension : getExtensionSpecifications()) {
-			final String id = extension.getAddonGroupId();
-			if (id == null || id.equals("Sequential.AddonGroup") || id.equals("General.AddonGroup")) {
-				_components.put(extension, null);
-			}
+			_components.put(extension, null);
 		}
 	}
 

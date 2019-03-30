@@ -40,15 +40,13 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
-	
-
 	var EObject root
 	var EGraph modelGraph
-	var List<Rule> semanticRules
-	protected HenshinStep _selectedLogicalStep;
+	
+	var ILogicalStepDecider _logicalStepDecider
+	var HenshinStep _selectedLogicalStep;
 	var HenshinSolver _solver;
 	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
-	var ILogicalStepDecider _logicalStepDecider
 
 	new(IConcurrentExecutionContext concurrentexecutionContext, HenshinSolver s) {
 		super();
@@ -86,6 +84,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		val entryPoint = _executionContext.runConfiguration.languageName
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
+		var List<Rule> semanticRules
 
 		// Check validity
 		if (semanticsResource.contents.head instanceof HenshinXDsmlSpecification) {
@@ -142,7 +141,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 				performExecutionStep();
 			}
 		} catch (EngineStoppedException ese) {
-			throw ese; // forward the stop exception
+			throw ese;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
@@ -269,99 +268,50 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	override performExecutionStep() throws InterruptedException {
 		computePossibleLogicalSteps();
 		
-		// 2- select one solution from available logical step /
-		// select interactive vs batch
 		if (_possibleLogicalSteps.size() == 0) {
 			debug("No more LogicalSteps to run")
 			stop();
 		} else {
 			val selectedLogicalStep = selectAndExecuteLogicalStep();
-
-			// 3 - run the selected logical step
-			// inform the solver that we will run this step
+			
 			if (selectedLogicalStep !== null) {
-				
 				engineStatus.incrementNbLogicalStepRun();
-			} else {
-				// no logical step was selected, this is most probably due to a
-				// preempt on the LogicalStepDecider and a change of Decider,
-				// notify Addons that we'll rerun this ExecutionStep
-				// recomputePossibleLogicalSteps();
 			}
 		}
 	}
 	
 	def selectAndExecuteLogicalStep() {
-		setEngineStatus(EngineStatus.RunStatus.WaitingLogicalStepSelection);
-		notifyAboutToSelectLogicalStep();
+		setEngineStatus(EngineStatus.RunStatus.WaitingLogicalStepSelection)
+		notifyAboutToSelectLogicalStep()
 		
-		val selectedLogicalStep = getLogicalStepDecider().decide(this, getPossibleLogicalSteps());
-		
+		val selectedLogicalStep = getLogicalStepDecider().decide(this, getPossibleLogicalSteps())
 		if (selectedLogicalStep !== null) {
-			setSelectedLogicalHenshinStep(selectedLogicalStep as HenshinStep);
+			setSelectedLogicalHenshinStep(selectedLogicalStep as HenshinStep)
 						
-			setEngineStatus(EngineStatus.RunStatus.Running);
-			notifyLogicalStepSelected();
-			// run all the event occurrences of this logical
-			// step 
+			setEngineStatus(EngineStatus.RunStatus.Running)
+			notifyLogicalStepSelected()
+			
+			//if it's a single rule step execute otherwise execute the whole sequence
 			if((selectedLogicalStep as HenshinStep).matches === null || ((selectedLogicalStep as HenshinStep).matches).isEmpty){
-				executeSelectedLogicalStep();
+				executeSelectedLogicalStep()
 			}else{
 				for(Step<?> step : getPossibleLogicalSteps()){
 					var s = step as HenshinStep
 					if((s.matches === null || s.matches.isEmpty) && (selectedLogicalStep as HenshinStep).matches.contains(s.match)){
-						executeStep(s);
-						
+						setSelectedLogicalHenshinStep(s)
+						executeSelectedLogicalStep()
 					}
 				}
 			}
-		}
-		return selectedLogicalStep;
-	}
-	
-	def executeStep(HenshinStep step) {
-		if (!_isStopped) { 
-			val command = new StepCommand(editingDomain, step.match , ruleRunner, modelGraph)
-			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			beforeExecutionStep(step,command);
-			//beforeExecutionStep(_selectedLogicalStep);
-
-			if (command.canExecute) {
-				try {
-					command.execute
-				} catch (RuleApplicationException rae) {
-					editingDomain.activeTransaction.abort(
-						new Status(IStatus.OK,
-							Activator.PLUGIN_ID, '''Error executing semantic rule «step.match.rule.name».'''))
-				}
-			}
-
-			afterExecutionStep()
-
-
-		} else {
 			
-			afterExecutionStep();
 		}
+		selectedLogicalStep
 	}
 	
 	override executeSelectedLogicalStep() {
-		// = step in debug mode, goes to next logical step
-		// -> run all event occurrences of the logical step
-		// step into / open internal thread and pause them
-		// each concurrent event occurrence is presented as a separate
-		// thread in the debugger
-		// execution feedback is sent to the solver so it can take internal
-		// event into account
-
-		if (!_isStopped) { // execute while stopped may occur when we push the
-							// stop button when paused in the debugger
-			
-			//perform HENSHIN!! step
+		if (!_isStopped) {
 			val command = new StepCommand(editingDomain, _selectedLogicalStep.match , ruleRunner, modelGraph)
-			// We're faking the class and operation names so that GEMOC can do its step tracing even though we're not actually calling operations 
-			
-			beforeExecutionStep(_selectedLogicalStep,command);
+			beforeExecutionStep(_selectedLogicalStep,command)
 			if (command.canExecute) {
 				try {
 					command.execute
@@ -374,7 +324,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			afterExecutionStep()
 			
 		} else {
-			afterExecutionStep();
+			afterExecutionStep()
 		}
 	}
 	

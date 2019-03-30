@@ -14,29 +14,21 @@ import org.eclipse.gemoc.executionframework.engine.commons.AbstractModelExecutio
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.extensions.sirius.modelloader.DefaultModelLoader
 import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionContext<IConcurrentRunConfiguration,IConcurrentExecutionPlatform,ConcurrentLanguageDefinitionExtension> implements IConcurrentExecutionContext{
 
 	protected ILogicalStepDecider logicalStepDecider
+	protected boolean showSequenceRules
 	
-	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode) throws EngineContextException {
+	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode, boolean showSequenceRules) throws EngineContextException {
 		super(runConfiguration, executionMode)
-		//logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
-		logicalStepDecider = LogicalStepDeciderFactory.createDecider("Step by step user decider", executionMode);	
+		logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
+		this.showSequenceRules = showSequenceRules;
+		//logicalStepDecider = LogicalStepDeciderFactory.createDecider("Step by step user decider", executionMode);	
 	}
 	override protected createExecutionPlatform() throws CoreException {
 		return new DefaultConcurrentExecutionPlatform(_languageDefinition as HenshinLanguageDefinitionExtension , _runConfiguration);
-	}
-	def protected void debug(String message) {
-		getMessagingSystem().debug(message, getPluginID());
-	}
-	def protected String getPluginID() {
-		return Activator.PLUGIN_ID;
-	}
-	def getMessagingSystem() {
-		return Activator.getDefault().getMessaggingSystem();
 	}
 	override protected getLanguageDefinition(String languageName) throws EngineContextException {
 		new HenshinLanguageDefinitionExtension(this)
@@ -57,7 +49,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_CODEEXECUTOR_ATT:
 							return new HenshinCodeExecutor()
 						case Lang.GEMOC_LANGUAGE_EXTENSION_POINT_XDSML_DEF_SOLVER_ATT:
-							return new HenshinSolver()
+							return new HenshinSolver(hmec.showSequenceRules)
 						default:
 							return null
 					}

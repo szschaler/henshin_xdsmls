@@ -32,7 +32,6 @@ import org.eclipse.gemoc.commons.eclipse.ui.ViewHelper
 import org.eclipse.gemoc.dsl.debug.ide.adapter.IDSLCurrentInstructionListener
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.step.LogicalStepsView
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.views.stimulimanager.StimuliManagerView
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.executionframework.engine.ui.launcher.AbstractGemocLauncher
@@ -55,9 +54,9 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentExecutionContext> {
 
-	public final static String TYPE_ID = Activator.PLUGIN_ID + ".launcher";
+	public final static String TYPE_ID = Activator.PLUGIN_ID + ".launcher"
 
-	var HenshinConcurrentExecutionEngine _executionEngine;
+	var HenshinConcurrentExecutionEngine _executionEngine
 	
 	override launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
 			IProgressMonitor monitor) throws CoreException {
@@ -67,7 +66,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			// make sure to have the engine view when starting the engine
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 				override run() {
-					ViewHelper.retrieveView(StimuliManagerView.ID);
+					//ViewHelper.retrieveView(StimuliManagerView.ID);
 					ViewHelper.retrieveView(EnginesStatusView.ID);
 					ViewHelper.showView(LogicalStepsView.ID);
 				}
@@ -89,8 +88,9 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 				return;
 			}
 			
+			var showSequenceRules = true;
 			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
-					runConfiguration, executionMode);
+					runConfiguration, executionMode, showSequenceRules);
 					 
 				concurrentexecutionContext.initializeResourceModel();
 					
@@ -108,23 +108,13 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 
 			openViewsRecommandedByAddons(runConfiguration);
 
-			// And we start it within a dedicated job
+
 			val Job job = new Job(getDebugJobName(configuration, getFirstInstruction(configuration))) {
 				override protected IStatus run(IProgressMonitor monitor) {
-					// If we are debugging, we add the animator and we start
-					// the execution using the super class
-					// AbstractDSLLaunchConfigurationDelegateUI
-					// This will start yet another job and eventually start
-					// the engine
+					//debug mode with Sirius animator
 					if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 						val IEngineAddon animator = AbstractGemocAnimatorServices.getAnimator();
-						var plat = _executionEngine.getExecutionContext().getExecutionPlatform()
-						for (addon : plat.engineAddons) {
-							plat.removeEngineAddon(addon)
-						}
-						//_executionEngine.getExecutionContext().getExecutionPlatform().addEngineAddon(animator);
-						
-						//(AbstractGemocAnimatorServices.getAnimator() as GemocModelAnimator).addRepresentationToRefresh("Production Line Diagram")
+						var plat = _executionEngine.getExecutionContext().getExecutionPlatform()					
 						plat.addEngineAddon(animator);
 						try {
 							HenshinConcurrentEngineLauncher.super.launch(configuration, mode, launch, monitor);
@@ -134,9 +124,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 							return new Status(IStatus.ERROR, getPluginID(), "Could not start debugger.");
 						}
 					}
-
-					// If we are not debugging, we simply start the engine
-					// from the current job
+					// if not debug mode, start the engine
 					else {
 						_executionEngine.start();
 						debug("Execution finished.");
@@ -144,6 +132,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 					}
 				}
 			};
+			
 			debug("Initialization done, starting engine...");
 			job.schedule();
 

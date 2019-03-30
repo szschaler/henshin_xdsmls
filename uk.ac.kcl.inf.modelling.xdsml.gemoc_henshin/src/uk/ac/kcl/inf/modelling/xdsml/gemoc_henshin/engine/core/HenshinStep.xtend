@@ -9,8 +9,8 @@ import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
 
 class HenshinStep extends GenericSmallStepImpl {
 	
-	public Match match
-	public List<Match> matches
+	protected Match match
+	protected List<Match> matches
 
 	new(Match match) {
 		super()
@@ -20,13 +20,13 @@ class HenshinStep extends GenericSmallStepImpl {
 		super()
 		this.matches = matches
 	}
-		
-	override getMseoccurrence() {
-		//create it on the fly each time it's called 
+	
+	//create it on the fly each time it's called 
 		//so simulate creating MSE object -> with operation same name as rule name
 		//create mse occurrence -> all objects except for the main object
 		//to create mseoccurrence use factory class generated from an ecore file
 		
+	override getMseoccurrence() {
 		if(matches === null || matches.isEmpty){
 			generateMSE(match, match.getRule().getName(), match.toString())
 		}else{

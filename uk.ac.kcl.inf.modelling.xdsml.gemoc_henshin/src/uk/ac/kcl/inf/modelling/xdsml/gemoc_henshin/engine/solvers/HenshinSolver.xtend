@@ -1,10 +1,9 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers
 
+import fr.inria.aoste.trace.EventOccurrence
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
-import java.util.Random
-import java.util.concurrent.CopyOnWriteArrayList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.henshin.cpa.CPAOptions
@@ -21,7 +20,9 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrent
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
-import fr.inria.aoste.trace.EventOccurrence
+import java.util.HashMap
+import org.eclipse.emf.henshin.cpa.result.Conflict
+import org.eclipse.emf.henshin.cpa.result.ConflictKind
 
 /**
  * A Solver is the visible interface of any constraint solver system that runs
@@ -33,45 +34,39 @@ import fr.inria.aoste.trace.EventOccurrence
 class HenshinSolver implements ISolver {
 	
 	var Engine henshinEngine 
-	
-
 	var EGraph modelGraph
-	// May be rules, too
 	var List<Rule> semanticRules
+	
+	var boolean showSequenceRules
 	var List<CriticalPair> conflictPairs
-	var CpaByAGG cpa
-	var CPAOptions cpaOptions
 	var HashSet<Rule> conflictRules
+	var HashMap<Rule, ArrayList<Node>> ruleDeletedNodesMap
 
 
-	new(){
+	new(boolean showSequenceRules){
 		super()
-		cpa = new CpaByAGG();
-		cpaOptions = new CPAOptions();
+		this.showSequenceRules = showSequenceRules;
 	}
 	
-	val rnd = new Random()
 	
-	override computeAndGetPossibleLogicalSteps() {
-		
-		
-		//HERE USE HENSHIN TO CALCULATE STEPS
-		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
+	override computeAndGetPossibleLogicalSteps() {		
 		var possibleLogicalSteps = new ArrayList()
-		var ruleList = new ArrayList<Rule>
 		var matchList = new ArrayList<Match>;
-		while(!applicableRules.empty) {
-			val tentativeStepRule = applicableRules.remove(rnd.nextInt(applicableRules.size))
-			val match = henshinEngine.findMatches(tentativeStepRule, modelGraph, null)
+		for(Rule currRule: semanticRules) {
+			val match = henshinEngine.findMatches(currRule, modelGraph, null)
 			for(Match m: match){
 				val step = new HenshinStep(m);
-				ruleList.add(tentativeStepRule)
 				possibleLogicalSteps.add(step)
 				matchList.add(m);
 			}
-					
 		}
+		if(showSequenceRules){
+			generateSequenceRulesSteps(possibleLogicalSteps, matchList);
+		}
+		possibleLogicalSteps	
+	}
 		
+	def generateSequenceRulesSteps(ArrayList<Step<?>> possibleLogicalSteps, ArrayList<Match> matchList) {
 		var conflictMatchesList = new ArrayList<Match>;
 		var conflictFreeMatchesList = new ArrayList<Match>;
 		
@@ -83,82 +78,66 @@ class HenshinSolver implements ISolver {
 			}
 		}
 		
-		var possibleSequences =  new ArrayList<ArrayList<Match>>;
+		if(!conflictMatchesList.isEmpty()){
+			var possibleSequences =  new HashSet<HashSet<Match>>;
 		
-		for(Match m1: conflictMatchesList){
-			var currSeq =  new CopyOnWriteArrayList<ArrayList<Match>>;
-			var oneSeq =  new ArrayList<Match>;
-			oneSeq.add(m1);
-			currSeq.add(oneSeq);
-			for(Match m2: conflictMatchesList){
-				//check if has conflicts with current
-				var safeToAddWithCurr = false;
-				if(!m1.equals(m2) && !haveConflicts(m1,m2)){
-					safeToAddWithCurr = true;
-				}
-				//if it doesnt then check all other elements
-				if(safeToAddWithCurr){
-					for(ArrayList<Match> alreadyInSeq: currSeq){
-						var safeToAdd = true;
-						for(Match currInnerMatch: alreadyInSeq){
-							if(!currInnerMatch.equals(m1) && !currInnerMatch.equals(m2) && haveConflicts(currInnerMatch,m2)){
-								safeToAdd = false;
-								var newSeq =  new ArrayList<Match>;
-								newSeq.add(m1);
-								newSeq.add(m2);
-								currSeq.add(newSeq);
-							}
-							
-						}
-						if(safeToAdd){
-							alreadyInSeq.add(m2);
-						}
-					}
-				}
-			}
+			createAllStepSequences(conflictMatchesList, possibleSequences, new HashSet<Match> );
 			
-			possibleSequences.addAll(currSeq);
-		}
-		
-		possibleSequences = removeDuplicates(possibleSequences);
-		
-		for(ArrayList<Match> arr: possibleSequences){
-			var concatArr = new ArrayList<Match>();
-			concatArr.addAll(conflictFreeMatchesList);
-			concatArr.addAll(arr);
-			var step = new HenshinStep(concatArr);
-			possibleLogicalSteps.add(step)
-		}
-		if(possibleSequences.isEmpty() && !conflictFreeMatchesList.isEmpty()){
+			for(HashSet<Match> arr: possibleSequences){
+				var concatArr = new ArrayList<Match>();
+				concatArr.addAll(conflictFreeMatchesList);
+				concatArr.addAll(arr);
+				var step = new HenshinStep(concatArr);
+				possibleLogicalSteps.add(step)
+			}
+		}else if(!conflictFreeMatchesList.isEmpty()){
 			var step = new HenshinStep(conflictFreeMatchesList);
 			possibleLogicalSteps.add(step)
 		}
-
-		possibleLogicalSteps	
 	}
 		
-		def removeDuplicates(ArrayList<ArrayList<Match>> lists) {
-			var noDuplicatesList =  new CopyOnWriteArrayList<ArrayList<Match>>;
-			
-			for(ArrayList<Match> list: lists){
-				var isDuplicate = false;
-				for(ArrayList<Match> alreadyAdded: noDuplicatesList){
-					if(alreadyAdded.containsAll(list)){
-						isDuplicate = true
-					}
-				}
-				if(!isDuplicate){
-					noDuplicatesList.add(list)
+	def void createAllStepSequences(ArrayList<Match> allMatches, HashSet<HashSet<Match>> possibleSequences, HashSet<Match> currentStack) {
+		var foundOne = false;
+		for(Match m: allMatches){
+			if(!currentStack.contains(m)){
+				if(!hasConflicts(m, currentStack)){
+					foundOne = true;
+					currentStack.add(m);
+					var clonedStack = currentStack.clone() as HashSet<Match>;
+					createAllStepSequences(allMatches, possibleSequences, clonedStack);
+					currentStack.remove(m);
 				}
 			}
-			var result =  new ArrayList<ArrayList<Match>>;
-			result.addAll(noDuplicatesList);
-			result
 		}
+		if(!foundOne){
+			possibleSequences.add(currentStack);
+		}
+	}
 		
-	def haveConflicts(Match match1, Match match2) {
-		var deletedNodes1 = getDeletedNodes(match1.getRule());
-		var deletedNodes2 = getDeletedNodes(match2.getRule());
+	def hasConflicts(Match match, HashSet<Match> matches) {
+		for(Match m: matches){
+			if(haveMatchesConflicts(match,m)){
+				return true;
+			}
+		}
+		return false;
+	}
+		
+		
+	def haveMatchesConflicts(Match match1, Match match2) {
+		var boolean isConflictPair = false;
+		for(CriticalPair cp: conflictPairs){
+			var first = cp.getFirstRule();
+			var second = cp.getSecondRule();
+			if((first.equals(match1.getRule()) && second.equals(match2.getRule())) || 
+				(first.equals(match2.getRule()) && second.equals(match1.getRule())))
+				isConflictPair = true;
+		}
+		if(!isConflictPair)
+			return false;
+			
+		var deletedNodes1 = ruleDeletedNodesMap.get(match1.getRule());
+		var deletedNodes2 = ruleDeletedNodesMap.get(match2.getRule());
 		
 		var deletedNodeTargets1 = new ArrayList<EObject>();
 		for(Node eo: deletedNodes1){
@@ -185,8 +164,57 @@ class HenshinSolver implements ISolver {
 		return false;
 	}
 		
+	private def boolean checkParameters(Rule operator) {
+		if (operator.parameters !== null) {
+			// Currently, we only support units without parameters (other than variables). 
+			// Check to make sure we're not running into problems
+			if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
+				println("Invalid unit with non-var parameters: " + operator.name)
+				return false
+			}
+		}
+
+		true
+	}
+	def configure(EGraph modelGraph, Engine henshinEngine, List<Rule> semanticRules){
+		this.modelGraph = modelGraph
+		this.henshinEngine = henshinEngine
+		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
+		this.semanticRules = applicableRules
+		
+		var cpa = new CpaByAGG();
+		var cpaOptions = new CPAOptions();
+		cpa.init(semanticRules, cpaOptions);
+		var result = cpa.runConflictAnalysis();
+		conflictPairs = result.getCriticalPairs();
+		
+		conflictRules = new HashSet<Rule>();
+		for(var i = 0; i < conflictPairs.length; i++){
+			var cp = conflictPairs.get(i)
+			var currConflictKind = (cp as Conflict).getConflictKind();
+			if(!currConflictKind.equals(ConflictKind.DELETE_USE_CONFLICT)){
+				this.showSequenceRules = false;
+				i = conflictPairs.length
+			}
+			
+			var first = cp.getFirstRule();
+			var second = cp.getSecondRule();
+			conflictRules.add(first);
+			conflictRules.add(second);
+		}
+		
+		if(showSequenceRules){
+			ruleDeletedNodesMap = new HashMap<Rule, ArrayList<Node>>();
+			for(Rule r: conflictRules){
+				var deletedNodes = getDeletedNodes(r);
+				ruleDeletedNodesMap.put(r, deletedNodes);
+			}	
+		}	
+	}
+	
+	//if its in mappings get origin then its preserved otherwise it's deleted
+	
 	def getDeletedNodes(Rule rule) {
-		//if its in mappings get origin then its preserved otherwise it's deleted
 		var lhsNodes = rule.getLhs().getNodes();
 		var mappings = rule.getMappings();
 		var deletedNodes =  new ArrayList<Node>();
@@ -203,38 +231,6 @@ class HenshinSolver implements ISolver {
 			}
 		}
 		deletedNodes;
-	}
-	def CheckIfContainsNode(){
-		
-	}
-		
-	private def boolean checkParameters(Rule operator) {
-		if (operator.parameters !== null) {
-			// Currently, we only support units without parameters (other than variables). 
-			// Check to make sure we're not running into problems
-			if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
-				println("Invalid unit with non-var parameters: " + operator.name)
-				return false
-			}
-		}
-
-		true
-	}
-	def configure(EGraph eg, Engine h, List<Rule> s){
-		modelGraph = eg
-		henshinEngine = h
-		semanticRules = s
-		cpa.init(semanticRules, cpaOptions);
-		var result = cpa.runConflictAnalysis();
-		conflictPairs = result.getCriticalPairs();
-		conflictRules = new HashSet<Rule>();
-		for(CriticalPair cp: conflictPairs){
-			var first = cp.getFirstRule();
-			var second = cp.getSecondRule();
-			conflictRules.add(first);
-			conflictRules.add(second);
-		}
-		
 	}
 	
 	override getState() {
@@ -287,5 +283,9 @@ class HenshinSolver implements ISolver {
 	override getAllDiscreteClocks() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-
+	
+	override getLastOccurrenceRelations() {
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
+	
 }
