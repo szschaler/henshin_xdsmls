@@ -5,7 +5,6 @@ import java.util.List
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
 import org.eclipse.emf.henshin.interpreter.Match
@@ -36,43 +35,44 @@ import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
+/**
+ * Henshin Concurrent Execution Engine implementation class that handles the main workflow
+ */
 class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurrentExecutionContext, IConcurrentRunConfiguration> implements IConcurrentExecutionEngine {
 
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
-	var EObject root
 	var EGraph modelGraph
 	
 	var ILogicalStepDecider _logicalStepDecider
 	var HenshinStep _selectedLogicalStep;
 	var HenshinSolver _solver;
 	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
-
+	/**
+	 * create a new instance
+	 * @param concurrent context and a Hensin Solver
+	 */
 	new(IConcurrentExecutionContext concurrentexecutionContext, HenshinSolver s) {
 		super();
 		initialize(concurrentexecutionContext);
 		_logicalStepDecider = concurrentexecutionContext.getLogicalStepDecider()
 		_solver = s
-		// Use non-deterministic matching for now to ensure we get a random trace rather than always the same one
-		henshinEngine.options.put(Engine.OPTION_DETERMINISTIC, false)
+		//henshinEngine.options.put(Engine.OPTION_DETERMINISTIC, false)
 	}
 
 	/**
-	 * Get the engine kinConcurrentExecutionEngined name
-	 * @return a user display name for the engine kind (will be used to compute
-	 *         the full name of the engine instance)
+	 * Get the engine  name
+	 * @return a user display name for the engine kind 
 	 */
 	override String engineKindName() '''Henshin Concurrent xDSML Engine'''
 
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
-	 * 
-	 * This is currently modelled on the implementation in PlainK3ExecutionEngine, but may need adjusting further down the line.
+	 * Code taken mostly copied from the sequential engine
 	 */
 	protected def void prepareEntryPoint() {
-		// executionContext.resourceModel points to the resource GEMOC loaded for the model to be run  
 		
-		root = executionContext.resourceModel.contents.head
+		var root = executionContext.resourceModel.contents.head
 		if (root instanceof EObjectAdapter<?>) {
 			root = (root as EObjectAdapter<?>).adaptee
 		}
@@ -107,12 +107,17 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 			semanticRules = semantics.units.filter(Rule).toList		
 		}
+		
+		//configure the solver
 		_solver.configure(modelGraph, henshinEngine, semanticRules)
 	}
 
 	private static class RuleApplicationException extends Exception {
 	}
-
+	/**
+	 * StepCommand to run the execution steps in Henshin
+	 * code taken from the sequential engine
+	 */
 	private static class StepCommand extends RecordingCommand {
 		val RuleApplication runner
 
@@ -133,6 +138,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 	
+	/**
+	 * the main loop of execution
+	 */
 	override protected performStart() {
 		engineStatus.setNbLogicalStepRun(0)
 		prepareEntryPoint()
@@ -147,6 +155,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 	
+	/**
+	 * stop the engine
+	 */
 	override protected performStop() {
 		setSelectedLogicalHenshinStep(null);
 		if (getLogicalStepDecider() !== null) {
@@ -154,13 +165,16 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			getLogicalStepDecider().preempt();
 		}	
 	}
-	
+	/**
+	 * initialize the engine, make sure a Henshin Model Execution Context is used
+	 * @param execution context
+	 */
 	override protected performInitialize(IConcurrentExecutionContext executionContext) {
 		if (!(executionContext instanceof HenshinConcurrentModelExecutionContext))
 			throw new IllegalArgumentException(
 					"executionContext must be an HenshinConcurrentExecutionEngine when used in HenshinConcurrentExecutionEngine");
 	}
-	
+
 	override changeLogicalStepDecider(ILogicalStepDecider newDecider) {
 		_logicalStepDecider = newDecider
 	}
@@ -187,9 +201,13 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 	
-	def setSelectedLogicalHenshinStep(HenshinStep ls) {
+	/**
+	 * set the selected Henshin Step
+	 * @param henshin step
+	 */
+	def setSelectedLogicalHenshinStep(HenshinStep step) {
 		synchronized (this) {
-			_selectedLogicalStep = ls
+			_selectedLogicalStep = step
 		}
 	}
 	
@@ -200,7 +218,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	override setSolver(ISolver solver) {
 		_solver = solver as HenshinSolver
 	}
-	
+	/**
+	 * notify the addons about the state of execution: about to select step
+	 */
 	override notifyAboutToSelectLogicalStep() {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
@@ -210,7 +230,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 		}
 	}
-	
+	/**
+	 * notify the addons about the state of execution:  step selected
+	 */
 	override notifyLogicalStepSelected() {
 		debug("selected");
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
@@ -222,8 +244,12 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 	
-	//code that should be here commented out for now coz of GEMOC architecture
-	override notifyAboutToExecuteLogicalStep(Step<?> l) {
+	/**
+	 * notify the addons about the state of execution: about to execute step
+	 * the code is commented out due to the bug that was found
+	 * it should be uncommented after the fix is implemented by GEMOC
+	 */	
+	 override notifyAboutToExecuteLogicalStep(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
 				//addon.aboutToExecuteStep(this, l);
@@ -237,7 +263,11 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 
-	//code moved here from notifyAboutToExecuteLogicalStep
+	/**
+	 * notify the addons about the state of execution: step executed
+	 * code moved here from notifyAboutToExecuteLogicalStep
+	 * to be deleted when GEMOC implements a fix
+	 */
 	override notifyLogicalStepExecuted(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
 			try {
@@ -256,7 +286,9 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
-	
+	/**
+	 * get a list of possible steps from the solver
+	 */
 	override computePossibleLogicalSteps() {
 		_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
 	}
@@ -264,7 +296,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	override updatePossibleLogicalSteps() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+	/**
+	 * perform one step of execution
+	 * close the engine if no more steps to choose
+	 */
 	override performExecutionStep() throws InterruptedException {
 		computePossibleLogicalSteps();
 		
@@ -280,6 +315,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 	}
 	
+	/**
+	 * select a step through a logical decider
+	 * and run the execution
+	 */
 	def selectAndExecuteLogicalStep() {
 		setEngineStatus(EngineStatus.RunStatus.WaitingLogicalStepSelection)
 		notifyAboutToSelectLogicalStep()
@@ -307,7 +346,10 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		}
 		selectedLogicalStep
 	}
-	
+	/**
+	 * execute the selected step by creating a new step command
+	 * and delegating the execution to Henshin
+	 */
 	override executeSelectedLogicalStep() {
 		if (!_isStopped) {
 			val command = new StepCommand(editingDomain, _selectedLogicalStep.match , ruleRunner, modelGraph)
@@ -335,22 +377,41 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	override setSelectedLogicalStep(Step<?> selectedLogicalStep) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
+	
+	/**
+	 * print a debug message to console
+	 */
 	def protected void debug(String message) {
 		getMessagingSystem().debug(message, getPluginID());
 	}
-
+	
+	/**
+	 * get messaging system
+	 */
 	def getMessagingSystem() {
 		return Activator.getDefault().getMessaggingSystem();
 	}
+	
+	/**
+	 * get plugin id
+	 */
 	def String getPluginID() {
 		return Activator.PLUGIN_ID;
 	}
 	
+	/**
+	 * run before start of the engine
+	 */
 	override protected beforeStart() {
 		debug('Running engine setup...')
 	}
+	
+	/**
+	 * execution of the engine done
+	 */
 	override protected finishDispose() {
 	}
+	
 	override addFutureAction(IFutureAction arg0) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}

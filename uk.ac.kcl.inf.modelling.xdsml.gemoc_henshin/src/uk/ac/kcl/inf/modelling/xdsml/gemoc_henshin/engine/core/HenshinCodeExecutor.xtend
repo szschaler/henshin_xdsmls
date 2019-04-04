@@ -6,6 +6,9 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.Co
 import java.util.List
 import java.lang.annotation.Annotation
 
+/**
+ * code executor - empty shell
+ */
 class HenshinCodeExecutor implements ICodeExecutor {
 	new(){
 		super()

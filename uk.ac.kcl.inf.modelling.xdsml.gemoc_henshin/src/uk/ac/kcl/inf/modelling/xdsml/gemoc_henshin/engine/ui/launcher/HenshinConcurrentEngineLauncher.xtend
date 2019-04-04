@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 INRIA and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     INRIA - initial API and implementation
- *     I3S Laboratory - API update and bug fix
- *******************************************************************************/
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
 import java.util.Collection
@@ -51,31 +40,34 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
-
+/**
+ * class to launch the Henshin Concurrent Execution Engine
+ */
 class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentExecutionContext> {
 
 	public final static String TYPE_ID = Activator.PLUGIN_ID + ".launcher"
-
 	var HenshinConcurrentExecutionEngine _executionEngine
 	
+	/**
+	 * launch the engine
+	 */
 	override launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
 			IProgressMonitor monitor) throws CoreException {
 		try {
 			debug("About to initialize and run the GEMOC Henshin Execution Engine...");
 
-			// make sure to have the engine view when starting the engine
+			// open engine views when starting the engine
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 				override run() {
-					//ViewHelper.retrieveView(StimuliManagerView.ID);
 					ViewHelper.retrieveView(EnginesStatusView.ID);
 					ViewHelper.showView(LogicalStepsView.ID);
 				}
 			});
 
-			// We parse the run configuration
+			// parse the run configuration
 			var ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration);
 
-			// We detect if we are running in debug mode or not
+			// detect if we are running in debug mode or not
 			var ExecutionMode executionMode = null;
 			if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 				executionMode = ExecutionMode.Animation;
@@ -83,18 +75,21 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 				executionMode = ExecutionMode.Run;
 			}
 
-			// We stop the launch if an engine is already running for this model
+			// stop the launch if an engine is already running for this model
 			if (isEngineAlreadyRunning(runConfiguration.getExecutedModelURI())) {
 				return;
 			}
 			
+			//!!!!!!!!
+			//flag to handle concurrent steps 
+			//!!!!!!!
 			var showSequenceRules = true;
 			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
 					runConfiguration, executionMode, showSequenceRules);
 					 
-				concurrentexecutionContext.initializeResourceModel();
+			concurrentexecutionContext.initializeResourceModel();
 					
-			
+			//initialize the solver
 			var HenshinSolver _solver
 			try {
 				_solver = concurrentexecutionContext.getLanguageDefinitionExtension().instanciateSolver() as HenshinSolver;
@@ -103,12 +98,12 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 				throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID,
 						"Cannot instanciate solver from language definition", e));
 			}
-
+	
 			_executionEngine = new HenshinConcurrentExecutionEngine(concurrentexecutionContext, _solver);
-
+			
 			openViewsRecommandedByAddons(runConfiguration);
 
-
+			//define a new job to run the engine
 			val Job job = new Job(getDebugJobName(configuration, getFirstInstruction(configuration))) {
 				override protected IStatus run(IProgressMonitor monitor) {
 					//debug mode with Sirius animator
@@ -144,9 +139,13 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID, message, e));
 		}
 	}
-
+	
+	//the rest of methods below are copied implementations from the GEMOC Concurrent Engine
+	
+	/**
+	 * make sure no other engine is running on the model
+	 */
 	def boolean isEngineAlreadyRunning(URI launchedModelURI) throws CoreException {
-		// make sure there is no other running engine on this model
 		var Collection<IExecutionEngine<?>> engines = org.eclipse.gemoc.executionframework.engine.Activator
 				.getDefault().gemocRunningEngineRegistry.getRunningEngines().values();
 		for (IExecutionEngine<?> engine : engines) {
@@ -160,15 +159,21 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 		}
 		return false;
 	}
-
+	/**
+	 * print debug messages to console
+	 */
 	def protected void debug(String message) {
 		getMessagingSystem().debug(message, getPluginID());
 	}
-
+	/**
+	 * print info message to coneole
+	 */
 	def protected void info(String message) {
 		getMessagingSystem().info(message, getPluginID());
 	}
-
+	/**
+	 * send a warning message
+	 */
 	def protected void warn(String message) {
 		getMessagingSystem().warn(message, getPluginID());
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -178,7 +183,9 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			}
 		});
 	}
-
+	/**
+	 * send an error message
+	 */
 	def void error(String message) {
 		getMessagingSystem().error(message, getPluginID());
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -188,15 +195,21 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			}
 		});
 	}
-
+	
+	/**
+	 * get the messaging system
+	 */
 	def getMessagingSystem() {
 		return Activator.getDefault().getMessaggingSystem();
 	}
-
+	
+	/**
+	 * get launch config
+	 */
 	override String getLaunchConfigurationTypeID() {
 		return TYPE_ID;
 	}
-
+	
 	override EObject getFirstInstruction(ISelection selection) {
 		return EcorePackage.eINSTANCE;
 	}
@@ -227,12 +240,12 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 	override String getPluginID() {
 		return Activator.PLUGIN_ID;
 	}
-
+	/**
+	 * create launch configuration
+	 */
 	override createLaunchConfiguration(IResource file, EObject firstInstruction, String mode)
 			throws CoreException {
-		debug("CREATE LAUNCH CONFIG");
 		val ILaunchConfiguration[] launchConfigs = super.createLaunchConfiguration(file, firstInstruction, mode);
-
 		if (launchConfigs.length == 1) {
 			// open configuration for further editing
 			if (launchConfigs.get(0) instanceof ILaunchConfigurationWorkingCopy) {
@@ -241,10 +254,8 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 				var String selectedLanguage = configuration.getAttribute(RunConfiguration.LAUNCH_SELECTED_LANGUAGE, "");
 				if (selectedLanguage.equals("")) {
 
-					// TODO try to infer possible language and other attribute
-					// from project content and environment
 					configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
-							ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);
+					ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);
 					val ILaunchGroup group = DebugUITools.getLaunchGroup(configuration, mode);
 					if (group !== null) {
 						var ILaunchConfiguration savedLaunchConfig = configuration.doSave();
@@ -252,9 +263,6 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 						DebugUITools.openLaunchConfigurationDialogOnGroup(
 								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 								new StructuredSelection(savedLaunchConfig), group.getIdentifier(), null);
-						// DebugUITools.openLaunchConfigurationDialog(PlatformUI.getWorkbench()
-						// .getActiveWorkbenchWindow().getShell(),
-						// savedLaunchConfig, group.getIdentifier(), null);
 					}
 				}
 			}
@@ -262,11 +270,15 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 		return launchConfigs;
 
 	}
-
-	override IExecutionEngine getExecutionEngine() {
+	/**
+	 * get the execution engine
+	 */
+	override getExecutionEngine() {
 		return _executionEngine;
 	}
-	
+	/**
+	 * get the model identifier
+	 */
 	override getModelIdentifier() {
 		if (_executionEngine instanceof HenshinConcurrentExecutionEngine){
 			return Activator.PLUGIN_ID + ".debugModel";
