@@ -102,8 +102,10 @@ class HenshinSolver implements ISolver {
 				var concatArr = new ArrayList<Match>();
 				concatArr.addAll(conflictFreeMatchesList);
 				concatArr.addAll(arr);
-				var step = new HenshinStep(concatArr);
-				possibleLogicalSteps.add(step)
+				if(concatArr.length > 1){
+					var step = new HenshinStep(concatArr);
+					possibleLogicalSteps.add(step)
+				}
 			}
 		
 		//if no matches with conflicts then just append one step with the rest of conflict free matches
