@@ -68,7 +68,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
-	 * Code taken mostly copied from the sequential engine
+	 * Code mostly copied from the sequential engine
 	 */
 	protected def void prepareEntryPoint() {
 		

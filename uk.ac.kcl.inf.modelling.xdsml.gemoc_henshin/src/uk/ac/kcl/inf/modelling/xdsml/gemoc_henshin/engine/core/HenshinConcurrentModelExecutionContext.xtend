@@ -29,7 +29,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 	 */
 	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode, boolean showConcurrentSteps) throws EngineContextException {
 		super(runConfiguration, executionMode)
-		//create a logical step decider based on the crun config
+		//create a logical step decider based on the current config
 		logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
 		this.showConcurrentSteps = showConcurrentSteps;
 	}
