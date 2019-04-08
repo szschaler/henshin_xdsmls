@@ -34,7 +34,7 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentR
 
 /**
  * 
- * Class fully taken from the sequential engine, the only changes made by me are where marked
+ * Class fully taken from the sequential engine, modifications: line 84-85, 93
  *
  */
 class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {

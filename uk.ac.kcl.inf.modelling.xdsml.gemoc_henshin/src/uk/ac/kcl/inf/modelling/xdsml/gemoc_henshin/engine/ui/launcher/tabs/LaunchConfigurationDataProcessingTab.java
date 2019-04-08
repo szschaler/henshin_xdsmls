@@ -21,7 +21,7 @@ import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon.EngineAddonS
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.EngineAddonGroupSpecificationExtension;
 /**
  * 
- * Class fully taken from the sequential engine, the only changes made by me are where marked
+ * Class fully taken from the sequential engine, modifications: line 39
  *
  */
 public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigurationTab {

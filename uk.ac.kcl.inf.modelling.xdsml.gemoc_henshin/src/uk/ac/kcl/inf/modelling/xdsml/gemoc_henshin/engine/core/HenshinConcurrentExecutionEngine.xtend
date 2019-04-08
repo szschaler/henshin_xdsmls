@@ -67,7 +67,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
-	 * Code mostly copied from the sequential engine
+	 * Code mostly copied from the sequential engine, except for where marked
 	 */
 	protected def void prepareEntryPoint() {
 		
@@ -107,7 +107,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			semanticRules = semantics.units.filter(Rule).toList		
 		}
 		
-		//configure the solver
+		//configure the solver, modified for the concurrent engine
 		_solver.configure(modelGraph, henshinEngine, semanticRules)
 	}
 
@@ -219,6 +219,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	/**
 	 * notify the addons about the state of execution: about to select step
+	 * code taken from the concurrent ccsl engine
 	 */
 	override notifyAboutToSelectLogicalStep() {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
@@ -231,6 +232,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	/**
 	 * notify the addons about the state of execution:  step selected
+	 * code taken from the concurrent ccsl engine
 	 */
 	override notifyLogicalStepSelected() {
 		debug("selected");
@@ -247,6 +249,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * notify the addons about the state of execution: about to execute step
 	 * the code is commented out due to the bug that was found
 	 * it should be uncommented after the fix is implemented by GEMOC
+	 * except for the modification, code taken from the concurrent ccsl engine
 	 */	
 	 override notifyAboutToExecuteLogicalStep(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
@@ -266,6 +269,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * notify the addons about the state of execution: step executed
 	 * code moved here from notifyAboutToExecuteLogicalStep
 	 * to be deleted when GEMOC implements a fix
+	 * except for the modification, code taken from the concurrent ccsl engine
 	 */
 	override notifyLogicalStepExecuted(Step<?> l) {
 		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
