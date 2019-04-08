@@ -57,7 +57,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		initialize(concurrentexecutionContext);
 		_logicalStepDecider = concurrentexecutionContext.getLogicalStepDecider()
 		_solver = s
-		//henshinEngine.options.put(Engine.OPTION_DETERMINISTIC, false)
 	}
 
 	/**

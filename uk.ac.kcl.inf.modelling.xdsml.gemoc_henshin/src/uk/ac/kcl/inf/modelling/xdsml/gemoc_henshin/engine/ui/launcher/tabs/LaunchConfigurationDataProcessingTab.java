@@ -19,13 +19,23 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon;
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon.EngineAddonSpecificationExtension;
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.EngineAddonGroupSpecificationExtension;
-
+/**
+ * 
+ * Class fully taken from the sequential engine, the only changes made by me are where marked
+ *
+ */
 public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigurationTab {
 
 	private HashMap<EngineAddonSpecificationExtension, Button> _components = new HashMap<>();
 
+	/**
+	 * the only change in here, the rest of the code taken 
+	 * from the sequential engine code developed previously
+	 */
 	protected LaunchConfigurationDataProcessingTab() {
 		for (EngineAddonSpecificationExtension extension : getExtensionSpecifications()) {
+			//the only changed line by me
+			//add all extensions as in the previous version it was only the sequential engine extensions
 			_components.put(extension, null);
 		}
 	}

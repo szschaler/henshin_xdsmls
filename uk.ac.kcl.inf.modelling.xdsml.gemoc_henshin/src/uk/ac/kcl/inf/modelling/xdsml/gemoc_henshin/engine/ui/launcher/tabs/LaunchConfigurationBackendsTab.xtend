@@ -7,7 +7,11 @@ import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon.EngineAddonS
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.EngineAddonGroupSpecificationExtension
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.EngineAddonGroupSpecificationExtensionPoint
 
-// Copied from original GEMOC code to work around package export issue
+/**
+ * 
+ * Class fully taken from the sequential engine
+ *
+ */
 class LaunchConfigurationBackendsTab extends LaunchConfigurationDataProcessingTab {
 
 	override String getName() { "Engine Addons" }

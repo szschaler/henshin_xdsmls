@@ -7,7 +7,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-
+/**
+ * 
+ * Class fully taken from the sequential engine
+ *
+ */
 public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab 
 {
 

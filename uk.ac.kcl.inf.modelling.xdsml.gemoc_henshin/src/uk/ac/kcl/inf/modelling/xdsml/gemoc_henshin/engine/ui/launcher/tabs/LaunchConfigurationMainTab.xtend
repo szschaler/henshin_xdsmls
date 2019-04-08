@@ -13,7 +13,6 @@ import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
-import org.eclipse.gemoc.executionframework.engine.commons.MelangeHelper
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
 import org.eclipse.swt.SWT
@@ -34,7 +33,9 @@ import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
 
 /**
- * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
+ * 
+ * Class fully taken from the sequential engine, the only changes made by me are where marked
+ *
  */
 class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
@@ -72,14 +73,23 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		val Group debugArea = createGroup(area, "Animation:")
 		createAnimationLayout(debugArea, null)
 	}
-
+	
+	/**
+	 * change number 1 in here
+	 */
 	override void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(RunConfiguration.LAUNCH_DELAY, 1000);
+		
+		//added logical step decided to run config
 		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
-				ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);	}
+		ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);}
 
+	/**
+	 * change number 2 in here
+	 */
 	override void initializeFrom(ILaunchConfiguration configuration) {
 		try {
+			//define concurrent run config
 			val ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration)
 			_modelLocationText.text = URIHelper.removePlatformScheme(runConfiguration.getExecutedModelURI())
 
