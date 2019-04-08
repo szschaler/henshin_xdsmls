@@ -242,7 +242,7 @@ class HenshinSolver implements ISolver {
 	}
 	
 	/**
-	 * check if a rule has no parameters
+	 * check if a rule has no parameters, method taken from the sequential engine(Zschaler)
 	 * @param Rule
 	 * @return false if a rule has parameters
 	 */

@@ -7,7 +7,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.Launc
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationBackendsTab
 /**
  * 
- * Class fully taken from the sequential engine
+ * Class fully taken from the sequential engine(Zschaler)
  *
  */
 class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {

@@ -67,7 +67,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
-	 * Code mostly copied from the sequential engine, except for where marked
+	 * Code mostly copied from the sequential engine(Zschaler), except for where marked
 	 */
 	protected def void prepareEntryPoint() {
 		
@@ -115,7 +115,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	}
 	/**
 	 * StepCommand to run the execution steps in Henshin
-	 * code taken from the sequential engine
+	 * code taken from the sequential engine(Zschaler)
 	 */
 	private static class StepCommand extends RecordingCommand {
 		val RuleApplication runner

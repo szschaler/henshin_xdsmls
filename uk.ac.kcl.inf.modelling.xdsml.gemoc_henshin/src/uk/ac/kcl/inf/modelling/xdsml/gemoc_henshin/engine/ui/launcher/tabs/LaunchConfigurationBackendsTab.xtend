@@ -9,7 +9,7 @@ import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.Engine
 
 /**
  * 
- * Class fully taken from the sequential engine
+ * Class fully taken from the sequential engine(Zschaler)
  *
  */
 class LaunchConfigurationBackendsTab extends LaunchConfigurationDataProcessingTab {
