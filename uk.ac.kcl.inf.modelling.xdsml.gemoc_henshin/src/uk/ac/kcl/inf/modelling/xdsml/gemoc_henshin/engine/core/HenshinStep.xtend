@@ -7,7 +7,6 @@ import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
 import java.util.ArrayList
-import java.util.Comparator
 
 /**
  * A class representing one possible step of execution in the Henshin Engine.
