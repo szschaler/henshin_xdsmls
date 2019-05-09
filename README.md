@@ -16,6 +16,7 @@ This repository contains a concurrent execution engine that implements support f
 ## Features
 
 Annotating any LHS node with `Target` will make the match of that node the target of the rule application for purposes of the GEMOC debugger. This will make for better representation in the GEMOC stack trace. Only LHS nodes and no multi-nodes can be annotated at this point.
+The current version of the engine includes both the atomic steps version and the maximally concurrent rules(a maximum sequence of rules that can be run together). The feature can be disabled with `showSequenceRules` flag in the launcher.
 
 ## Publications
 
