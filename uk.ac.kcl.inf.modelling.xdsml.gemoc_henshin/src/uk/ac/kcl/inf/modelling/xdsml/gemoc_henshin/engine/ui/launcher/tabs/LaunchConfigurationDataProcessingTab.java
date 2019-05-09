@@ -29,12 +29,11 @@ public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigu
 	private HashMap<EngineAddonSpecificationExtension, Button> _components = new HashMap<>();
 
 	/**
-	 * the only change in here, the rest of the code taken 
-	 * from the sequential engine code developed previously
+	 * get all possible addons and add them to the tab so the user can switch them on/off
 	 */
 	protected LaunchConfigurationDataProcessingTab() {
 		for (EngineAddonSpecificationExtension extension : getExtensionSpecifications()) {
-			//add all extensions as in the previous version it was only the sequential engine extensions
+			//add all extensions
 			_components.put(extension, null);
 		}
 	}

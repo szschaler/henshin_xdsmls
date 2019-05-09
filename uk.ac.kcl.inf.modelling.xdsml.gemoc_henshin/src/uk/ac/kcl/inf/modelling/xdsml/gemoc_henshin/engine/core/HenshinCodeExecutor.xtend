@@ -7,7 +7,9 @@ import java.util.List
 import java.lang.annotation.Annotation
 
 /**
- * code executor - empty shell
+ * code executor - empty shell as the concurrent engine requires it for the execution of steps
+ * but in case of Henshin, execution is delegated to Henshin in the actual engine class so 
+ * this class remains empty
  */
 class HenshinCodeExecutor implements ICodeExecutor {
 	new(){

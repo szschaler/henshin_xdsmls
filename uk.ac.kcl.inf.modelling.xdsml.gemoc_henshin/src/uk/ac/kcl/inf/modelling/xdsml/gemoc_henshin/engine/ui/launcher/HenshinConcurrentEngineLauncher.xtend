@@ -80,9 +80,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 				return;
 			}
 			
-			//!!!!!!!!
 			//flag to handle concurrent steps 
-			//!!!!!!!
 			var showSequenceRules = true;
 			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
 					runConfiguration, executionMode, showSequenceRules);
@@ -141,6 +139,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 	}
 	
 	//the rest of methods below are copied implementations from the GEMOC Concurrent Engine
+	//there is no generic launcher to inherit these methods from
 	
 	/**
 	 * make sure no other engine is running on the model

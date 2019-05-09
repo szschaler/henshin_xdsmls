@@ -9,8 +9,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 /**
  * 
- * Class fully taken from the sequential engine(Zschaler)
- *
+ * common functions for launch configuration tabs
  */
 public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab 
 {

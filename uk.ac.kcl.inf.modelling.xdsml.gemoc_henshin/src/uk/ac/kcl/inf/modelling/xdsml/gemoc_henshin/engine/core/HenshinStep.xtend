@@ -7,7 +7,10 @@ import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
 /**
- * a class representing one step of execution
+ * A class representing one possible step of execution in the Henshin Engine.
+ * The HenshinSteps are given to the Logical Step Decider to decide which one should be executed next.
+ * Each step stores a Henshin rule match which we can execute on a model at a given point of execution.
+ * So basically a new Henshin Step is created for each possible rule match we can execute on the model.
  */
 class HenshinStep extends GenericSmallStepImpl {
 	
@@ -32,7 +35,12 @@ class HenshinStep extends GenericSmallStepImpl {
 	}
 	
 	/**
-	 * return a MSEOccurence for a step
+	 * return a MSEOccurence for a step, MSEOccurences represent objects that we run updates on 
+	 * so in case of Henshin it's a set of objects(element nodes). MSEOccurences are used by GEMOC
+	 * to track changes to let the addons(such as animator) know when they should be updated so 
+	 * without defining them the Sirius animator will never update.
+	 * MSEOcurrences are also used for display purposes in the Logical Step Decider therefore they have been
+	 * mocked in this method to show a  more meaningful representation to the user.
 	 */
 	override getMseoccurrence() {
 		if(matches === null || matches.isEmpty){
@@ -69,7 +77,8 @@ class HenshinStep extends GenericSmallStepImpl {
 	}		
 	
 	/**
-	 * extract a random node target from a match 
+	 * extract a node from a match with a Target annotation (one per rule is expected)
+	 * if for some reason, more than one exists then pick a random one out of them.
 	 * @param match
 	 */
 	private def mainObject(Match match) {

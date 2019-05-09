@@ -34,7 +34,8 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentR
 
 /**
  * 
- * Class fully taken from the sequential engine(Zschaler), modifications: line 84-85, 93
+ * Main tab to let the user specify input to the engine
+ * such as model/language/animator
  *
  */
 class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
@@ -75,17 +76,16 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	}
 	
 	/**
-	 * change number 1 in here
+	 * add logical step decider to the run config
 	 */
 	override void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(RunConfiguration.LAUNCH_DELAY, 1000);
 		
-		//added logical step decided to run config
 		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
 		ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);}
 
 	/**
-	 * change number 2 in here
+	 * define run configiguration
 	 */
 	override void initializeFrom(ILaunchConfiguration configuration) {
 		try {
