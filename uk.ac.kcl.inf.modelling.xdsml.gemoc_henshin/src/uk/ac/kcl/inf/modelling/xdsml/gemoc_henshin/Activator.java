@@ -19,7 +19,7 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 
 	protected MessagingSystem messaggingSystem = null;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -28,7 +28,9 @@ public class Activator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
+	 * BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -37,7 +39,9 @@ public class Activator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
@@ -57,13 +61,15 @@ public class Activator extends AbstractUIPlugin {
 		Activator.getDefault().getLog().log(new Status(Status.ERROR, PLUGIN_ID, Status.OK, msg, e));
 	}
 
+	public void debug(String msg) {
+		getLog().log(new Status(Status.INFO, PLUGIN_ID, Status.OK, msg, null));
+	}
 
 	public MessagingSystem getMessaggingSystem() {
 		if (messaggingSystem == null) {
 			MessagingSystemManager msm = new MessagingSystemManager();
 			messaggingSystem = msm.createBestPlatformMessagingSystem(
-					org.eclipse.gemoc.executionframework.debugger.Activator.PLUGIN_ID, 
-					"Model Debugger console");
+					org.eclipse.gemoc.executionframework.debugger.Activator.PLUGIN_ID, "Model Debugger console");
 		}
 		return messaggingSystem;
 	}

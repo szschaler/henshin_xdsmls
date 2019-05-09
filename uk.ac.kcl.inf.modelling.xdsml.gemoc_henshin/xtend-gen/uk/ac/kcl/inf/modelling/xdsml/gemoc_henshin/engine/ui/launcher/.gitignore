@@ -7,3 +7,6 @@
 /.LauncherTabGroup.xtendbin
 /HenshinEngineLauncher.java
 /LauncherTabGroup.java
+/.HenshinConcurrentEngineLauncher.java._trace
+/.HenshinConcurrentEngineLauncher.xtendbin
+/HenshinConcurrentEngineLauncher.java
