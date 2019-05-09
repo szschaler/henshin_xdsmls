@@ -34,7 +34,6 @@ public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigu
 	 */
 	protected LaunchConfigurationDataProcessingTab() {
 		for (EngineAddonSpecificationExtension extension : getExtensionSpecifications()) {
-			//the only changed line by me
 			//add all extensions as in the previous version it was only the sequential engine extensions
 			_components.put(extension, null);
 		}
