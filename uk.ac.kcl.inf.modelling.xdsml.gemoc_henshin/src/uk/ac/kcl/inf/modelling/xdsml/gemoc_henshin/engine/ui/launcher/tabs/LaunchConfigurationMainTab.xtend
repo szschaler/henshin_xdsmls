@@ -33,7 +33,7 @@ import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
 
 /**
- * 
+ * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
  * Main tab to let the user specify input to the engine
  * such as model/language/animator
  *
