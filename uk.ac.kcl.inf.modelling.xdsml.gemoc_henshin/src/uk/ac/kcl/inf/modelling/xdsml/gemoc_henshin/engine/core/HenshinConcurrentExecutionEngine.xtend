@@ -18,7 +18,6 @@ import org.eclipse.emf.transaction.RecordingCommand
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator;
-import uk.ac.kcl.inf.modelling.xdsml.henshinXDsmlSpecification.HenshinXDsmlSpecification
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionEngine
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentRunConfiguration
@@ -28,7 +27,6 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.executionframework.engine.core.AbstractExecutionEngine
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 
-import static extension uk.ac.kcl.inf.modelling.xdsml.HenshinXDsmlSpecificationHelper.*
 import java.util.ArrayList
 import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
 import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
@@ -84,29 +82,18 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 		val entryPoint = _executionContext.runConfiguration.languageName
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
-		var List<Rule> semanticRules
+		
 
 		// Check validity
-		if (semanticsResource.contents.head instanceof HenshinXDsmlSpecification) {
-			// Assume a HenshinXDsmlSpecification
-			val semantics = semanticsResource.contents.head as HenshinXDsmlSpecification
-			if (semantics.metamodel !== root.eClass.EPackage) {
-				throw new IllegalArgumentException(
-					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
-			}
+		// Assume a direct link to a Henshin file
+		val semantics = semanticsResource.contents.head as Module
 
-			semanticRules = semantics.rules
-		} else {
-			// Assume a direct link to a Henshin file
-			val semantics = semanticsResource.contents.head as Module
-
-			if (!semantics.imports.contains(root.eClass.EPackage)) {
-				throw new IllegalArgumentException(
-					"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
-			}
-
-			semanticRules = semantics.units.filter(Rule).toList
+		if (!semantics.imports.contains(root.eClass.EPackage)) {
+			throw new IllegalArgumentException(
+				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 		}
+
+		val semanticRules = semantics.units.filter(Rule).toList
 
 		// configure the solver, modified for the concurrent engine
 		_solver.configure(modelGraph, henshinEngine, semanticRules)
