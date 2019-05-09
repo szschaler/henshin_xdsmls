@@ -9,7 +9,7 @@ import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.Engine
 
 /**
  * 
- * Class fully taken from the sequential engine(Zschaler)
+ * Tab for backend configuration. Needed so that tracing (and, thus, debugging) works
  *
  */
 class LaunchConfigurationBackendsTab extends LaunchConfigurationDataProcessingTab {
