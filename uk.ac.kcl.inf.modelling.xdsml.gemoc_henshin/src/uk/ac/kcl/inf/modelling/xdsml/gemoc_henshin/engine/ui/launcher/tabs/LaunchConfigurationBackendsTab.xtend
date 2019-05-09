@@ -11,7 +11,7 @@ import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.Engine
 /**
  * 
  * Tab for backend configuration. Needed so that tracing (and, thus, debugging) works
- *
+ * 
  */
 class LaunchConfigurationBackendsTab extends LaunchConfigurationDataProcessingTab {
 
@@ -24,7 +24,7 @@ class LaunchConfigurationBackendsTab extends LaunchConfigurationDataProcessingTa
 	protected override Collection<EngineAddonGroupSpecificationExtension> getGroupExtensionSpecifications() {
 		val HashMap<String, EngineAddonGroupSpecificationExtension> result = new HashMap<String, EngineAddonGroupSpecificationExtension>();
 		// ensures to get only one group for a given id
-		EngineAddonGroupSpecificationExtensionPoint.specifications.forEach[engineAddonGroupSpecificationExtension |
+		EngineAddonGroupSpecificationExtensionPoint.specifications.forEach [ engineAddonGroupSpecificationExtension |
 			result.put(engineAddonGroupSpecificationExtension.getId(), engineAddonGroupSpecificationExtension)
 		]
 

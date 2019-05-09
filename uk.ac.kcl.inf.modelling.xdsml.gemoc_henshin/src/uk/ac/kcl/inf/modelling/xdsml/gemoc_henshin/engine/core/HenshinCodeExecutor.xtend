@@ -12,22 +12,23 @@ import java.lang.annotation.Annotation
  * this class remains empty
  */
 class HenshinCodeExecutor implements ICodeExecutor {
-	new(){
+	new() {
 		super()
 	}
-	
+
 	override execute(MSEOccurrence mseOccurrence) throws CodeExecutionException {
-		return null	
+		return null
 	}
-	
+
 	override execute(Object caller, String methodName, List<Object> parameters) throws CodeExecutionException {
 		return null
 	}
-	
-	override findCompatibleMethodsWithAnnotation(Object caller, List<Object> parameters, Class<? extends Annotation> annotationClass) {
+
+	override findCompatibleMethodsWithAnnotation(Object caller, List<Object> parameters,
+		Class<? extends Annotation> annotationClass) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override getExcutorID() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}

@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EcoreFactory
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
+
 /**
  * A class representing one possible step of execution in the Henshin Engine.
  * The HenshinSteps are given to the Logical Step Decider to decide which one should be executed next.
@@ -13,10 +14,10 @@ import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
  * So basically a new Henshin Step is created for each possible rule match we can execute on the model.
  */
 class HenshinStep extends GenericSmallStepImpl {
-	
+
 	protected Match match
 	protected List<Match> matches
-	
+
 	/**
 	 * create a new HenshinStep with a match
 	 * @param match
@@ -25,6 +26,7 @@ class HenshinStep extends GenericSmallStepImpl {
 		super()
 		this.match = match
 	}
+
 	/**
 	 * create a new Henshin step with a sequence of rule matches
 	 * @param a list of matches
@@ -33,7 +35,7 @@ class HenshinStep extends GenericSmallStepImpl {
 		super()
 		this.matches = matches
 	}
-	
+
 	/**
 	 * return a MSEOccurence for a step, MSEOccurences represent objects that we run updates on 
 	 * so in case of Henshin it's a set of objects(element nodes). MSEOccurences are used by GEMOC
@@ -43,24 +45,25 @@ class HenshinStep extends GenericSmallStepImpl {
 	 * mocked in this method to show a  more meaningful representation to the user.
 	 */
 	override getMseoccurrence() {
-		if(matches === null || matches.isEmpty){
+		if (matches === null || matches.isEmpty) {
 			generateMSE(match, match.getRule().getName(), match.toString())
-		}else{
+		} else {
 			var rulesNames = ''
-			for(Match m: matches){
+			for (Match m : matches) {
 				var r = m.getRule();
 				rulesNames = rulesNames + ' ' + r.getName()
 			}
 			generateMSE(matches.get(0), rulesNames, rulesNames)
 		}
 	}
+
 	/**
 	 * mock the generation of MSEOccurences
 	 * simulate creating MSE object -> with operation name same as rule name
 	 * concat the rule names for display purposes of the concurrent steps
 	 * @param a match, string of the rule/s name/s and string of all matched objects or again rule names
 	 */
-	def generateMSE(Match match, String name, String name2){
+	def generateMSE(Match match, String name, String name2) {
 		val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
 		mse.setCallerReference(match.mainObject)
 		val eo = EcoreFactory.eINSTANCE.createEOperation()
@@ -70,12 +73,12 @@ class HenshinStep extends GenericSmallStepImpl {
 
 		val mseoc = TracePackage::eINSTANCE.traceFactory.createMSEOccurrence()
 		mseoc.setMse(mse)
-		for(EObject e: match.getNodeTargets()){
+		for (EObject e : match.getNodeTargets()) {
 			mseoc.parameters.add(e)
 		}
 		mseoc
-	}		
-	
+	}
+
 	/**
 	 * extract a node from a match with a Target annotation (one per rule is expected)
 	 * if for some reason, more than one exists then pick a random one out of them.
