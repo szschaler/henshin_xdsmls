@@ -6,6 +6,7 @@ import java.util.HashMap
 import java.util.HashSet
 import java.util.List
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.henshin.cpa.result.CriticalPair
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
 import org.eclipse.emf.henshin.interpreter.Match
@@ -13,7 +14,6 @@ import org.eclipse.emf.henshin.model.Edge
 import org.eclipse.emf.henshin.model.Node
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
-import org.eclipse.emf.henshin.multicda.cpa.result.CriticalPair
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.trace.commons.model.trace.Step
@@ -34,10 +34,10 @@ class HenshinSolver implements ISolver {
 	//handling concurrent steps
 	var extension CPAHelper cpa
 	var boolean showConcurrentSteps
-	var List<CriticalPair> conflictPairs
-	var HashSet<Rule> conflictRules
-	var HashMap<Rule, ArrayList<Node>> ruleDeletedNodesMap
-	var HashMap<Rule, ArrayList<Edge>> ruleDeletedEdgesMap
+//	var List<CriticalPair> conflictPairs
+//	var HashSet<Rule> conflictRules
+//	var HashMap<Rule, ArrayList<Node>> ruleDeletedNodesMap
+//	var HashMap<Rule, ArrayList<Edge>> ruleDeletedEdgesMap
 
 	/**
 	 * create new HenshinSolver with the concurrent steps on/off
