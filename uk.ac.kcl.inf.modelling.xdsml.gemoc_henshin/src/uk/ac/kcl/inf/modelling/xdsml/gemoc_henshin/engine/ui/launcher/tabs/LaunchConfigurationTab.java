@@ -8,8 +8,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab 
-{
+/**
+ * 
+ * common functions for launch configuration tabs
+ */
+public abstract class LaunchConfigurationTab extends AbstractLaunchConfigurationTab {
 
 	public LaunchConfigurationTab() {
 		super();
@@ -25,41 +28,37 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		group.setLayout(locationLayout);
 		return group;
 	}
-	
+
 	/**
 	 * 
-	 * @param parent
-	 *            the Parent of this argument tab
-	 * @param labelString
-	 *            the label of the input text to create
+	 * @param parent      the Parent of this argument tab
+	 * @param labelString the label of the input text to create
 	 */
 	protected void createTextLabelLayout(Composite parent, String labelString) {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		parent.setLayoutData(gd);
 		Label inputLabel = new Label(parent, SWT.NONE);
-		inputLabel.setText(labelString); //$NON-NLS-1$
-		//gd = new GridData();
-		//gd.horizontalSpan = 2;
-		//inputLabel.setLayoutData(gd);
+		inputLabel.setText(labelString); // $NON-NLS-1$
+		// gd = new GridData();
+		// gd.horizontalSpan = 2;
+		// inputLabel.setLayoutData(gd);
 	}
+
 	/**
 	 * 
-	 * @param parent
-	 *            the Parent of this argument tab
-	 * @param labelString
-	 *            the label of the input text to create
-	 * @param toolTipText
-	 * 			  the text for tool tip
+	 * @param parent      the Parent of this argument tab
+	 * @param labelString the label of the input text to create
+	 * @param toolTipText the text for tool tip
 	 */
 	protected void createTextLabelLayout(Composite parent, String labelString, String toolTipText) {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		parent.setLayoutData(gd);
 		Label inputLabel = new Label(parent, SWT.NONE);
-		inputLabel.setText(labelString); //$NON-NLS-1$
+		inputLabel.setText(labelString); // $NON-NLS-1$
 		inputLabel.setToolTipText(toolTipText);
-		//gd = new GridData();
-		//gd.horizontalSpan = 2;
-		//inputLabel.setLayoutData(gd);
+		// gd = new GridData();
+		// gd.horizontalSpan = 2;
+		// inputLabel.setLayoutData(gd);
 	}
 
 }

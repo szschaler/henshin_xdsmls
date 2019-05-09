@@ -15,46 +15,52 @@ import org.eclipse.gemoc.executionframework.engine.commons.EngineContextExceptio
 import org.eclipse.gemoc.executionframework.extensions.sirius.modelloader.DefaultModelLoader
 import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+
 /**
  * a model execution context for the Henshin Concurrent Engine
  */
-class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionContext<IConcurrentRunConfiguration,IConcurrentExecutionPlatform,ConcurrentLanguageDefinitionExtension> implements IConcurrentExecutionContext{
+class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionContext<IConcurrentRunConfiguration, IConcurrentExecutionPlatform, ConcurrentLanguageDefinitionExtension> implements IConcurrentExecutionContext {
 
 	protected ILogicalStepDecider logicalStepDecider
 	protected boolean showConcurrentSteps
-	
+
 	/**
 	 * create a new HenshinConcurrentModelExecutionContext
 	 * @param run configuration, mode of execution and a flag for the concurrent steps feature
 	 */
-	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode, boolean showConcurrentSteps) throws EngineContextException {
+	new(IConcurrentRunConfiguration runConfiguration, ExecutionMode executionMode,
+		boolean showConcurrentSteps) throws EngineContextException {
 		super(runConfiguration, executionMode)
-		//create a logical step decider based on the crun config
-		logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);	
+		// create a logical step decider based on the current config
+		logicalStepDecider = LogicalStepDeciderFactory.createDecider(runConfiguration.getDeciderName(), executionMode);
 		this.showConcurrentSteps = showConcurrentSteps;
 	}
+
 	/**
 	 * create an execution platform
 	 */
 	override protected createExecutionPlatform() throws CoreException {
-		return new DefaultConcurrentExecutionPlatform(_languageDefinition as HenshinLanguageDefinitionExtension , _runConfiguration);
+		return new DefaultConcurrentExecutionPlatform(_languageDefinition as HenshinLanguageDefinitionExtension,
+			_runConfiguration);
 	}
+
 	/**
 	 * get language definition
 	 */
 	override protected getLanguageDefinition(String languageName) throws EngineContextException {
 		new HenshinLanguageDefinitionExtension(this)
 	}
+
 	/**
 	 * not needed
 	 */
 	override getFeedbackModel() {}
-	
+
 	/**
 	 * null as not used
 	 */
 	override getMSEModel() { null }
-	
+
 	/**
 	 * get the logical step decider
 	 * @return logical step decider
@@ -62,6 +68,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 	override getLogicalStepDecider() {
 		return logicalStepDecider
 	}
+
 	/**
 	 * class represeting the Henshin Language extension
 	 */
@@ -71,7 +78,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 		 * @param henshin execution context
 		 */
 		new(HenshinConcurrentModelExecutionContext hmec) {
-			super()			
+			super()
 			_configurationElement = new IConfigurationElement() {
 				/**
 				 * configure the language settings
@@ -89,6 +96,7 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 							return null
 					}
 				}
+
 				/**
 				 * get the language name
 				 */
@@ -160,14 +168,14 @@ class HenshinConcurrentModelExecutionContext extends AbstractModelExecutionConte
 				override isValid() {
 					throw new UnsupportedOperationException("TODO: auto-generated method stub")
 				}
-				
+
 				override getHandleId() {
 					throw new UnsupportedOperationException("TODO: auto-generated method stub")
 				}
 
 			}
 		}
-		
+
 	}
-	
+
 }

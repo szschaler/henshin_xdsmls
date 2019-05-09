@@ -26,11 +26,11 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
  * and handle the concurrent steps as rule sequences feature
  */
 class HenshinSolver implements ISolver {
-	
-	var Engine henshinEngine 
+
+	var Engine henshinEngine
 	var EGraph modelGraph
 	var List<Rule> semanticRules
-	
+
 	//handling concurrent steps
 	var extension CPAHelper cpa
 	var boolean showConcurrentSteps
@@ -43,34 +43,34 @@ class HenshinSolver implements ISolver {
 	 * create new HenshinSolver with the concurrent steps on/off
 	 * @param flag to enable the concurrent steps feature
 	 */
-	new(boolean showConcurrentSteps){
+	new(boolean showConcurrentSteps) {
 		super()
 		this.showConcurrentSteps = showConcurrentSteps;
 	}
-	
+
 	/**
 	 * compute and create all possible steps by finding rule matches
 	 * and generate concurrent steps
 	 * @return a list of possible steps
 	 */
-	override computeAndGetPossibleLogicalSteps() {		
+	override computeAndGetPossibleLogicalSteps() {
 		var possibleLogicalSteps = new ArrayList()
 		var matchList = new ArrayList<Match>;
-		for(Rule currRule: semanticRules) {
+		for (Rule currRule : semanticRules) {
 			val match = henshinEngine.findMatches(currRule, modelGraph, null)
-			for(Match m: match){
+			for (Match m : match) {
 				val step = new HenshinStep(m);
 				possibleLogicalSteps.add(step)
 				matchList.add(m);
 			}
 		}
-		//only generate Concurrent Steps if the flag is on
-		if(showConcurrentSteps){
+		// only generate Concurrent Steps if the flag is on
+		if (showConcurrentSteps) {
 			generateConcurrentSteps(possibleLogicalSteps, matchList);
 		}
-		possibleLogicalSteps	
+		possibleLogicalSteps
 	}
-	
+
 	/**
 	 * generate all possible maximum concurrent steps
 	 * @param a list of all possible steps and a list of all current matches
@@ -99,7 +99,7 @@ class HenshinSolver implements ISolver {
 				var concatArr = new ArrayList<Match>();
 //				concatArr.addAll(conflictFreeMatchesList);
 				concatArr.addAll(arr);
-				if(concatArr.length > 1){
+				if (concatArr.length > 1) {
 					var step = new HenshinStep(concatArr);
 					possibleLogicalSteps.add(step)
 				}
@@ -111,16 +111,17 @@ class HenshinSolver implements ISolver {
 //			possibleLogicalSteps.add(step)
 //		}
 	}
-	
+
 	/**
 	 * recursively explore all matches, check if they have conflicts and create max valid rule sequence
 	 * @param a list of all matches, a list of lists of all possible sequences, current stack
 	 */
-	def void createAllStepSequences(ArrayList<Match> allMatches, HashSet<HashSet<Match>> possibleSequences, HashSet<Match> currentStack) {
+	def void createAllStepSequences(ArrayList<Match> allMatches, HashSet<HashSet<Match>> possibleSequences,
+		HashSet<Match> currentStack) {
 		var foundOne = false;
-		for(Match m: allMatches){
-			if(!currentStack.contains(m)){
-				if(!hasConflicts(m, currentStack)){
+		for (Match m : allMatches) {
+			if (!currentStack.contains(m)) {
+				if (!hasConflicts(m, currentStack)) {
 					foundOne = true;
 					currentStack.add(m);
 					var clonedStack = currentStack.clone() as HashSet<Match>;
@@ -129,24 +130,24 @@ class HenshinSolver implements ISolver {
 				}
 			}
 		}
-		if(!foundOne){
+		if (!foundOne) {
 			possibleSequences.add(currentStack);
 		}
 	}
-		
+
 	/**
 	 * check if a match has conflicts with a set of other matches
 	 * @param match and a list of matches
 	 */
 	def hasConflicts(Match match, HashSet<Match> matches) {
-		for(Match m: matches){
-			if(haveMatchesConflicts(match,m)){
+		for (Match m : matches) {
+			if (haveMatchesConflicts(match, m)) {
 				return true;
 			}
 		}
 		return false;
 	}
-		
+
 	/**
 	 * check if two matches have conflicts with each other
 	 * @param match1 and match2
@@ -239,9 +240,9 @@ class HenshinSolver implements ISolver {
 //		//if no conflicts found return false	
 //		return false;
 	}
-	
+
 	/**
-	 * check if a rule has no parameters
+	 * check if a rule has no parameters, method taken from the sequential engine(Zschaler)
 	 * @param Rule
 	 * @return false if a rule has parameters
 	 */
@@ -257,12 +258,13 @@ class HenshinSolver implements ISolver {
 
 		true
 	}
+
 	/**
 	 * configure the henshin solver setup, check if concurrent steps possible by running henshin CPA
 	 * and generate deleted nodes and edges if the feature enabled
 	 * @param henshin egraph, henshin engine and all semantic rules
 	 */
-	def configure(EGraph modelGraph, Engine henshinEngine, List<Rule> semanticRules){
+	def configure(EGraph modelGraph, Engine henshinEngine, List<Rule> semanticRules) {
 		this.modelGraph = modelGraph
 		this.henshinEngine = henshinEngine
 		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
@@ -270,7 +272,7 @@ class HenshinSolver implements ISolver {
 		
 		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
 	}
-	
+
 	/**
 	 * get deleted nodes from a rule
 	 * @param a rule
@@ -279,15 +281,16 @@ class HenshinSolver implements ISolver {
 		var lhsNodes = rule.getLhs().getNodes();
 		var rhs = rule.getRhs();
 		var mappings = rule.getMappings();
-		var deletedNodes =  new ArrayList<Node>();
-		
-		//check if the LHS nodes are mapped to something in RHS
-		for(Node eo: lhsNodes){
-			if(mappings.getImage(eo,rhs) === null)
+		var deletedNodes = new ArrayList<Node>();
+
+		// check if the LHS nodes are mapped to something in RHS
+		for (Node eo : lhsNodes) {
+			if (mappings.getImage(eo, rhs) === null)
 				deletedNodes.add(eo);
 		}
 		deletedNodes;
 	}
+
 	/**
 	 * get deleted edges from a rule
 	 * @param a rule
@@ -295,70 +298,70 @@ class HenshinSolver implements ISolver {
 	def getDeletedEdges(Rule rule) {
 		var rhs = rule.getRhs();
 		var mappings = rule.getMappings();
-		var deletedEdges =  new ArrayList<Edge>();
+		var deletedEdges = new ArrayList<Edge>();
 		var lhsEdges = rule.getLhs().getEdges();
-		
-		//check if the LHS edges are mapped to something in RHS
-		for(Edge e: lhsEdges){
-			if(mappings.getImage(e,rhs) === null)
+
+		// check if the LHS edges are mapped to something in RHS
+		for (Edge e : lhsEdges) {
+			if (mappings.getImage(e, rhs) === null)
 				deletedEdges.add(e);
 		}
 		deletedEdges;
 	}
-	
+
 	override getState() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override initialize(IConcurrentExecutionContext concurrentexecutionContext) {
 	}
-	
+
 	override prepareBeforeModelLoading(IConcurrentExecutionContext concurrentexecutionContext) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override proposeLogicalStep() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override revertForceClockEffect() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override setExecutableModelResource(Resource execModelResource) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override setState(byte[] serializableModel) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override updatePossibleLogicalSteps() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override dispose() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override applyLogicalStep(Step<?> logicalStep) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override forbidEventOccurrence(EventOccurrence arg0) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override forceEventOccurrence(EventOccurrence arg0) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override getAllDiscreteClocks() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override getLastOccurrenceRelations() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 }

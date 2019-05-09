@@ -10,12 +10,14 @@ This repository contains a concurrent execution engine that implements support f
 4. Clone this repository and import all projects into your GEMOC Studio
 5. Clone https://github.com/szschaler/henshin_xtext_adapter and import all projects.
 6. Clone one of the example repositories ([banking](https://github.com/szschaler/banking_language), [production line system](https://github.com/szschaler/pls_language)) and import all projects except the `.design`, `.henshin`, and the `.example` projects.
-7. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. If you're running the cpa version go to Arguments, choose Other and specify workspace in your filesystem.
+7. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. You may have to set a non-default working directory on the `Arguments` tab.
 8. In the second instance of GEMOC Studio import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
 
 ## Features
 
 Annotating any LHS node with `Target` will make the match of that node the target of the rule application for purposes of the GEMOC debugger. This will make for better representation in the GEMOC stack trace. Only LHS nodes and no multi-nodes can be annotated at this point.
+
+The current version of the engine includes both the atomic steps version and the maximally concurrent rules(a maximum sequence of rules that can be run together). The feature can be disabled with `showSequenceRules` flag in the launcher.
 
 ## Publications
 

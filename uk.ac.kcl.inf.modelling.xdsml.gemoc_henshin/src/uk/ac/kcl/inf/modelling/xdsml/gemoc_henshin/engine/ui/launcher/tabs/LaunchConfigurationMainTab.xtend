@@ -13,7 +13,6 @@ import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
-import org.eclipse.gemoc.executionframework.engine.commons.MelangeHelper
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
 import org.eclipse.swt.SWT
@@ -35,6 +34,9 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentR
 
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
+ * Main tab to let the user specify input to the engine
+ * such as model/language/animator
+ * 
  */
 class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
@@ -73,13 +75,22 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		createAnimationLayout(debugArea, null)
 	}
 
+	/**
+	 * add logical step decider to the run config
+	 */
 	override void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(RunConfiguration.LAUNCH_DELAY, 1000);
-		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
-				ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);	}
 
+		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER,
+			ConcurrentRunConfiguration.DECIDER_ASKUSER_STEP_BY_STEP);
+	}
+
+	/**
+	 * define run configiguration
+	 */
 	override void initializeFrom(ILaunchConfiguration configuration) {
 		try {
+			// define concurrent run config
 			val ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration)
 			_modelLocationText.text = URIHelper.removePlatformScheme(runConfiguration.getExecutedModelURI())
 
@@ -271,12 +282,12 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 				errorMessage = "Specified language-semantics file doesn't exist: " + languageName
 				return false
 			}
-			
+
 			if (! (languageResource instanceof IFile)) {
 				errorMessage = "Not a valid file " + languageName
 				return false
 			}
-			
+
 			if (! languageName.endsWith(".henshin_xdsml") && ! languageName.endsWith(".henshin")) {
 				errorMessage = "Wrong type of file for language semantics: " + languageName
 				return false

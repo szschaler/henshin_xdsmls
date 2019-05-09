@@ -20,12 +20,22 @@ import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon;
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon.EngineAddonSpecificationExtension;
 import org.eclipse.gemoc.xdsmlframework.api.extensions.engine_addon_group.EngineAddonGroupSpecificationExtension;
 
+/**
+ * 
+ * Tab for data processing.
+ *
+ */
 public abstract class LaunchConfigurationDataProcessingTab extends LaunchConfigurationTab {
 
 	private HashMap<EngineAddonSpecificationExtension, Button> _components = new HashMap<>();
 
+	/**
+	 * get all possible addons and add them to the tab so the user can switch them
+	 * on/off
+	 */
 	protected LaunchConfigurationDataProcessingTab() {
 		for (EngineAddonSpecificationExtension extension : getExtensionSpecifications()) {
+			// add all extensions
 			_components.put(extension, null);
 		}
 	}
