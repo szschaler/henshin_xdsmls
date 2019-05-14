@@ -4,6 +4,7 @@ import fr.inria.aoste.trace.EventOccurrence
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
+import java.util.Set
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
@@ -15,6 +16,7 @@ import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.trace.commons.model.trace.Step
+import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 
@@ -29,9 +31,14 @@ class HenshinSolver implements ISolver {
 	var EGraph modelGraph
 	var List<Rule> semanticRules
 
-	//handling concurrent steps
+	// handling concurrent steps
 	var extension CPAHelper cpa
 	var boolean showConcurrentSteps
+
+	@Accessors
+	var List<ConcurrencyHeuristic> concurrencyHeuristics
+	@Accessors
+	var List<FilteringHeuristic> filteringHeuristics
 
 	/**
 	 * create new HenshinSolver with the concurrent steps on/off
@@ -48,48 +55,41 @@ class HenshinSolver implements ISolver {
 	 * @return a list of possible steps
 	 */
 	override computeAndGetPossibleLogicalSteps() {
-		var possibleLogicalSteps = new ArrayList()
-		var matchList = new ArrayList<Match>;
-		for (Rule currRule : semanticRules) {
-			val match = henshinEngine.findMatches(currRule, modelGraph, null)
-			for (Match m : match) {
-				val step = new HenshinStep(m);
-				possibleLogicalSteps.add(step)
-				matchList.add(m);
-			}
-		}
+		var possibleLogicalSteps = new ArrayList<Step<?>>()
+
+		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
+		possibleLogicalSteps.addAll(atomicMatches.map[m|new HenshinStep(m)])
+
 		// only generate Concurrent Steps if the flag is on
 		if (showConcurrentSteps) {
-			generateConcurrentSteps(possibleLogicalSteps, matchList);
+			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq|new HenshinStep(seq.toList)])
 		}
-		possibleLogicalSteps
+
+		possibleLogicalSteps.filterByHeuristics
+	}
+
+	private def filterByHeuristics(List<Step<?>> possibleSteps) {
+		filteringHeuristics.fold(possibleSteps, [steps, fh | fh.filter(steps)])
 	}
 
 	/**
-	 * generate all possible maximum concurrent steps
-	 * @param a list of all possible steps and a list of all current matches
+	 * Generate all possible maximally concurrent steps
+	 * 
+	 * @param matchList all current atomic matches
 	 */
-	def generateConcurrentSteps(ArrayList<Step<?>> possibleLogicalSteps, ArrayList<Match> matchList) {
-			var possibleSequences =  new HashSet<HashSet<Match>>;
-		
-			createAllStepSequences(matchList, possibleSequences, new HashSet<Match> );
-			
-			//for all lists of max sequences add the conflict free matches and create a henshinStep
-			for(HashSet<Match> arr: possibleSequences){
-				var concatArr = new ArrayList<Match>();
-				concatArr.addAll(arr);
-				if (concatArr.length > 1) {
-					var step = new HenshinStep(concatArr);
-					possibleLogicalSteps.add(step)
-				}
-			}
+	def generateConcurrentSteps(List<Match> matchList) {
+		var possibleSequences = new HashSet<Set<Match>>;
+
+		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
+
+		possibleSequences
 	}
 
 	/**
 	 * recursively explore all matches, check if they have conflicts and create max valid rule sequence
 	 * @param a list of all matches, a list of lists of all possible sequences, current stack
 	 */
-	def void createAllStepSequences(ArrayList<Match> allMatches, HashSet<HashSet<Match>> possibleSequences,
+	def void createAllStepSequences(List<Match> allMatches, Set<Set<Match>> possibleSequences,
 		HashSet<Match> currentStack) {
 		var foundOne = false;
 		for (Match m : allMatches) {
@@ -113,21 +113,20 @@ class HenshinSolver implements ISolver {
 	 * @param match and a list of matches
 	 */
 	def hasConflicts(Match match, HashSet<Match> matches) {
-		for (Match m : matches) {
-			if (haveMatchesConflicts(match, m)) {
-				return true;
-			}
-		}
-		return false;
+		matches.exists[m|match.cannotRunConcurrently(m)]
 	}
 
 	/**
-	 * check if two matches have conflicts with each other
+	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
+	 * conflict based on the CPA analysis. Then checks if all concurrency heuristics agree 
+	 * that they should be run in parallel.
+	 * 
 	 * @param match1 and match2
-	 * @output true if there are conflicts, false otherwise
+	 * 
+	 * @output true if the two matches should not run in parallel
 	 */
-	def haveMatchesConflicts(Match match1, Match match2) {
-		match1.conflictsWith(match2)
+	def cannotRunConcurrently(Match match1, Match match2) {
+		match1.conflictsWith(match2) || concurrencyHeuristics.exists[ch|!ch.canBeConcurrent(match1, match2)]
 	}
 
 	/**
@@ -158,7 +157,7 @@ class HenshinSolver implements ISolver {
 		this.henshinEngine = henshinEngine
 		var applicableRules = semanticRules.filter[r|r.checkParameters].toList
 		this.semanticRules = applicableRules
-		
+
 		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
 	}
 

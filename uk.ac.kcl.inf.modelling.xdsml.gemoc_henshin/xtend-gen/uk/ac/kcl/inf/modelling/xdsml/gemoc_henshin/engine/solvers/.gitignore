@@ -1,3 +1,9 @@
 /.HenshinSolver.xtendbin
 /.HenshinSolver.java._trace
 /HenshinSolver.java
+/.ConcurrencyHeuristic.java._trace
+/.FilteringHeuristic.java._trace
+/.ConcurrencyHeuristic.xtendbin
+/.FilteringHeuristic.xtendbin
+/ConcurrencyHeuristic.java
+/FilteringHeuristic.java
