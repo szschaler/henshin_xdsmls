@@ -13,6 +13,6 @@ class SetOfRulesHeuristic implements ConcurrencyHeuristic {
 		this.rules = rules;
 	}
 	override boolean canBeConcurrent (Match match1, Match match2){
-		rules.contains(match1) && rules.contains(match2)
+		rules.contains(match1.rule) && rules.contains(match2.rule)
 	}	
 }
