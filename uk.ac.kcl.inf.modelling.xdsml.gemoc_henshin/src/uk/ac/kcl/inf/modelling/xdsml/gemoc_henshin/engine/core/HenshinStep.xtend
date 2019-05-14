@@ -48,11 +48,7 @@ class HenshinStep extends GenericSmallStepImpl {
 		if (matches === null || matches.isEmpty) {
 			generateMSE(match, match.getRule().getName(), match.toString())
 		} else {
-			var rulesNames = ''
-			for (Match m : matches) {
-				var r = m.getRule();
-				rulesNames = rulesNames + ' ' + r.getName()
-			}
+			val rulesNames = matches.map[m | m.rule.name].sort.join(' ')			
 			generateMSE(matches.get(0), rulesNames, rulesNames)
 		}
 	}
