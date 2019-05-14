@@ -32,7 +32,7 @@ class CPAHelper {
 	new(Set<Rule> rules) {
 		// Run Critical-Pair Analysis
 		val cpa = new CpaByAGG()
-		cpa.init(new ArrayList(rules), new CPAOptions())
+		cpa.init(rules.toList, new CPAOptions())
 		var result = cpa.runConflictAnalysis()
 		// FIXME: With Henshin 1.5, can do: val criticalPairs = result.initialCriticalPairs
 		val criticalPairs = result.criticalPairs

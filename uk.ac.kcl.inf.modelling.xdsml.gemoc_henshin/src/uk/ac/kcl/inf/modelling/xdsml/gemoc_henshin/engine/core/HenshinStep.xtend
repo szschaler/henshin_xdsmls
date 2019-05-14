@@ -6,7 +6,6 @@ import org.eclipse.emf.ecore.EcoreFactory
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
-import java.util.ArrayList
 
 /**
  * A class representing one possible step of execution in the Henshin Engine.
@@ -49,17 +48,7 @@ class HenshinStep extends GenericSmallStepImpl {
 		if (matches === null || matches.isEmpty) {
 			generateMSE(match, match.getRule().getName(), match.toString())
 		} else {
-			var rulesNames = ''
-			var ruleNamesArray = new ArrayList();
-			for (Match m : matches) {
-				var r = m.getRule();
-				ruleNamesArray.add(r.getName())
-			}
-			var sortedRuleNames = ruleNamesArray.sort()
-			for(String s: sortedRuleNames){
-				rulesNames = rulesNames + ' ' + s
-			}				
-			
+			val rulesNames = matches.map[m | m.rule.name].sort.join(' ')			
 			generateMSE(matches.get(0), rulesNames, rulesNames)
 		}
 	}
