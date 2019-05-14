@@ -47,6 +47,10 @@ class HenshinSolver implements ISolver {
 	new(boolean showConcurrentSteps) {
 		super()
 		this.showConcurrentSteps = showConcurrentSteps;
+//		concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
+//		concurrencyHeuristics.add(new OverlapHeuristic())
+//		filteringHeuristics = new ArrayList<FilteringHeuristic>()
+//		filteringHeuristics.add(new maxNumberOfStepsHeuristic(2))
 	}
 
 	/**
@@ -58,18 +62,35 @@ class HenshinSolver implements ISolver {
 		var possibleLogicalSteps = new ArrayList<Step<?>>()
 
 		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
-		possibleLogicalSteps.addAll(atomicMatches.map[m|new HenshinStep(m)])
 
 		// only generate Concurrent Steps if the flag is on
 		if (showConcurrentSteps) {
-			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq|new HenshinStep(seq.toList)])
+			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| if(seq.length > 1) new HenshinStep(seq.toList)])
 		}
 
 		possibleLogicalSteps.filterByHeuristics
+		
+		removeDuplicates(possibleLogicalSteps)
+		possibleLogicalSteps.addAll(atomicMatches.map[m| new HenshinStep(m)])
+		possibleLogicalSteps
 	}
+	
+	def List<Step<?>> removeDuplicates(ArrayList<Step<?>> steps) {		
+		var uniqueMatches = new HashSet<List<Match>>
+				
+		for(Step<?> s: steps){
+			var henshinStep = s as HenshinStep
+			if(henshinStep.matches !== null){
+				uniqueMatches.add(henshinStep.matches)
+			}
+		}
+		uniqueMatches.map(m | new HenshinStep(m) as Step<?>).toList
+	}
+
 
 	private def filterByHeuristics(List<Step<?>> possibleSteps) {
 		filteringHeuristics.fold(possibleSteps, [steps, fh | fh.filter(steps)])
+		//filteringHeuristics.get(0).filter(possibleSteps)
 	}
 
 	/**
@@ -81,7 +102,7 @@ class HenshinSolver implements ISolver {
 		var possibleSequences = new HashSet<Set<Match>>;
 
 		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
-
+		
 		possibleSequences
 	}
 

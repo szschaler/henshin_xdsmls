@@ -15,8 +15,8 @@ import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
  */
 class HenshinStep extends GenericSmallStepImpl {
 
-	protected Match match
-	protected List<Match> matches
+	public Match match
+	public List<Match> matches
 
 	/**
 	 * create a new HenshinStep with a match
