@@ -7,3 +7,6 @@
 /.FilteringHeuristic.xtendbin
 /ConcurrencyHeuristic.java
 /FilteringHeuristic.java
+/.SetOfRulesHeuristic.java._trace
+/.OverlapHeuristic.java._trace
+/.FullyOverlapHeuristic.java._trace
