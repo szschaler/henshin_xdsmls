@@ -10,3 +10,9 @@
 /.SetOfRulesHeuristic.java._trace
 /.OverlapHeuristic.java._trace
 /.FullyOverlapHeuristic.java._trace
+/.FullyOverlapHeuristic.xtendbin
+/.OverlapHeuristic.xtendbin
+/.SetOfRulesHeuristic.xtendbin
+/FullyOverlapHeuristic.java
+/OverlapHeuristic.java
+/SetOfRulesHeuristic.java
