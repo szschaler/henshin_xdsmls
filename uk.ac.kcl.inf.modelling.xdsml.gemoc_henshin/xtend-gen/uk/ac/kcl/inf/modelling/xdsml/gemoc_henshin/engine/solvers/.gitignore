@@ -16,6 +16,6 @@
 /FullyOverlapHeuristic.java
 /OverlapHeuristic.java
 /SetOfRulesHeuristic.java
-/.maxNumberOfStepsHeuristic.java._trace
-/.maxNumberOfStepsHeuristic.xtendbin
-/maxNumberOfStepsHeuristic.java
+/MaxNumberOfStepsHeuristic.java
+/.MaxNumberOfStepsHeuristic.xtendbin
+/.MaxNumberOfStepsHeuristic.java._trace

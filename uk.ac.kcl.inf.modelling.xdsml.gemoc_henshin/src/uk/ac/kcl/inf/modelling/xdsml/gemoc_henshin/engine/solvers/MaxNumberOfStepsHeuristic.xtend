@@ -7,7 +7,7 @@ import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 
-class maxNumberOfStepsHeuristic implements FilteringHeuristic {
+class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 
 	var int maxNumberOfSteps
 

@@ -50,7 +50,7 @@ class HenshinSolver implements ISolver {
 		concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
 //		concurrencyHeuristics.add(new OverlapHeuristic())
 		filteringHeuristics = new ArrayList<FilteringHeuristic>()
-		filteringHeuristics.add(new maxNumberOfStepsHeuristic(2))
+		filteringHeuristics.add(new MaxNumberOfStepsHeuristic(2))
 	}
 
 	/**
