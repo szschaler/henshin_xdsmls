@@ -26,8 +26,6 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 				generateSteps(
 					hs.matches,
 					newSteps,
-					0,
-					hs.matches.length,
 					new ArrayList<Match>
 				)
 				validSteps.addAll(newSteps.map[step|new HenshinStep(step)])
@@ -41,20 +39,20 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 
 	/**
 	 * Recursively produce all match sets of the given size from the list of matches and add to steps
-	 * 
-	 * TODO: Needs cleaning up
 	 */
-	def void generateSteps(List<Match> matches, List<List<Match>> steps, int start, int end, List<Match> currentList) {
-		if (currentList.size() == maxNumberOfSteps) {
-			steps.add(new ArrayList<Match>(currentList));
-			return;
+	def void generateSteps(List<Match> matches, List<List<Match>> steps, List<Match> currentList) {
+		if (currentList.size == maxNumberOfSteps) {
+			steps.add(new ArrayList<Match>(currentList))
+			return
 		}
 
-		for (var i = start; i < end; i++) {
-			currentList.add(matches.get(i));
-			generateSteps(matches, steps, start + 1, end, currentList);
-			currentList.remove(currentList.size() - 1);
-		}
+		matches.forEach[m, idx|
+			currentList.add(m)
+			
+			generateSteps(matches.subList(idx + 1, matches.size), steps, currentList)
+			
+			currentList.remove(currentList.size - 1)			
+		]
 	}
 
 	/**
