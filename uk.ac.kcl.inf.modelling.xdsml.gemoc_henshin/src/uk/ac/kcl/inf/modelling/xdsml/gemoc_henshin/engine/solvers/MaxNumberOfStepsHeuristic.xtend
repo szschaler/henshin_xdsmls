@@ -39,6 +39,11 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 		validSteps.removeDuplicates
 	}
 
+	/**
+	 * Recursively produce all match sets of the given size from the list of matches and add to steps
+	 * 
+	 * TODO: Needs cleaning up
+	 */
 	def void generateSteps(List<Match> matches, List<List<Match>> steps, int start, int end, List<Match> currentList) {
 		if (currentList.size() == maxNumberOfSteps) {
 			steps.add(new ArrayList<Match>(currentList));
@@ -52,15 +57,23 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 		}
 	}
 
-	def List<Step<?>> removeDuplicates(ArrayList<Step<?>> steps) {
-		var uniqueMatches = new HashSet<List<Match>>
+	/**
+	 * Remove all duplicate steps from the list.
+	 * 
+	 * FIXME: Not the most efficient implementation yet, and I suspect it will break if there 
+	 * are multiple matches for the same rule that can be run in parallel
+	 */
+	def List<Step<?>> removeDuplicates(List<Step<?>> steps) {
+		steps.fold(new ArrayList<Step<?>>, [list, s |
+			val hs = s as HenshinStep 
+			if (!list.exists[s2 |
+				val hs2 = s2 as HenshinStep 
+				
+				((hs.match !== null) && (hs.match === hs2.match)) ||
+				((hs.matches !== null) && (hs.matches.sortBy[m | m.rule.name] == hs2.matches.sortBy[m | m.rule.name]))])
+				list.add(s) 
 
-		for (Step<?> s : steps) {
-			var henshinStep = s as HenshinStep
-			if (henshinStep.matches !== null) {
-				uniqueMatches.add(henshinStep.matches)
-			}
-		}
-		uniqueMatches.map(m|new HenshinStep(m) as Step<?>).toList
+			list
+		]).toList
 	}
 }
