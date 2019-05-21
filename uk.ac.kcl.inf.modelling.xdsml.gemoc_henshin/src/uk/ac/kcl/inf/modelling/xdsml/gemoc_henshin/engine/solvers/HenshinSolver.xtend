@@ -19,6 +19,8 @@ import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
 
 /**
  * A HenshinSolver class implementing an ISolver
@@ -48,9 +50,7 @@ class HenshinSolver implements ISolver {
 		super()
 		this.showConcurrentSteps = showConcurrentSteps;
 		concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
-//		concurrencyHeuristics.add(new OverlapHeuristic())
 		filteringHeuristics = new ArrayList<FilteringHeuristic>()
-//		filteringHeuristics.add(new MaxNumberOfStepsHeuristic(2))
 	}
 
 	/**
@@ -212,6 +212,20 @@ class HenshinSolver implements ISolver {
 	}
 
 	override initialize(IConcurrentExecutionContext concurrentexecutionContext) {
+		var config = (concurrentexecutionContext as HenshinConcurrentModelExecutionContext).getRunConfiguration() as HenshinConcurrentRunConfiguration
+		if(config.getMaxNumberOfStepsHeuristic()){
+			filteringHeuristics.add(new MaxNumberOfStepsHeuristic())
+		}
+		if(config.getOverlapHeuristic()){
+			concurrencyHeuristics.add(new OverlapHeuristic())
+		}
+		if(config.getFullyOverlapHeuristic()){
+			concurrencyHeuristics.add(new FullyOverlapHeuristic())
+			
+		}
+		if(config.getSetOfRulesHeuristic()){
+			concurrencyHeuristics.add(new SetOfRulesHeuristic(semanticRules))
+		}
 	}
 
 	override prepareBeforeModelLoading(IConcurrentExecutionContext concurrentexecutionContext) {

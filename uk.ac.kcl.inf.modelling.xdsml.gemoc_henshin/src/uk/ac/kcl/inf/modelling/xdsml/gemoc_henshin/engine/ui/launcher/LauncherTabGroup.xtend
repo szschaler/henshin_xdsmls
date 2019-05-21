@@ -5,6 +5,7 @@ import org.eclipse.debug.ui.CommonTab
 import org.eclipse.debug.ui.ILaunchConfigurationDialog
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationMainTab
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationBackendsTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationHeuristicsTab
 
 /**
  * 
@@ -17,6 +18,7 @@ class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {
 		tabs = #[
 			new LaunchConfigurationMainTab,
 			new LaunchConfigurationBackendsTab,
+			new LaunchConfigurationHeuristicsTab,
 			new CommonTab
 		]
 	}

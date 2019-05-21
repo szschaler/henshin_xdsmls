@@ -14,6 +14,10 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 		super()
 		this.maxNumberOfSteps = maxNumberOfSteps
 	}
+	new() {
+		super()
+		maxNumberOfSteps = 2
+	}
 
 	override List<Step<?>> filter(List<Step<?>> steps) {
 		var validSteps = new ArrayList<Step<?>>()
