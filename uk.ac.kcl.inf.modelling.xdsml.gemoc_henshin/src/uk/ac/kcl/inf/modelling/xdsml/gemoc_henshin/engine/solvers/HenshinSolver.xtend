@@ -50,7 +50,7 @@ class HenshinSolver implements ISolver {
 		concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
 //		concurrencyHeuristics.add(new OverlapHeuristic())
 		filteringHeuristics = new ArrayList<FilteringHeuristic>()
-		filteringHeuristics.add(new MaxNumberOfStepsHeuristic(2))
+//		filteringHeuristics.add(new MaxNumberOfStepsHeuristic(2))
 	}
 
 	/**
@@ -167,6 +167,8 @@ class HenshinSolver implements ISolver {
 		this.semanticRules = applicableRules
 
 		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
+		
+//		filteringHeuristics.add(new NonIdentityElementsHeuristic(modelGraph.roots.head.eClass.EPackage.EClassifiers.filter(EClass).filter[ec | ec.name == "Part"].toList))
 	}
 
 	/**
