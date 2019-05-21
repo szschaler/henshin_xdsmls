@@ -40,6 +40,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
 
 /**
  * class to launch the Henshin Concurrent Execution Engine
@@ -66,7 +67,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			});
 
 			// parse the run configuration
-			var ConcurrentRunConfiguration runConfiguration = new ConcurrentRunConfiguration(configuration);
+			var HenshinConcurrentRunConfiguration runConfiguration = new HenshinConcurrentRunConfiguration(configuration);
 
 			// detect if we are running in debug mode or not
 			var ExecutionMode executionMode = null;
@@ -80,7 +81,7 @@ class HenshinConcurrentEngineLauncher extends AbstractGemocLauncher<IConcurrentE
 			if (isEngineAlreadyRunning(runConfiguration.getExecutedModelURI())) {
 				return;
 			}
-
+			
 			// flag to handle concurrent steps 
 			var showSequenceRules = true;
 			var HenshinConcurrentModelExecutionContext concurrentexecutionContext = new HenshinConcurrentModelExecutionContext(
