@@ -1,6 +1,7 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import fr.inria.diverse.melange.adapters.EObjectAdapter
+import java.util.ArrayList
 import java.util.List
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
@@ -16,8 +17,6 @@ import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.emf.transaction.RecordingCommand
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain
-import org.eclipse.xtext.resource.XtextResourceSet
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator;
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionEngine
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentRunConfiguration
@@ -25,12 +24,13 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IFutureActi
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ILogicalStepDecider
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.executionframework.engine.core.AbstractExecutionEngine
-import org.eclipse.gemoc.trace.commons.model.trace.Step
-
-import java.util.ArrayList
-import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
 import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
+import org.eclipse.gemoc.trace.commons.model.trace.Step
+import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
+import org.eclipse.xtext.resource.XtextResourceSet
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 
 /**
@@ -43,7 +43,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	var EGraph modelGraph
 
 	var ILogicalStepDecider _logicalStepDecider
-	var HenshinStep _selectedLogicalStep;
+	var Step<?> _selectedLogicalStep;
 	var HenshinSolver _solver;
 	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
 
@@ -196,7 +196,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * set the selected Henshin Step
 	 * @param henshin step
 	 */
-	def setSelectedLogicalHenshinStep(HenshinStep step) {
+	def setSelectedLogicalHenshinStep(Step step) {
 		synchronized (this) {
 			_selectedLogicalStep = step
 		}
@@ -245,21 +245,21 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * it should be uncommented after the fix is implemented by GEMOC
 	 * except for the modification, code taken from the concurrent ccsl engine
 	 */
-	override notifyAboutToExecuteLogicalStep(Step<?> l) {
-		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-			try {
-				// addon.aboutToExecuteStep(this, l);
-			} catch (EngineStoppedException ese) {
-				debug(
-					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
-						") has received stop command  with message : " + ese.getMessage());
-				stop();
-				throw ese;
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
+//	override notifyAboutToExecuteLogicalStep(Step<?> l) {
+//		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
+//			try {
+//				// addon.aboutToExecuteStep(this, l);
+//			} catch (EngineStoppedException ese) {
+//				debug(
+//					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
+//						") has received stop command  with message : " + ese.getMessage());
+//				stop();
+//				throw ese;
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//	}
 
 	/**
 	 * notify the addons about the state of execution: step executed
@@ -267,21 +267,21 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * to be deleted when GEMOC implements a fix
 	 * except for the modification, code taken from the concurrent ccsl engine
 	 */
-	override notifyLogicalStepExecuted(Step<?> l) {
-		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-			try {
-				addon.aboutToExecuteStep(this, l);
-				addon.stepExecuted(this, l);
-			} catch (EngineStoppedException ese) {
-				debug(
-					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
-						") has received stop command  with message : " + ese.getMessage());
-				stop();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
+//	override notifyLogicalStepExecuted(Step<?> l) {
+//		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
+//			try {
+//				addon.aboutToExecuteStep(this, l);
+//				addon.stepExecuted(this, l);
+//			} catch (EngineStoppedException ese) {
+//				debug(
+//					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
+//						") has received stop command  with message : " + ese.getMessage());
+//				stop();
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//	}
 
 	override notifyProposedLogicalStepsChanged() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
@@ -327,24 +327,32 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 
 		val selectedLogicalStep = getLogicalStepDecider().decide(this, getPossibleLogicalSteps())
 		if (selectedLogicalStep !== null) {
-			setSelectedLogicalHenshinStep(selectedLogicalStep as HenshinStep)
+			setSelectedLogicalHenshinStep(selectedLogicalStep)
 
 			setEngineStatus(EngineStatus.RunStatus.Running)
 			notifyLogicalStepSelected()
 
 			// if it's a single rule step execute otherwise execute the whole sequence
-			if ((selectedLogicalStep as HenshinStep).matches === null ||
-				((selectedLogicalStep as HenshinStep).matches).isEmpty) {
+			if (selectedLogicalStep instanceof HenshinStep) {
 				executeSelectedLogicalStep()
 			} else {
-				for (Step<?> step : getPossibleLogicalSteps()) {
-					var s = step as HenshinStep
-					if ((s.matches === null || s.matches.isEmpty) &&
-						(selectedLogicalStep as HenshinStep).matches.contains(s.match)) {
-						setSelectedLogicalHenshinStep(s)
-						executeSelectedLogicalStep()
-					}
-				}
+				beforeExecutionStep(selectedLogicalStep)
+				
+				(selectedLogicalStep as GenericParallelStep).subSteps.forEach[s | 
+					val hs = s as HenshinStep
+					setSelectedLogicalHenshinStep(hs)
+					executeSelectedLogicalStep()
+				]
+				
+				afterExecutionStep()
+//				for (Step<?> step : getPossibleLogicalSteps()) {
+//					var s = step as HenshinStep
+//					if ((s.matches === null || s.matches.isEmpty) &&
+//						(selectedLogicalStep as HenshinStep).matches.contains(s.match)) {
+//						setSelectedLogicalHenshinStep(s)
+//						executeSelectedLogicalStep()
+//					}
+//				}
 			}
 
 		}
@@ -357,20 +365,24 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 */
 	override executeSelectedLogicalStep() {
 		if (!_isStopped) {
-			val command = new StepCommand(editingDomain, _selectedLogicalStep.match, ruleRunner, modelGraph)
-			beforeExecutionStep(_selectedLogicalStep, command)
-			if (command.canExecute) {
-				try {
-					command.execute
-				} catch (RuleApplicationException rae) {
-					editingDomain.activeTransaction.abort(
-						new Status(IStatus.OK,
-							Activator.
-								PLUGIN_ID, '''Error executing semantic rule «_selectedLogicalStep.match.rule.name».'''))
+			if (_selectedLogicalStep instanceof HenshinStep) {
+				val command = new StepCommand(editingDomain, _selectedLogicalStep.match, ruleRunner, modelGraph)
+				beforeExecutionStep(_selectedLogicalStep, command)
+				if (command.canExecute) {
+					try {
+						command.execute
+					} catch (RuleApplicationException rae) {
+						editingDomain.activeTransaction.abort(
+							new Status(IStatus.OK,
+								Activator.
+									PLUGIN_ID, '''Error executing semantic rule «_selectedLogicalStep.match.rule.name».'''))
+					}
 				}
+				afterExecutionStep()				
+			} else {
+				// TODO: Fix this to actually run the parallel step here rather than where it's being done at the moment
+				throw new IllegalStateException("Parallel steps are executed somewhere else...")
 			}
-			afterExecutionStep()
-
 		} else {
 			afterExecutionStep()
 		}
