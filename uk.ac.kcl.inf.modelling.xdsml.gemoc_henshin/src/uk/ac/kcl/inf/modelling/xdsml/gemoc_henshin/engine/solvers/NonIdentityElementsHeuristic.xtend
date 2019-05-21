@@ -71,7 +71,7 @@ class NonIdentityElementsHeuristic implements FilteringHeuristic {
 		((m1.rule === m2.rule) &&
 			(
 				// TODO compare use of non-identity types
-				
+				false
 			)
 		)
 	}
