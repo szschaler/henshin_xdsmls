@@ -1,7 +1,6 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers
 
 import java.util.ArrayList
-import java.util.HashSet
 import java.util.List
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.trace.Step
