@@ -1,9 +1,9 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics
 
 import java.util.List
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 
-interface FilteringHeuristic {
+interface FilteringHeuristic extends Heuristic {
 	
 	def List<Step<?>> filter(List<Step<?>> steps)
 	

@@ -1,46 +1,25 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
-import org.eclipse.debug.core.ILaunchConfiguration
+import java.util.List
 import org.eclipse.core.runtime.CoreException
+import org.eclipse.debug.core.ILaunchConfiguration
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class HenshinConcurrentRunConfiguration extends ConcurrentRunConfiguration {
-	
-	public static final String maxNumberOfStepsHeuristicID = "uk.ac.kcl.inf.xdsml.heuristics.num_steps";
-	public static final String overlapHeuristicID = "uk.ac.kcl.inf.xdsml.heuristics.overlap";
-	public static final String fullyOverlapHeuristicID = "uk.ac.kcl.inf.xdsml.heuristics.full_overlap";
-	public static final String setOfRulesHeuristicID = "uk.ac.kcl.inf.xdsml.heuristics.set_of_rules";
 	
 	new(ILaunchConfiguration launchConfiguration) throws CoreException {
 		super(launchConfiguration)
 	}
 	
-	var boolean maxNumberOfStepsHeuristic;
-	var boolean overlapHeuristic;
-	var boolean fullyOverlapHeuristic;
-	var boolean setOfRulesHeuristic;
-	
-	def boolean getMaxNumberOfStepsHeuristic() {
-		return maxNumberOfStepsHeuristic
-	}
-	
-	def boolean getOverlapHeuristic() {
-		return overlapHeuristic
-	}
-	
-	def boolean getFullyOverlapHeuristic() {
-		return fullyOverlapHeuristic
-	}
-	
-	def boolean getSetOfRulesHeuristic() {
-		return setOfRulesHeuristic
-	}
-	
-	override extractInformation() throws CoreException {
-		super.extractInformation();
-		maxNumberOfStepsHeuristic = getAttribute(maxNumberOfStepsHeuristicID, Boolean.FALSE);
-		overlapHeuristic = getAttribute(overlapHeuristicID, Boolean.FALSE);
-		fullyOverlapHeuristic = getAttribute(fullyOverlapHeuristicID, Boolean.FALSE);
-		setOfRulesHeuristic = getAttribute(setOfRulesHeuristicID, Boolean.FALSE);
+	@Accessors(PUBLIC_GETTER)
+	var List<HeuristicsRegistry.HeuristicDefinition> heuristics
+		
+	override extractInformation() {
+		super.extractInformation
+		
+		// TODO Encode heuristics parameters in run configuration and extract them here so they can be stored in a copy of the heuristics description 
+		heuristics = _launchConfiguration.getAttribute(HeuristicsRegistry.HEURISTICS_CONFIG_KEY, #[]).map[hdi | HeuristicsRegistry.INSTANCE.get(hdi)].toList
 	}
 }

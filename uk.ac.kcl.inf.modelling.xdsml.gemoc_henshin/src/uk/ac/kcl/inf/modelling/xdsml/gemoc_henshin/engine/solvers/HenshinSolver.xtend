@@ -17,10 +17,16 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrent
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.ConcurrencyHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FilteringHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FullyOverlapHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.MaxNumberOfStepsHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.OverlapHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.SetOfRulesHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 
 /**
  * A HenshinSolver class implementing an ISolver
@@ -213,19 +219,16 @@ class HenshinSolver implements ISolver {
 
 	override initialize(IConcurrentExecutionContext concurrentexecutionContext) {
 		var config = (concurrentexecutionContext as HenshinConcurrentModelExecutionContext).getRunConfiguration() as HenshinConcurrentRunConfiguration
-		if(config.getMaxNumberOfStepsHeuristic()){
-			filteringHeuristics.add(new MaxNumberOfStepsHeuristic())
-		}
-		if(config.getOverlapHeuristic()){
-			concurrencyHeuristics.add(new OverlapHeuristic())
-		}
-		if(config.getFullyOverlapHeuristic()){
-			concurrencyHeuristics.add(new FullyOverlapHeuristic())
+		
+		config.heuristics.forEach[hd | 
+			val h = hd.instantiate
 			
-		}
-		if(config.getSetOfRulesHeuristic()){
-			concurrencyHeuristics.add(new SetOfRulesHeuristic(semanticRules))
-		}
+			if (h instanceof FilteringHeuristic) {
+				filteringHeuristics.add(h)
+			} else {
+				concurrencyHeuristics.add(h as ConcurrencyHeuristic)
+			}
+		]
 	}
 
 	override prepareBeforeModelLoading(IConcurrentExecutionContext concurrentexecutionContext) {

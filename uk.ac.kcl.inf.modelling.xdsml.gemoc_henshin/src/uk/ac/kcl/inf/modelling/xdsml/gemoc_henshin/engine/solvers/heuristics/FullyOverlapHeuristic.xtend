@@ -1,4 +1,4 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics
 
 import org.eclipse.emf.henshin.interpreter.Match
 
