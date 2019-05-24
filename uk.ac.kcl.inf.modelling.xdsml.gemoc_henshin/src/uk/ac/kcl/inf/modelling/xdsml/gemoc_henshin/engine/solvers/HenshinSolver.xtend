@@ -14,6 +14,7 @@ import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
@@ -79,8 +80,9 @@ class HenshinSolver implements ISolver {
 				var concatArr = new ArrayList<Match>();
 				concatArr.addAll(arr);
 				if (concatArr.length > 1) {
-					var step = new HenshinStep(concatArr);
-					possibleLogicalSteps.add(step)
+					val parStep = GenerictraceFactory.eINSTANCE.createGenericParallelStep
+					parStep.subSteps.addAll(concatArr.map[m | new HenshinStep(m)])
+					possibleLogicalSteps.add(parStep)
 				}
 			}
 	}
