@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
 
 /**
  * Remove steps that differ only in objects of a specific type -- specify that objects of that type are not considered to have identity (e.g., parts in the PLS example).
@@ -44,22 +45,22 @@ class NonIdentityElementsHeuristic implements FilteringHeuristic {
 	}
 
 	private def equivalentSteps(Step<?> s1, Step<?> s2) {
-		val hs1 = s1 as HenshinStep
-		val hs2 = s2 as HenshinStep
-
-		if (((hs1.match !== null) && (hs2.match === null)) || ((hs2.match !== null) && (hs1.match === null))) {
-			return false
-		} else if (hs1.match === null) {
-			if (hs1.matches.size != hs2.matches.size) {
-				return false
-			} else {
-				// TODO This can probably be done more efficiently
-				return hs1.matches.forall[m1 | hs2.matches.exists[m2 | equivalentMatches(m1, m2)]] &&
-					hs2.matches.forall[m2 | hs1.matches.exists[m1 | equivalentMatches(m1, m2)]]
+		if (s1 instanceof HenshinStep) {
+			if (s2 instanceof HenshinStep) {
+				return equivalentMatches(s1.match, s2.match)
 			}
 		} else {
-			return equivalentMatches(hs1.match, hs2.match)
+			val ps1 = s1 as GenericParallelStep
+			val ps2 = s2 as GenericParallelStep
+			
+			if (ps1.subSteps.size == ps2.subSteps.size) {
+				// TODO This can probably be done more efficiently
+				return ps1.subSteps.forall[ss1 | ps2.subSteps.exists[ss2 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]] &&
+					ps2.subSteps.forall[ss2 | ps1.subSteps.exists[ss1 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]]
+			}
 		}
+		
+		false
 	}
 
 	private def equivalentMatches(Match m1, Match m2) {

@@ -5,6 +5,8 @@ import java.util.List
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
 
 class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 
@@ -14,6 +16,7 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 		super()
 		this.maxNumberOfSteps = maxNumberOfSteps
 	}
+
 	new() {
 		super()
 		maxNumberOfSteps = 2
@@ -23,15 +26,22 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 		var validSteps = new ArrayList<Step<?>>()
 
 		for (Step<?> s : steps) {
-			val hs = s as HenshinStep
-			if (hs.matches !== null && hs.matches.length > maxNumberOfSteps) {
-				var newSteps = new ArrayList<List<Match>>();
-				generateSteps(
-					hs.matches,
-					newSteps,
-					new ArrayList<Match>
-				)
-				validSteps.addAll(newSteps.map[step|new HenshinStep(step)])
+			if (s instanceof GenericParallelStep) {
+				if (s.subSteps.length > maxNumberOfSteps) {
+					var newSteps = new ArrayList<List<Match>>();
+					generateSteps(
+						s.subSteps.map[s2|val hs = s2 as HenshinStep hs.match].toList,
+						newSteps,
+						new ArrayList<Match>
+					)
+					validSteps.addAll(newSteps.map [ step |
+						var ps = GenerictraceFactory.eINSTANCE.createGenericParallelStep
+						ps.subSteps.addAll(step.map[m|new HenshinStep(m)])
+						ps
+					])
+				} else {
+					validSteps.add(s)
+				}
 			} else {
 				validSteps.add(s)
 			}
@@ -49,12 +59,12 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 			return
 		}
 
-		matches.forEach[m, idx|
+		matches.forEach [ m, idx |
 			currentList.add(m)
-			
+
 			generateSteps(matches.subList(idx + 1, matches.size), steps, currentList)
-			
-			currentList.remove(currentList.size - 1)			
+
+			currentList.remove(currentList.size - 1)
 		]
 	}
 
@@ -65,14 +75,23 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 	 * are multiple matches for the same rule that can be run in parallel
 	 */
 	def List<Step<?>> removeDuplicates(List<Step<?>> steps) {
-		steps.fold(new ArrayList<Step<?>>, [list, s |
-			val hs = s as HenshinStep 
-			if (!list.exists[s2 |
-				val hs2 = s2 as HenshinStep 
-				
-				((hs.match !== null) && (hs.match === hs2.match)) ||
-				((hs.matches !== null) && (hs.matches.sortBy[m | m.rule.name] == hs2.matches.sortBy[m | m.rule.name]))])
-				list.add(s) 
+		steps.fold(new ArrayList<Step<?>>, [ list, s |
+			if (!list.exists [ s2 |
+				if (s2 instanceof HenshinStep) {
+					val hs = s as HenshinStep
+					(hs.match === s2.match)
+				} else {
+					val ps2 = s2 as GenericParallelStep
+					val ps = s as GenericParallelStep
+					(ps.subSteps.map [ s3 |
+						val hs3 = s3 as HenshinStep
+						hs3.match
+					].sortBy[m|m.rule.name] == ps2.subSteps.map [ s3 |
+						val hs3 = s3 as HenshinStep
+						hs3.match
+					].sortBy[m|m.rule.name])
+				}
+			]) { list.add(s) }
 
 			list
 		]).toList

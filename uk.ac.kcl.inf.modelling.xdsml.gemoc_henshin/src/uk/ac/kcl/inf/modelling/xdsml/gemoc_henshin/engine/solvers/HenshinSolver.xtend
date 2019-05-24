@@ -15,6 +15,7 @@ import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
@@ -22,10 +23,6 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrent
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.ConcurrencyHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FilteringHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FullyOverlapHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.MaxNumberOfStepsHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.OverlapHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.SetOfRulesHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 
 /**
@@ -71,7 +68,12 @@ class HenshinSolver implements ISolver {
 
 		// only generate Concurrent Steps if the flag is on
 		if (showConcurrentSteps) {
-			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| if(seq.length > 1) new HenshinStep(seq.toList)])
+			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
+				if(seq.length > 1) {
+					val parStep = GenerictraceFactory.eINSTANCE.createGenericParallelStep
+					parStep.subSteps.addAll(seq.map[m | new HenshinStep(m)])
+					parStep
+				}])
 		}
 
 		possibleLogicalSteps.addAll(atomicMatches.map[m| new HenshinStep(m)])
