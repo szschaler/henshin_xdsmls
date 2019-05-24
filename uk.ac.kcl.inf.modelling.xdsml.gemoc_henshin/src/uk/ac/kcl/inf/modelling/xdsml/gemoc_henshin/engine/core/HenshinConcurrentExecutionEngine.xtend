@@ -36,6 +36,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
  */
+// FIXME: Is there value in implementing IConcurrentExecutionEngine?
 class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurrentExecutionContext, IConcurrentRunConfiguration> implements IConcurrentExecutionEngine {
 
 	val Engine henshinEngine = new EngineImpl
@@ -196,7 +197,7 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 	 * set the selected Henshin Step
 	 * @param henshin step
 	 */
-	def setSelectedLogicalHenshinStep(Step step) {
+	def setSelectedLogicalHenshinStep(Step<?> step) {
 		synchronized (this) {
 			_selectedLogicalStep = step
 		}
@@ -238,50 +239,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 			}
 		}
 	}
-
-	/**
-	 * notify the addons about the state of execution: about to execute step
-	 * the code is commented out due to the bug that was found
-	 * it should be uncommented after the fix is implemented by GEMOC
-	 * except for the modification, code taken from the concurrent ccsl engine
-	 */
-//	override notifyAboutToExecuteLogicalStep(Step<?> l) {
-//		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-//			try {
-//				// addon.aboutToExecuteStep(this, l);
-//			} catch (EngineStoppedException ese) {
-//				debug(
-//					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
-//						") has received stop command  with message : " + ese.getMessage());
-//				stop();
-//				throw ese;
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//	}
-
-	/**
-	 * notify the addons about the state of execution: step executed
-	 * code moved here from notifyAboutToExecuteLogicalStep
-	 * to be deleted when GEMOC implements a fix
-	 * except for the modification, code taken from the concurrent ccsl engine
-	 */
-//	override notifyLogicalStepExecuted(Step<?> l) {
-//		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-//			try {
-//				addon.aboutToExecuteStep(this, l);
-//				addon.stepExecuted(this, l);
-//			} catch (EngineStoppedException ese) {
-//				debug(
-//					"Addon (" + addon.getClass().getSimpleName() + "@" + addon.hashCode() +
-//						") has received stop command  with message : " + ese.getMessage());
-//				stop();
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//	}
 
 	override notifyProposedLogicalStepsChanged() {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
@@ -345,14 +302,6 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 				]
 				
 				afterExecutionStep()
-//				for (Step<?> step : getPossibleLogicalSteps()) {
-//					var s = step as HenshinStep
-//					if ((s.matches === null || s.matches.isEmpty) &&
-//						(selectedLogicalStep as HenshinStep).matches.contains(s.match)) {
-//						setSelectedLogicalHenshinStep(s)
-//						executeSelectedLogicalStep()
-//					}
-//				}
 			}
 
 		}
