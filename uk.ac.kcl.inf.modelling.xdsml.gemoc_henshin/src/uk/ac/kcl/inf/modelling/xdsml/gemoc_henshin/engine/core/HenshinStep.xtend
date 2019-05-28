@@ -27,15 +27,6 @@ class HenshinStep extends GenericSmallStepImpl {
 		this.match = match
 	}
 
-//	/**
-//	 * create a new Henshin step with a sequence of rule matches
-//	 * @param a list of matches
-//	 */
-//	new(List<Match> matches) {
-//		super()
-//		this.matches = matches
-//	}
-
 	/**
 	 * return a MSEOccurence for a step, MSEOccurences represent objects that we run updates on 
 	 * so in case of Henshin it's a set of objects(element nodes). MSEOccurences are used by GEMOC
@@ -45,12 +36,7 @@ class HenshinStep extends GenericSmallStepImpl {
 	 * mocked in this method to show a  more meaningful representation to the user.
 	 */
 	override getMseoccurrence() {
-//		if (matches === null || matches.isEmpty) {
-			generateMSE(match, match.getRule().getName(), match.toString())
-//		} else {
-//			val rulesNames = matches.map[m | m.rule.name].sort.join(' ')			
-//			generateMSE(matches.get(0), rulesNames, rulesNames)
-//		}
+		generateMSE(match, match.getRule().getName(), match.toString())
 	}
 
 	/**
