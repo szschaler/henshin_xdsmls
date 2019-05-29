@@ -7,9 +7,11 @@ import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 
+	@Accessors
 	var int maxNumberOfSteps
 
 	new(int maxNumberOfSteps) {
@@ -18,8 +20,7 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 	}
 
 	new() {
-		super()
-		maxNumberOfSteps = 2
+		this(2)
 	}
 
 	override List<Step<?>> filter(List<Step<?>> steps) {
@@ -76,22 +77,29 @@ class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 	 */
 	def List<Step<?>> removeDuplicates(List<Step<?>> steps) {
 		steps.fold(new ArrayList<Step<?>>, [ list, s |
-			if (!list.exists [ s2 |
-				if (s2 instanceof HenshinStep) {
-					val hs = s as HenshinStep
-					(hs.match === s2.match)
-				} else {
-					val ps2 = s2 as GenericParallelStep
-					val ps = s as GenericParallelStep
-					(ps.subSteps.map [ s3 |
-						val hs3 = s3 as HenshinStep
-						hs3.match
-					].sortBy[m|m.rule.name] == ps2.subSteps.map [ s3 |
-						val hs3 = s3 as HenshinStep
-						hs3.match
-					].sortBy[m|m.rule.name])
+			if (s instanceof HenshinStep) {
+				if (!list.exists [ s2 |
+					if (s2 instanceof HenshinStep) {
+						(s.match === s2.match)
+					} else {
+						false
+					}]) { 
+					list.add(s)
 				}
-			]) { list.add(s) }
+			} else if (s instanceof GenericParallelStep) {
+				if (!list.exists [ s2 |
+					if (s2 instanceof GenericParallelStep) {
+						(s.subSteps.map [ s3 |
+							val hs3 = s3 as HenshinStep
+							hs3.match].sortBy[m|m.rule.name] == s2.subSteps.map [ s3 |
+								val hs3 = s3 as HenshinStep
+								hs3.match].sortBy[m|m.rule.name])
+					} else {
+						false
+					}]) {
+					list.add(s)
+				}
+			}
 
 			list
 		]).toList

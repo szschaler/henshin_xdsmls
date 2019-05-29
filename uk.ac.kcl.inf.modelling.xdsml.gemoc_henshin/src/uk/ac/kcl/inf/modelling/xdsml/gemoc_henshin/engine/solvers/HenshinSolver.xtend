@@ -220,10 +220,11 @@ class HenshinSolver implements ISolver {
 	}
 
 	override initialize(IConcurrentExecutionContext concurrentexecutionContext) {
-		var config = (concurrentexecutionContext as HenshinConcurrentModelExecutionContext).getRunConfiguration() as HenshinConcurrentRunConfiguration
+		val config = (concurrentexecutionContext as HenshinConcurrentModelExecutionContext).getRunConfiguration() as HenshinConcurrentRunConfiguration
 		
-		config.heuristics.forEach[hd | 
+		config.heuristics.forEach[extension hd | 
 			val h = hd.instantiate
+			h.initialise(config.getConfigDetailFor(hd))
 			
 			if (h instanceof FilteringHeuristic) {
 				filteringHeuristics.add(h)
