@@ -47,17 +47,14 @@ class LaunchConfigurationHeuristicsTab extends LaunchConfigurationTab {
 
 	private def createLayout(Composite parent) {
 		val groupmap = new HashMap<String, Group>()
-
-		groupmap.put("1", createGroup(parent, "Concurrency Heuristics"))
-		groupmap.put("2", createGroup(parent, "Filtering Heuristics"))
+		
+		groupmap.put("", createGroup(parent, "Uncategorized"));
+		groupmap.put("Concurrency Heuristics", createGroup(parent, "Concurrency Heuristics"))
+		groupmap.put("Filtering Heuristics", createGroup(parent, "Filtering Heuristics"))
 
 		heuristicSelections.keySet.forEach [ hd |
-			var parentGroup = groupmap.get("1")
 
-			// FIXME: Let heuristic definitions determine the group directly
-			if (hd.heuristicID.equals("uk.ac.kcl.inf.xdsml.heuristics.num_steps")) {
-				parentGroup = groupmap.get("2")
-			}
+			var parentGroup = groupmap.getOrDefault(hd.type, groupmap.get(""))
 
 			val checkbox = createCheckButton(parentGroup, hd.humanReadableLabel)
 			checkbox.selection = heuristicSelections.get(hd)

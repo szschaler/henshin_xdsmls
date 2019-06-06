@@ -26,12 +26,15 @@ class HeuristicsRegistry {
 		val String heuristicID
 		@Accessors(AccessorType.PUBLIC_GETTER)
 		val String humanReadableLabel
+		@Accessors(AccessorType.PUBLIC_GETTER)
+		val String type
 
 		val Class<? extends Heuristic> clazz
 
-		new(String ID, String label, Class<? extends Heuristic> clazz) {
+		new(String ID, String label, String type, Class<? extends Heuristic> clazz) {
 			heuristicID = ID
 			humanReadableLabel = label
+			this.type = type
 			this.clazz = clazz
 		}
 
@@ -64,12 +67,12 @@ class HeuristicsRegistry {
 	}
 
 	private new() {
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.overlap", "Overlap Heuristic", OverlapHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.full_overlap", "Fully Overlap Heuristic",
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.overlap", "Overlap Heuristic", "Concurrency Heuristics", OverlapHeuristic))
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.full_overlap", "Fully Overlap Heuristic","Concurrency Heuristics", 
 			FullyOverlapHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic",
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic","Concurrency Heuristics", 
 			SetOfRulesHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic",
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", "Filtering Heuristics", 
 				MaxNumberOfStepsHeuristic) {
 				override getUIControl(Composite parent) {
 					val control = new Text(parent, SWT.SINGLE.bitwiseOr(SWT.BORDER))
