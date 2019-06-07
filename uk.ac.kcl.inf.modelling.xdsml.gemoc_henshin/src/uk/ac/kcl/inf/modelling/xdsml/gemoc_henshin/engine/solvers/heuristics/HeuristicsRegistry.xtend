@@ -20,21 +20,29 @@ class HeuristicsRegistry {
 	public static val INSTANCE = new HeuristicsRegistry
 
 	public static val HEURISTICS_CONFIG_KEY = "uk.ac.kcl.inf.xdsml.heuristics"
-
-	static class HeuristicDefinition {
+	
+	enum HeuristicsGroup {
+		CONCURRENCY_HEURISTIC,
+		FILTERING_HEURISTIC
+	}
+		
+	static class HeuristicDefinition {		
+		
 		@Accessors(AccessorType.PUBLIC_GETTER)
 		val String heuristicID
 		@Accessors(AccessorType.PUBLIC_GETTER)
 		val String humanReadableLabel
+		
 		@Accessors(AccessorType.PUBLIC_GETTER)
-		val String type
+		val HeuristicsGroup group
+
 
 		val Class<? extends Heuristic> clazz
 
-		new(String ID, String label, String type, Class<? extends Heuristic> clazz) {
+		new(String ID, String label, HeuristicsGroup group, Class<? extends Heuristic> clazz) {
 			heuristicID = ID
 			humanReadableLabel = label
-			this.type = type
+			this.group = group
 			this.clazz = clazz
 		}
 
@@ -67,12 +75,13 @@ class HeuristicsRegistry {
 	}
 
 	private new() {
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.overlap", "Overlap Heuristic", "Concurrency Heuristics", OverlapHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.full_overlap", "Fully Overlap Heuristic","Concurrency Heuristics", 
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.overlap", "Overlap Heuristic", HeuristicsGroup.CONCURRENCY_HEURISTIC, OverlapHeuristic))
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.full_overlap", "Fully Overlap Heuristic",HeuristicsGroup.CONCURRENCY_HEURISTIC, 
 			FullyOverlapHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic","Concurrency Heuristics", 
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic",HeuristicsGroup.CONCURRENCY_HEURISTIC, 
 			SetOfRulesHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", "Filtering Heuristics", 
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.non_identity_elements", "Non Identity Elements Heuristic", HeuristicsGroup.FILTERING_HEURISTIC, NonIdentityElementsHeuristic))
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", HeuristicsGroup.FILTERING_HEURISTIC, 
 				MaxNumberOfStepsHeuristic) {
 				override getUIControl(Composite parent) {
 					val control = new Text(parent, SWT.SINGLE.bitwiseOr(SWT.BORDER))

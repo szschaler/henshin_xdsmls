@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Group
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicDefinition
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicsGroup
 
 /**
  * 
@@ -46,15 +47,14 @@ class LaunchConfigurationHeuristicsTab extends LaunchConfigurationTab {
 	}
 
 	private def createLayout(Composite parent) {
-		val groupmap = new HashMap<String, Group>()
+		val groupmap = new HashMap<HeuristicsGroup, Group>()
 		
-		groupmap.put("", createGroup(parent, "Uncategorized"));
-		groupmap.put("Concurrency Heuristics", createGroup(parent, "Concurrency Heuristics"))
-		groupmap.put("Filtering Heuristics", createGroup(parent, "Filtering Heuristics"))
+		groupmap.put(HeuristicsGroup.CONCURRENCY_HEURISTIC, createGroup(parent, "Concurrency Heuristics"))
+		groupmap.put(HeuristicsGroup.FILTERING_HEURISTIC, createGroup(parent, "Filtering Heuristics"))
 
 		heuristicSelections.keySet.forEach [ hd |
 
-			var parentGroup = groupmap.getOrDefault(hd.type, groupmap.get(""))
+			var parentGroup = groupmap.get(hd.group)
 
 			val checkbox = createCheckButton(parentGroup, hd.humanReadableLabel)
 			checkbox.selection = heuristicSelections.get(hd)

@@ -24,6 +24,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.ConcurrencyHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FilteringHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicsGroup
 
 /**
  * A HenshinSolver class implementing an ISolver
@@ -226,8 +227,8 @@ class HenshinSolver implements ISolver {
 			val h = hd.instantiate
 			h.initialise(config.getConfigDetailFor(hd))
 			
-			if (h instanceof FilteringHeuristic) {
-				filteringHeuristics.add(h)
+			if (hd.group === HeuristicsGroup.FILTERING_HEURISTIC) {
+				filteringHeuristics.add(h as FilteringHeuristic)
 			} else {
 				concurrencyHeuristics.add(h as ConcurrencyHeuristic)
 			}
