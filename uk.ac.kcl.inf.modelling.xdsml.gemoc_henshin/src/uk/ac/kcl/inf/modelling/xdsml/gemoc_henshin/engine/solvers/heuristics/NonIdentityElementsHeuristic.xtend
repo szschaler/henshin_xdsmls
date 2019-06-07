@@ -7,6 +7,7 @@ import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
+import org.eclipse.xtend.lib.annotations.Accessors
 
 /**
  * Remove steps that differ only in objects of a specific type -- specify that objects of that type are not considered to have identity (e.g., parts in the PLS example).
@@ -21,7 +22,12 @@ class NonIdentityElementsHeuristic implements FilteringHeuristic {
 	 * Objects of these types should not be considered to have independent identity. So, while we can require to match multiple, distinct objects in one rule match, two rule matches 
 	 * should only be considered different if they differ in matches for objects that are not of one of these types.
 	 */
-	val List<? extends EClass> nonIdentityTypes
+	@Accessors
+	var List<? extends EClass> nonIdentityTypes
+
+	new() {
+		nonIdentityTypes = emptyList
+	}
 
 	new(List<? extends EClass> nonIdentityTypes) {
 		this.nonIdentityTypes = nonIdentityTypes
@@ -49,14 +55,13 @@ class NonIdentityElementsHeuristic implements FilteringHeuristic {
 			if (s2 instanceof HenshinStep) {
 				return equivalentMatches(s1.match, s2.match)
 			}
-		} else {
-			val ps1 = s1 as GenericParallelStep
-			val ps2 = s2 as GenericParallelStep
-			
-			if (ps1.subSteps.size == ps2.subSteps.size) {
-				// TODO This can probably be done more efficiently
-				return ps1.subSteps.forall[ss1 | ps2.subSteps.exists[ss2 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]] &&
-					ps2.subSteps.forall[ss2 | ps1.subSteps.exists[ss1 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]]
+		} else if (s1 instanceof GenericParallelStep) {
+			if (s2 instanceof GenericParallelStep) {
+				if (s1.subSteps.size == s2.subSteps.size) {
+					// TODO This can probably be done more efficiently
+					return s1.subSteps.forall[ss1 | s2.subSteps.exists[ss2 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]] &&
+						s2.subSteps.forall[ss2 | s1.subSteps.exists[ss1 | equivalentMatches((ss1 as HenshinStep).match, (ss2 as HenshinStep).match)]]
+				}
 			}
 		}
 		
