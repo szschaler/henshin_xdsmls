@@ -10,6 +10,8 @@ import org.eclipse.xtend.lib.annotations.AccessorType
 import org.eclipse.xtend.lib.annotations.Accessors
 
 import static extension org.eclipse.xtend.lib.annotations.AccessorType.*
+import org.eclipse.swt.widgets.List
+import java.util.ArrayList
 
 /**
  * Registry of heuristics descriptions. Eventually to be filled from an extension point.
@@ -72,6 +74,7 @@ class HeuristicsRegistry {
 		 * Initialise this heuristic definition's control from the given configData
 		 */
 		def void initaliseControl(Control uiElement, String configData) {}
+		
 	}
 
 	private new() {
@@ -80,7 +83,43 @@ class HeuristicsRegistry {
 			FullyOverlapHeuristic))
 		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic",HeuristicsGroup.CONCURRENCY_HEURISTIC, 
 			SetOfRulesHeuristic))
-		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.non_identity_elements", "Non Identity Elements Heuristic", HeuristicsGroup.FILTERING_HEURISTIC, NonIdentityElementsHeuristic))
+		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.non_identity_elements", "Non Identity Elements Heuristic", HeuristicsGroup.FILTERING_HEURISTIC, 
+				NonIdentityElementsHeuristic) {
+				override getUIControl(Composite parent) {
+					var modelObjects = new ArrayList<String>()
+					modelObjects.add("Hammer")
+					modelObjects.add("Handle")
+					
+					val control = new List(parent, SWT.MULTI.bitwiseOr(SWT.V_SCROLL).bitwiseOr(SWT.BORDER))
+					control.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
+					for (var i=0; i<modelObjects.length; i++) control.add (modelObjects.get(i))
+
+					control
+				}
+				
+				override initaliseControl(Control uiElement, String configData) {
+					val list = uiElement as List	
+					list.getSelectionIndices()
+				}
+				
+				override encodeConfigInformation(Control uiElement) {
+					val list = uiElement as List
+					
+					var sb = new StringBuilder();
+					for(var i = 0; i < list.getSelectionIndices().length; i++ ){
+						sb.append(list.items.get(list.getSelectionIndices().get(i)))
+						sb.append(" ")
+					}
+					sb.toString()
+				}
+				
+				override initialise (Heuristic heuristic, String configData) {
+					val h = heuristic as NonIdentityElementsHeuristic
+					
+					//how to access the list of eclasses? from the list of string?
+									
+				}
+		})
 		add(new HeuristicDefinition("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", HeuristicsGroup.FILTERING_HEURISTIC, 
 				MaxNumberOfStepsHeuristic) {
 				override getUIControl(Composite parent) {

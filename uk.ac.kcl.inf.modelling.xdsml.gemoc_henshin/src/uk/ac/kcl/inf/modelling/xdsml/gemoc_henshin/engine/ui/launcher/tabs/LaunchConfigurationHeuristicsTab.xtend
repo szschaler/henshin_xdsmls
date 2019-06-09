@@ -24,7 +24,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.Heu
 class LaunchConfigurationHeuristicsTab extends LaunchConfigurationTab {
 	val heuristicSelections = new HashMap<HeuristicDefinition, Boolean>
 	val components = new HashMap<HeuristicDefinition, Pair<Button, Control>>
-
+	
 	/**
 	 * get all possible heuristics and add them to the tab so the user can switch them on/off
 	 */

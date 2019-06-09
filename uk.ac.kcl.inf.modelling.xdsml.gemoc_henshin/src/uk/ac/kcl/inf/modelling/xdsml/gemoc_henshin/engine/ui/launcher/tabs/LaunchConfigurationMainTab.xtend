@@ -31,6 +31,13 @@ import org.eclipse.swt.widgets.Text
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
+import org.eclipse.emf.common.util.URI
+import java.util.HashSet
+import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.emf.henshin.model.Module
+import org.eclipse.emf.henshin.model.Rule
 
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
@@ -54,7 +61,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	protected var Text modelofexecutionglml_LocationText
 
 	protected var IProject _modelProject
-
+	
 	override void createControl(Composite parent) {
 		_parent = parent
 
@@ -143,6 +150,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		_modelLocationText.font = font
 		_modelLocationText.addModifyListener(fBasicModifyListener)
 		val Button modelLocationButton = createPushButton(parent, "Browse", null)
+		
 		modelLocationButton.addSelectionListener(new SelectionAdapter() {
 
 			override widgetSelected(SelectionEvent evt) {
@@ -152,6 +160,17 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 					_modelLocationText.text = modelPath
 					updateLaunchConfigurationDialog
 					_modelProject = (dialog.result.head as IResource).project
+					 
+					  //extracting a list of EClass instances with a modelPath
+					  val resourceSet = new ResourceSetImpl(); 
+					  val ecoreResource = resourceSet.getResource(URI.createPlatformResourceURI(modelPath, true), true); 
+					  val ePackage = ecoreResource.getContents().get(0); 
+					  
+					  var eclassList = new HashSet<EClass>()
+					  for(var i = 0; i < ePackage.eContents.length; i++){
+					  	eclassList.add(ePackage.eContents.get(i).eClass)
+					  }
+					  //------
 				}
 			}
 		})
@@ -176,6 +195,16 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 				if (dialog.open === Dialog.OK) {
 					val String modelPath = (dialog.result.head as IResource).fullPath.toPortableString
 					_languageText.text = modelPath
+					
+					
+					//extracting a list of rules with modelPath
+					val resourceSet = new XtextResourceSet
+					val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(modelPath, false), true)
+					val semantics = semanticsResource.contents.head as Module
+					val semanticRules = semantics.units.filter(Rule).toList
+					// ----
+					
+					
 					updateLaunchConfigurationDialog
 				}
 			}
@@ -315,4 +344,18 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		val Label inputLabel = new Label(parent, SWT.NONE)
 		inputLabel.text = labelString
 	}
+	/**
+	 * print debug messages to console
+	 */
+	def protected void debug(String message) {
+		getMessagingSystem().debug(message, getPluginID());
+	}
+	def getMessagingSystem() {
+		return Activator.getDefault().getMessaggingSystem();
+	}
+	def String getPluginID() {
+		return Activator.PLUGIN_ID;
+	}
+
+	
 }
