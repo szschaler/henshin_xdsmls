@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Group
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicDefinition
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicsGroup
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicsRegistry
 
 /**
  * 

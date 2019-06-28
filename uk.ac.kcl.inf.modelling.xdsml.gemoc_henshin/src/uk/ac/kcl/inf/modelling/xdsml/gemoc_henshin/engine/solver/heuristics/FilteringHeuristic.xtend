@@ -1,4 +1,4 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics
 
 import java.util.List
 import org.eclipse.gemoc.trace.commons.model.trace.Step

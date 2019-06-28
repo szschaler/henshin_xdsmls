@@ -14,7 +14,7 @@ import org.eclipse.gemoc.executionframework.engine.commons.AbstractModelExecutio
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
 import org.eclipse.gemoc.executionframework.extensions.sirius.modelloader.DefaultModelLoader
 import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.HenshinSolver
 
 /**
  * a model execution context for the Henshin Concurrent Engine

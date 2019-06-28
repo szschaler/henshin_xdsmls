@@ -1,4 +1,4 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver
 
 import fr.inria.aoste.trace.EventOccurrence
 import java.util.ArrayList
@@ -21,10 +21,10 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.ConcurrencyHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.FilteringHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.ConcurrencyHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics.HeuristicsRegistry.HeuristicsGroup
 
 /**
  * A HenshinSolver class implementing an ISolver

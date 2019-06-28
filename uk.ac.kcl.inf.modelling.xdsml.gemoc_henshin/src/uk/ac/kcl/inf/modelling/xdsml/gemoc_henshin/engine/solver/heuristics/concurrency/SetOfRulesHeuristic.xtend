@@ -1,10 +1,10 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.heuristics
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.concurrency
 
 import org.eclipse.emf.henshin.interpreter.Match
 import java.util.List
 import org.eclipse.emf.henshin.model.Rule
 
-class SetOfRulesHeuristic implements ConcurrencyHeuristic {
+class SetOfRulesHeuristic implements uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.ConcurrencyHeuristic {
 	
 	var List<Rule> rules 
 	

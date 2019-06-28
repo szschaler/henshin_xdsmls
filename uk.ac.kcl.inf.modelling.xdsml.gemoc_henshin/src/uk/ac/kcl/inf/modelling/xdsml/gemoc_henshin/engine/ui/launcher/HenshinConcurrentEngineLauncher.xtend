@@ -39,8 +39,8 @@ import org.eclipse.ui.PlatformUI
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentModelExecutionContext
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.HenshinSolver
 
 /**
  * class to launch the Henshin Concurrent Execution Engine
