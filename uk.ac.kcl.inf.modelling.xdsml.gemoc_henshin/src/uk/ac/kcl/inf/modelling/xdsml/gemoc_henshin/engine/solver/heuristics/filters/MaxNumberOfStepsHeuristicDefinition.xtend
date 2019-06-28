@@ -6,13 +6,14 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Text
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.Heuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
 
 class MaxNumberOfStepsHeuristicDefinition extends FilteringHeuristicDefinition {
 	new() {
 		super("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", MaxNumberOfStepsHeuristic)
 	}
 
-	override getUIControl(Composite parent) {
+	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
 		val control = new Text(parent, SWT.SINGLE.bitwiseOr(SWT.BORDER))
 		control.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
 		control

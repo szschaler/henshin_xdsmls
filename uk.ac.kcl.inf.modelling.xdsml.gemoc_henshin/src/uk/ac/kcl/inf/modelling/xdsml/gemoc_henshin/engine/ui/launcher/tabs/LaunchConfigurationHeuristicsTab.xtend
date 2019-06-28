@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Group
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicsRegistry
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
 
 /**
  * 
@@ -24,11 +25,13 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.Heur
 class LaunchConfigurationHeuristicsTab extends LaunchConfigurationTab {
 	val heuristicSelections = new HashMap<HeuristicDefinition, Boolean>
 	val components = new HashMap<HeuristicDefinition, Pair<Button, Control>>
+	val LaunchConfigurationContext configContext
 	
 	/**
 	 * get all possible heuristics and add them to the tab so the user can switch them on/off
 	 */
-	new() {
+	new(LaunchConfigurationContext configContext) {
+		this.configContext = configContext
 		HeuristicsRegistry.INSTANCE.heuristics.forEach [ hd |
 			heuristicSelections.put(hd, false)
 		]
@@ -68,7 +71,7 @@ class LaunchConfigurationHeuristicsTab extends LaunchConfigurationTab {
 				override widgetDefaultSelected(SelectionEvent e) {}
 			})
 
-			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup)))
+			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext)))
 		]
 
 		// remove empty groups

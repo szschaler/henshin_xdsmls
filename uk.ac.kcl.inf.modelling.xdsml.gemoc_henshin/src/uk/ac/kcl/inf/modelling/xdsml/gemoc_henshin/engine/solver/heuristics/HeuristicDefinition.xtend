@@ -46,7 +46,7 @@ class HeuristicDefinition {
 	/**
 	 * Provide an optional control to display in a launch tab to allow users to provide additional configuration information for the heuristic. 
 	 */
-	def Control getUIControl(Composite parent) { null }
+	def Control getUIControl(Composite parent, LaunchConfigurationContext lcc) { null }
 
 	/**
 	 * Encode the user choice in a string that can be saved in a launch configuration.
