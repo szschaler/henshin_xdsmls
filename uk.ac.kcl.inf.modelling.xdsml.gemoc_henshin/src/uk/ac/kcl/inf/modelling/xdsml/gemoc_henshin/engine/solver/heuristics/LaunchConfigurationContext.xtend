@@ -12,5 +12,8 @@ interface LaunchConfigurationContext {
 	 */
 	def List<EPackage> getMetamodels()
 	
+	/**
+	 * Register a listener to be informed on any changes of the metamodel selected in this launch configuration. 
+	 */
 	def void addMetamodelChangeListener(PropertyChangeListener pcl)
 }

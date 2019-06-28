@@ -1,10 +1,12 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver
 
 import fr.inria.aoste.trace.EventOccurrence
+import java.beans.PropertyChangeListener
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
+import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
@@ -24,7 +26,9 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.ConcurrencyHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
+import java.beans.PropertyChangeSupport
 
 /**
  * A HenshinSolver class implementing an ISolver
@@ -176,8 +180,8 @@ class HenshinSolver implements ISolver {
 		this.semanticRules = applicableRules
 
 		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
-		
-//		filteringHeuristics.add(new NonIdentityElementsHeuristic(modelGraph.roots.head.eClass.EPackage.EClassifiers.filter(EClass).filter[ec | ec.name == "Part"].toList))
+	
+		lcc.metamodelUpdated	
 	}
 
 	/**
@@ -220,12 +224,41 @@ class HenshinSolver implements ISolver {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
+	static class LCC implements LaunchConfigurationContext {
+		
+		val HenshinSolver hs
+		
+		new(HenshinSolver hs) {
+			this.hs = hs
+		}
+		
+		override getMetamodels() {
+			if (hs.modelGraph !== null) {
+				hs.modelGraph.roots.flatMap[eo | eo.eClass.eResource.contents.filter(EPackage)].toList				
+			} else {
+				emptyList
+			}
+		}
+		
+		val pcs = new PropertyChangeSupport(this)
+		
+		override addMetamodelChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener("metamodel", pcl)
+		}
+		
+		def metamodelUpdated() {
+			pcs.firePropertyChange("metamodel", null, metamodels)
+		}
+	}
+	
+	val lcc = new LCC(this)
+
 	override initialize(IConcurrentExecutionContext concurrentexecutionContext) {
 		val config = (concurrentexecutionContext as HenshinConcurrentModelExecutionContext).getRunConfiguration() as HenshinConcurrentRunConfiguration
 		
 		config.heuristics.forEach[extension hd | 
 			val h = hd.instantiate
-			h.initialise(config.getConfigDetailFor(hd))
+			h.initialise(config.getConfigDetailFor(hd), lcc)
 			
 			if (hd.group === HeuristicsGroup.FILTERING_HEURISTIC) {
 				filteringHeuristics.add(h as FilteringHeuristic)

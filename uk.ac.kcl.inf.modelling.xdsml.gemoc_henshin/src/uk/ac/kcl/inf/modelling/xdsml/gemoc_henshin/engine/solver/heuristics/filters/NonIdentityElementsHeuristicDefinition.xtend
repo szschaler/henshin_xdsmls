@@ -21,15 +21,11 @@ class NonIdentityElementsHeuristicDefinition extends FilteringHeuristicDefinitio
 	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
 		val control = new List(parent, SWT.MULTI.bitwiseOr(SWT.V_SCROLL).bitwiseOr(SWT.BORDER))
 		control.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
-		
-		lcc.addMetamodelChangeListener(new PropertyChangeListener {
-			
-			override propertyChange(PropertyChangeEvent evt) {
-				control.updateMetamodels (evt.newValue as java.util.List<EPackage>)
-			}
-			
-		})
-	
+
+		lcc.addMetamodelChangeListener([ evt |
+			control.updateMetamodels(evt.newValue as java.util.List<EPackage>)
+		])
+
 		control.updateMetamodels(lcc.metamodels)
 
 		control
@@ -43,28 +39,35 @@ class NonIdentityElementsHeuristicDefinition extends FilteringHeuristicDefinitio
 	override encodeConfigInformation(Control uiElement) {
 		val list = uiElement as List
 
-		var sb = new StringBuilder();
-		for (var i = 0; i < list.getSelectionIndices().length; i++) {
-			sb.append(list.items.get(list.getSelectionIndices().get(i)))
-			sb.append(" ")
-		}
-		sb.toString()
+		list.selectionIndices.map[i | list.items.get(i)].join("@@")
 	}
 
-	override initialise(Heuristic heuristic, String configData) {
+	override initialise(Heuristic heuristic, String configData, LaunchConfigurationContext lcc) {
 		val h = heuristic as NonIdentityElementsHeuristic
+
+		lcc.addMetamodelChangeListener([ evt |
+			h.updateMetamodels(evt.newValue as java.util.List<EPackage>, configData)
+		])
 		
-		// TODO Add a similar context parameter here and use it to extract relevant information
+		h.updateMetamodels(lcc.metamodels as java.util.List<EPackage>, configData)
 	}
 
-	def updateMetamodels (List control, java.util.List<EPackage> metamodels) {
+	def updateMetamodels(List control, java.util.List<EPackage> metamodels) {
 		control.items = emptyList
+
+		if (metamodels !== null) {
+			metamodels.flatMap[mm|mm.eAllContents.filter(EClass).toIterable].forEach [ c |
+				control.add(c.name)
+			]
+		}
+	}
+
+	def updateMetamodels(NonIdentityElementsHeuristic nieh, java.util.List<EPackage> metamodels, String configData) {
+		nieh.nonIdentityTypes.clear
 		
 		if (metamodels !== null) {
-			metamodels.flatMap[mm | mm.eAllContents.filter(EClass).toIterable].forEach[c |
-				control.add(c.name)
-			]			
+			val classNames = configData.split("@@").toList
+			nieh.nonIdentityTypes = metamodels.flatMap[ep | ep.eAllContents.filter(EClass).filter[ec | classNames.contains(ec.name)].toIterable].toList
 		}
 	}
-
 }

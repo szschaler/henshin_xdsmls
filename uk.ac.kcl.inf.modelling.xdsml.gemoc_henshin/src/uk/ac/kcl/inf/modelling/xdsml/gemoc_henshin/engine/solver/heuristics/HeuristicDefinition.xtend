@@ -40,8 +40,9 @@ class HeuristicDefinition {
 	 * 
 	 * @param heuristic the heuristic to configure
 	 * @param configData a string containing configuration data as defined by a previous call to {@link #encodeConfigInformation}. May be <code>null</code> if this heuristic definition does not define any additional configuration data.
+	 * @param lcc contextual information for the configuration
 	 */
-	def void initialise(Heuristic heuristic, String configData) {}
+	def void initialise(Heuristic heuristic, String configData, LaunchConfigurationContext lcc) {}
 
 	/**
 	 * Provide an optional control to display in a launch tab to allow users to provide additional configuration information for the heuristic. 

@@ -41,7 +41,7 @@ class MaxNumberOfStepsHeuristicDefinition extends FilteringHeuristicDefinition {
 		}
 	}
 
-	override initialise(Heuristic heuristic, String configData) {
+	override initialise(Heuristic heuristic, String configData, LaunchConfigurationContext lcc) {
 		val h = heuristic as MaxNumberOfStepsHeuristic
 
 		try {
