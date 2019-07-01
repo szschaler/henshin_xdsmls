@@ -8,6 +8,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.Launc
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationHeuristicsTab
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
 import java.beans.PropertyChangeListener
+import org.eclipse.emf.henshin.model.Rule
 
 /**
  * 
@@ -31,6 +32,16 @@ class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {
 				
 				override addMetamodelChangeListener(PropertyChangeListener pcl) {
 					mainTab.addMetamodelListener(pcl)
+				}
+				
+				override getSemantics() {
+					val semantics = mainTab.semantics
+					
+					if (semantics !== null) semantics.units.filter(Rule).toList else emptyList
+				}
+				
+				override addSemanticsChangeListener(PropertyChangeListener pcl) {
+					mainTab.addSemanticsListener(pcl)
 				}
 				
 			}),

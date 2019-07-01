@@ -1,5 +1,7 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs
 
+import java.beans.PropertyChangeListener
+import java.beans.PropertyChangeSupport
 import java.util.HashSet
 import java.util.List
 import org.eclipse.core.resources.IFile
@@ -16,6 +18,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.henshin.model.Module
+import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
@@ -40,8 +43,6 @@ import org.eclipse.swt.widgets.Text
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import java.beans.PropertyChangeSupport
-import java.beans.PropertyChangeListener
 
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
@@ -68,6 +69,8 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
 	@Accessors(PUBLIC_GETTER)
 	var List<EPackage> metamodels
+	@Accessors(PUBLIC_GETTER)
+	var Module semantics
 
 	override void createControl(Composite parent) {
 		_parent = parent
@@ -205,7 +208,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 					_languageText.text = modelPath
 
 					updateMetamodels
-					
+
 					updateLaunchConfigurationDialog
 				}
 			}
@@ -363,19 +366,30 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
 	val pcs = new PropertyChangeSupport(this)
 	val METAMODELS = "metamodels"
+	val SEMANTICS = "semantics"
 
 	def updateMetamodels() {
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(_languageText.text, false), true)
-		val semantics = semanticsResource.contents.head as Module
+
+		val oldSemantics = semantics
+		semantics = semanticsResource.contents.head as Module
 
 		val oldmms = metamodels
 		metamodels = semantics.imports
-		
-		pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+
+		pcs.firePropertyChange(SEMANTICS, if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
+			if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
+		if (oldmms !== metamodels) {
+			pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+		}
 	}
-	
-	def addMetamodelListener (PropertyChangeListener pcl) {
+
+	def addMetamodelListener(PropertyChangeListener pcl) {
 		pcs.addPropertyChangeListener(METAMODELS, pcl)
+	}
+
+	def addSemanticsListener(PropertyChangeListener pcl) {
+		pcs.addPropertyChangeListener(SEMANTICS, pcl)
 	}
 }

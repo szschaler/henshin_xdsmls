@@ -181,7 +181,7 @@ class HenshinSolver implements ISolver {
 
 		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
 	
-		lcc.metamodelUpdated	
+		lcc.configured	
 	}
 
 	/**
@@ -246,9 +246,19 @@ class HenshinSolver implements ISolver {
 			pcs.addPropertyChangeListener("metamodel", pcl)
 		}
 		
-		def metamodelUpdated() {
+		def configured() {
 			pcs.firePropertyChange("metamodel", null, metamodels)
+			pcs.firePropertyChange("semantics", null, semantics)
 		}
+		
+		override getSemantics() {
+			hs.semanticRules
+		}
+		
+		override addSemanticsChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener("semantics", pcl)
+		}
+		
 	}
 	
 	val lcc = new LCC(this)
