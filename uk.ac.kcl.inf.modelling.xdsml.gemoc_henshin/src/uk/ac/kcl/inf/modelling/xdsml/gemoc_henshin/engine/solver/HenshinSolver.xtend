@@ -78,7 +78,7 @@ class HenshinSolver implements ISolver {
 					val parStep = GenerictraceFactory.eINSTANCE.createGenericParallelStep
 					parStep.subSteps.addAll(seq.map[m | new HenshinStep(m)])
 					parStep
-				}])
+				}].filterNull)
 		}
 
 		possibleLogicalSteps.addAll(atomicMatches.map[m| new HenshinStep(m)])
