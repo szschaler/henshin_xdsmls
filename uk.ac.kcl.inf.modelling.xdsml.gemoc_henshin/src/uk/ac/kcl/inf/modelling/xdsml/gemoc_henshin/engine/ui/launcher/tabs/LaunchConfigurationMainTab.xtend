@@ -1,5 +1,9 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs
 
+import java.beans.PropertyChangeListener
+import java.beans.PropertyChangeSupport
+import java.util.HashSet
+import java.util.List
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IResource
@@ -9,10 +13,18 @@ import org.eclipse.core.runtime.CoreException
 import org.eclipse.debug.core.ILaunchConfiguration
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab
+import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.EPackage
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
+import org.eclipse.emf.henshin.model.Module
+import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
 import org.eclipse.swt.SWT
@@ -28,9 +40,9 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Group
 import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Text
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
 
 /**
  * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
@@ -54,6 +66,11 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	protected var Text modelofexecutionglml_LocationText
 
 	protected var IProject _modelProject
+
+	@Accessors(PUBLIC_GETTER)
+	var List<EPackage> metamodels
+	@Accessors(PUBLIC_GETTER)
+	var Module semantics
 
 	override void createControl(Composite parent) {
 		_parent = parent
@@ -105,6 +122,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 			_animationFirstBreak.selection = runConfiguration.breakStart
 
 			_languageText.text = runConfiguration.languageName
+			updateMetamodels
 		} catch (CoreException e) {
 			Activator.error(e.getMessage(), e);
 		}
@@ -128,7 +146,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * Basic modify listener that can be reused if there is no more precise need
 	 */
-	private val ModifyListener fBasicModifyListener = new ModifyListener() {
+	val ModifyListener fBasicModifyListener = new ModifyListener() {
 		override void modifyText(ModifyEvent event) {
 			updateLaunchConfigurationDialog()
 		}
@@ -143,6 +161,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		_modelLocationText.font = font
 		_modelLocationText.addModifyListener(fBasicModifyListener)
 		val Button modelLocationButton = createPushButton(parent, "Browse", null)
+
 		modelLocationButton.addSelectionListener(new SelectionAdapter() {
 
 			override widgetSelected(SelectionEvent evt) {
@@ -152,6 +171,17 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 					_modelLocationText.text = modelPath
 					updateLaunchConfigurationDialog
 					_modelProject = (dialog.result.head as IResource).project
+
+					// extracting a list of EClass instances with a modelPath
+					val resourceSet = new ResourceSetImpl();
+					val ecoreResource = resourceSet.getResource(URI.createPlatformResourceURI(modelPath, true), true);
+					val ePackage = ecoreResource.getContents().get(0);
+
+					var eclassList = new HashSet<EClass>()
+					for (var i = 0; i < ePackage.eContents.length; i++) {
+						eclassList.add(ePackage.eContents.get(i).eClass)
+					}
+				// ------
 				}
 			}
 		})
@@ -176,6 +206,9 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 				if (dialog.open === Dialog.OK) {
 					val String modelPath = (dialog.result.head as IResource).fullPath.toPortableString
 					_languageText.text = modelPath
+
+					updateMetamodels
+
 					updateLaunchConfigurationDialog
 				}
 			}
@@ -314,5 +347,49 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		parent.layoutData = gd
 		val Label inputLabel = new Label(parent, SWT.NONE)
 		inputLabel.text = labelString
+	}
+
+	/**
+	 * print debug messages to console
+	 */
+	def protected void debug(String message) {
+		getMessagingSystem().debug(message, getPluginID());
+	}
+
+	def getMessagingSystem() {
+		return Activator.getDefault().getMessaggingSystem();
+	}
+
+	def String getPluginID() {
+		return Activator.PLUGIN_ID;
+	}
+
+	val pcs = new PropertyChangeSupport(this)
+	val METAMODELS = "metamodels"
+	val SEMANTICS = "semantics"
+
+	def updateMetamodels() {
+		val resourceSet = new XtextResourceSet
+		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(_languageText.text, false), true)
+
+		val oldSemantics = semantics
+		semantics = semanticsResource.contents.head as Module
+
+		val oldmms = metamodels
+		metamodels = semantics.imports
+
+		pcs.firePropertyChange(SEMANTICS, if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
+			if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
+		if (oldmms !== metamodels) {
+			pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+		}
+	}
+
+	def addMetamodelListener(PropertyChangeListener pcl) {
+		pcs.addPropertyChangeListener(METAMODELS, pcl)
+	}
+
+	def addSemanticsListener(PropertyChangeListener pcl) {
+		pcs.addPropertyChangeListener(SEMANTICS, pcl)
 	}
 }

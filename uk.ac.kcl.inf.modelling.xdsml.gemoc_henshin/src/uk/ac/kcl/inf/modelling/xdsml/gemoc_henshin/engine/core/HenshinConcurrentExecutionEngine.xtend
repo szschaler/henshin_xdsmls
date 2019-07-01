@@ -31,7 +31,7 @@ import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
 import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solvers.HenshinSolver
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.HenshinSolver
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
