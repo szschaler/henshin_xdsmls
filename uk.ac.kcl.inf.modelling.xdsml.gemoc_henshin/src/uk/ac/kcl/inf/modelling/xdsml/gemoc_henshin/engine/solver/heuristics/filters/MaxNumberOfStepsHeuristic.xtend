@@ -3,13 +3,14 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.fil
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.emf.henshin.interpreter.Match
-import org.eclipse.gemoc.trace.commons.model.trace.Step
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
+import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic
 
-class MaxNumberOfStepsHeuristic implements uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic {
+class MaxNumberOfStepsHeuristic implements FilteringHeuristic {
 
 	@Accessors
 	var int maxNumberOfSteps
