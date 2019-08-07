@@ -22,7 +22,7 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		Group group = new Group(parent, SWT.NULL);
 		group.setText(text);
 		GridLayout locationLayout = new GridLayout();
-		locationLayout.numColumns = 3;
+		locationLayout.numColumns = 5;
 		locationLayout.marginHeight = 10;
 		locationLayout.marginWidth = 10;
 		group.setLayout(locationLayout);
