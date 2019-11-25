@@ -5,6 +5,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.Conc
 
 class OverlapHeuristic implements ConcurrencyHeuristic {
 	
+	// TODO: Should only check static parts
 	override boolean canBeConcurrent (Match match1, Match match2){
 		match1.overlapsWith(match2)
 	}	
