@@ -35,9 +35,11 @@ class SetOfRulesHeuristicDefinition extends ConcurrencyHeuristicDefinition {
 
 	override initaliseControl(Control uiElement, String configData) {
 		val list = uiElement as org.eclipse.swt.widgets.List
-		val namesToSelect = configData.split("@@")
-
-		list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
+		if (list.items.size > 0) {	
+			val namesToSelect = configData.split("@@")
+	
+			list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
+		}
 	}
 
 	override initialise(Heuristic heuristic, String configData, LaunchConfigurationContext lcc) {
