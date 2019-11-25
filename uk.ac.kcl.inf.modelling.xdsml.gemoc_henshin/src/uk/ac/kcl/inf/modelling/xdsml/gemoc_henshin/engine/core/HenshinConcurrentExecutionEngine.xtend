@@ -1,11 +1,14 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import fr.inria.diverse.melange.adapters.EObjectAdapter
+import java.beans.PropertyChangeListener
+import java.beans.PropertyChangeSupport
 import java.util.ArrayList
+import java.util.HashSet
 import java.util.List
-import org.eclipse.core.runtime.IStatus
-import org.eclipse.core.runtime.Status
+import java.util.Set
 import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
 import org.eclipse.emf.henshin.interpreter.Match
@@ -14,63 +17,70 @@ import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
 import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
 import org.eclipse.emf.henshin.model.Module
+import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
-import org.eclipse.emf.transaction.RecordingCommand
-import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionContext
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentExecutionEngine
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IConcurrentRunConfiguration
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.IFutureAction
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ILogicalStepDecider
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.moc.ISolver
-import org.eclipse.gemoc.executionframework.engine.core.AbstractExecutionEngine
-import org.eclipse.gemoc.executionframework.engine.core.EngineStoppedException
-import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
+import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.Step
-import org.eclipse.gemoc.xdsmlframework.api.core.EngineStatus
-import org.eclipse.gemoc.xdsmlframework.api.engine_addon.IEngineAddon
+import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.HenshinSolver
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.ConcurrencyHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
  */
-// FIXME: Is there value in implementing IConcurrentExecutionEngine?
-class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurrentExecutionContext, IConcurrentRunConfiguration> implements IConcurrentExecutionEngine {
-
+class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
+	
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
 	var EGraph modelGraph
+	var List<Rule> semanticRules
+	
+	// handling concurrent steps
+	var extension CPAHelper cpa
+	var boolean showConcurrentSteps = true
+	
+	@Accessors
+	var List<ConcurrencyHeuristic> concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
+	@Accessors
+	var List<FilteringHeuristic> filteringHeuristics = new ArrayList<FilteringHeuristic>()
+	
+	val lcc = new LCC(this)
 
-	var ILogicalStepDecider _logicalStepDecider
-	var Step<?> _selectedLogicalStep;
-	var HenshinSolver _solver;
-	var List<Step<?>> _possibleLogicalSteps = new ArrayList()
-
-	/**
-	 * create a new instance
-	 * @param concurrent context and a Hensin Solver
-	 */
-	new(IConcurrentExecutionContext concurrentexecutionContext, HenshinSolver s) {
-		super();
-		initialize(concurrentexecutionContext);
-		_logicalStepDecider = concurrentexecutionContext.getLogicalStepDecider()
-		_solver = s
-	}
+	new(HenshinConcurrentExecutionContext executionContext) {
+		initialize(executionContext)
+		
+		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
+		
+		config.heuristics.forEach[extension hd | 
+			val h = hd.instantiate
+			h.initialise(config.getConfigDetailFor(hd), lcc)
+			
+			if (hd.group === HeuristicsGroup.FILTERING_HEURISTIC) {
+				filteringHeuristics.add(h as FilteringHeuristic)
+			} else {
+				concurrencyHeuristics.add(h as ConcurrencyHeuristic)
+			}
+		]
+    }
 
 	/**
 	 * Get the engine  name
 	 * @return a user display name for the engine kind 
 	 */
 	override String engineKindName() '''Henshin Concurrent xDSML Engine'''
-
+	
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
 	 * Code mostly copied from the sequential engine(Zschaler), except for where marked
 	 */
-	protected def void prepareEntryPoint() {
-
+	override protected performSpecificInitialize(HenshinConcurrentExecutionContext executionContext) {
 		var root = executionContext.resourceModel.contents.head
 		if (root instanceof EObjectAdapter<?>) {
 			root = (root as EObjectAdapter<?>).adaptee
@@ -94,293 +104,175 @@ class HenshinConcurrentExecutionEngine extends AbstractExecutionEngine<IConcurre
 				"Mismatch between metamodel of model to be executed and metamodel over which operational semantics have been defined.")
 		}
 
-		val semanticRules = semantics.units.filter(Rule).toList
+		semanticRules = semantics.units.filter(Rule).filter[r|r.checkParameters].toList
 
-		// configure the solver, modified for the concurrent engine
-		_solver.configure(modelGraph, henshinEngine, semanticRules)
-	}
-
-	private static class RuleApplicationException extends Exception {
+		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
+	
+		lcc.configured	
 	}
 
 	/**
-	 * StepCommand to run the execution steps in Henshin
-	 * code taken from the sequential engine(Zschaler)
+	 * Compute and create all possible steps by finding rule matches and generate concurrent steps
+	 * 
+	 * @return a list of possible steps
 	 */
-	private static class StepCommand extends RecordingCommand {
-		val RuleApplication runner
+	override protected computePossibleLogicalSteps() {
+		var possibleLogicalSteps = new ArrayList<Step<?>>()
 
-		new(InternalTransactionalEditingDomain editingDomain, Match match, RuleApplication runner, EGraph model) {
-			super(editingDomain,
-				"Run a step using rule " +
-					match.rule.
-						name, '''Runs rule «match.rule.name» from the set of rules provided as the operational semantics for this language.''')
+		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
 
-			this.runner = runner
-			this.runner.EGraph = model
-			this.runner.rule = match.rule
-			this.runner.completeMatch = match
+		// only generate Concurrent Steps if the flag is on
+		if (showConcurrentSteps) {
+			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
+				if(seq.length > 1) {
+					val parStep = GenerictraceFactory.eINSTANCE.createGenericParallelStep
+					parStep.subSteps.addAll(seq.map[m | new HenshinStep(m)])
+					parStep
+				}].filterNull)
 		}
 
-		override protected doExecute() {
-			if (!runner.execute(null)) {
-				throw new RuleApplicationException()
+		possibleLogicalSteps.addAll(atomicMatches.map[m| new HenshinStep(m)])
+
+		possibleLogicalSteps.filterByHeuristics		
+	}
+	
+	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
+		val henshinStep = smallStep as HenshinStep
+		
+		ruleRunner.EGraph = modelGraph
+		ruleRunner.rule = henshinStep.match.rule
+		ruleRunner.completeMatch = henshinStep.match
+		
+		if (!ruleRunner.execute(null)) {
+				throw new CodeExecutionException('''Couldn't apply rule «henshinStep.match.rule.name».''', henshinStep.mseoccurrence)
+		}
+	}
+
+	override protected doAfterLogicalStepExecution(Step<?> logicalStep) { }
+	
+	override protected finishDispose() { }
+	
+	/**
+	 * Check if a rule has no parameters
+	 * 
+	 * @param Rule
+	 * @return false if a rule has parameters
+	 */
+	private def boolean checkParameters(Rule operator) {
+		if (operator.parameters !== null) {
+			// Currently, we only support units without parameters (other than variables). 
+			// Check to make sure we're not running into problems
+			if (!operator.parameters.reject[parameter|parameter.kind.equals(ParameterKind.VAR)].empty) {
+				println("Invalid unit with non-var parameters: " + operator.name)
+				return false
 			}
 		}
+
+		true
+	}
+	
+	/**
+	 * Generate all possible maximally concurrent steps
+	 * 
+	 * @param matchList all current atomic matches
+	 */
+	private def generateConcurrentSteps(List<Match> matchList) {
+		var possibleSequences = new HashSet<Set<Match>>;
+
+		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
+		
+		possibleSequences
 	}
 
 	/**
-	 * the main loop of execution
+	 * Recursively explore all matches, check if they have conflicts and create max valid rule sequence
+	 * 
+	 * @param a list of all matches, a list of lists of all possible sequences, current stack
 	 */
-	override protected performStart() {
-		engineStatus.setNbLogicalStepRun(0)
-		prepareEntryPoint()
-		try {
-			while (!_isStopped) {
-				performExecutionStep();
-			}
-		} catch (EngineStoppedException ese) {
-			throw ese;
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * stop the engine
-	 */
-	override protected performStop() {
-		setSelectedLogicalHenshinStep(null);
-		if (getLogicalStepDecider() !== null) {
-			// unlock decider if this is a user decider
-			getLogicalStepDecider().preempt();
-		}
-	}
-
-	/**
-	 * initialize the engine, make sure a Henshin Model Execution Context is used
-	 * @param execution context
-	 */
-	override protected performInitialize(IConcurrentExecutionContext executionContext) {
-		if (!(executionContext instanceof HenshinConcurrentModelExecutionContext))
-			throw new IllegalArgumentException(
-				"executionContext must be an HenshinConcurrentExecutionEngine when used in HenshinConcurrentExecutionEngine");
-	}
-
-	override changeLogicalStepDecider(ILogicalStepDecider newDecider) {
-		_logicalStepDecider = newDecider
-	}
-
-	override getCodeExecutor() {
-		return getConcurrentExecutionContext().getExecutionPlatform().getCodeExecutor();
-	}
-
-	override getConcurrentExecutionContext() {
-		return _executionContext
-	}
-
-	override getLogicalStepDecider() {
-		return _logicalStepDecider
-	}
-
-	override getPossibleLogicalSteps() {
-		return _possibleLogicalSteps
-	}
-
-	override getSelectedLogicalStep() {
-		synchronized (this) {
-			return _selectedLogicalStep
-		}
-	}
-
-	/**
-	 * set the selected Henshin Step
-	 * @param henshin step
-	 */
-	def setSelectedLogicalHenshinStep(Step<?> step) {
-		synchronized (this) {
-			_selectedLogicalStep = step
-		}
-	}
-
-	override getSolver() {
-		return _solver
-	}
-
-	override setSolver(ISolver solver) {
-		_solver = solver as HenshinSolver
-	}
-
-	/**
-	 * notify the addons about the state of execution: about to select step
-	 * code taken from the concurrent ccsl engine
-	 */
-	override notifyAboutToSelectLogicalStep() {
-		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-			try {
-				addon.aboutToSelectStep(this, getPossibleLogicalSteps());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	/**
-	 * notify the addons about the state of execution:  step selected
-	 * code taken from the concurrent ccsl engine
-	 */
-	override notifyLogicalStepSelected() {
-		debug("selected");
-		for (IEngineAddon addon : getExecutionContext().getExecutionPlatform().getEngineAddons()) {
-			try {
-				addon.stepSelected(this, getSelectedLogicalStep());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	override notifyProposedLogicalStepsChanged() {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
-	/**
-	 * get a list of possible steps from the solver
-	 */
-	override computePossibleLogicalSteps() {
-		_possibleLogicalSteps = getSolver().computeAndGetPossibleLogicalSteps();
-	}
-
-	override updatePossibleLogicalSteps() {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
-	/**
-	 * perform one step of execution
-	 * close the engine if no more steps to choose
-	 */
-	override performExecutionStep() throws InterruptedException {
-		computePossibleLogicalSteps();
-
-		if (_possibleLogicalSteps.size() == 0) {
-			debug("No more LogicalSteps to run")
-			stop();
-		} else {
-			val selectedLogicalStep = selectAndExecuteLogicalStep();
-
-			if (selectedLogicalStep !== null) {
-				engineStatus.incrementNbLogicalStepRun();
-			}
-		}
-	}
-
-	/**
-	 * select a step through a logical decider
-	 * and run the execution
-	 */
-	def selectAndExecuteLogicalStep() {
-		setEngineStatus(EngineStatus.RunStatus.WaitingLogicalStepSelection)
-		notifyAboutToSelectLogicalStep()
-
-		val selectedLogicalStep = getLogicalStepDecider().decide(this, getPossibleLogicalSteps())
-		if (selectedLogicalStep !== null) {
-			setSelectedLogicalHenshinStep(selectedLogicalStep)
-
-			setEngineStatus(EngineStatus.RunStatus.Running)
-			notifyLogicalStepSelected()
-
-			// if it's a single rule step execute otherwise execute the whole sequence
-			if (selectedLogicalStep instanceof HenshinStep) {
-				executeSelectedLogicalStep()
-			} else {
-				beforeExecutionStep(selectedLogicalStep)
-				
-				(selectedLogicalStep as GenericParallelStep).subSteps.forEach[s | 
-					val hs = s as HenshinStep
-					setSelectedLogicalHenshinStep(hs)
-					executeSelectedLogicalStep()
-				]
-				
-				afterExecutionStep()
-			}
-
-		}
-		selectedLogicalStep
-	}
-
-	/**
-	 * execute the selected step by creating a new step command
-	 * and delegating the execution to Henshin
-	 */
-	override executeSelectedLogicalStep() {
-		if (!_isStopped) {
-			if (_selectedLogicalStep instanceof HenshinStep) {
-				val command = new StepCommand(editingDomain, _selectedLogicalStep.match, ruleRunner, modelGraph)
-				beforeExecutionStep(_selectedLogicalStep, command)
-				if (command.canExecute) {
-					try {
-						command.execute
-					} catch (RuleApplicationException rae) {
-						editingDomain.activeTransaction.abort(
-							new Status(IStatus.OK,
-								Activator.
-									PLUGIN_ID, '''Error executing semantic rule «_selectedLogicalStep.match.rule.name».'''))
-					}
+	private def void createAllStepSequences(List<Match> allMatches, Set<Set<Match>> possibleSequences,
+		HashSet<Match> currentStack) {
+		var foundOne = false;
+		for (Match m : allMatches) {
+			if (!currentStack.contains(m)) {
+				if (!hasConflicts(m, currentStack)) {
+					foundOne = true;
+					currentStack.add(m);
+					var clonedStack = currentStack.clone() as HashSet<Match>;
+					createAllStepSequences(allMatches, possibleSequences, clonedStack);
+					currentStack.remove(m);
 				}
-				afterExecutionStep()				
-			} else {
-				// TODO: Fix this to actually run the parallel step here rather than where it's being done at the moment
-				throw new IllegalStateException("Parallel steps are executed somewhere else...")
 			}
-		} else {
-			afterExecutionStep()
+		}
+		if (!foundOne) {
+			possibleSequences.add(currentStack);
 		}
 	}
-
-	override recomputePossibleLogicalSteps() {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
-	override setSelectedLogicalStep(Step<?> selectedLogicalStep) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
+	
 	/**
-	 * print a debug message to console
+	 * Check if a match has conflicts with a set of other matches
+	 * 
+	 * @param match and a list of matches
 	 */
-	def protected void debug(String message) {
-		getMessagingSystem().debug(message, getPluginID());
+	private def hasConflicts(Match match, HashSet<Match> matches) {
+		matches.exists[m|match.cannotRunConcurrently(m)]
 	}
-
+	
 	/**
-	 * get messaging system
+	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
+	 * conflict based on the CPA analysis. Then checks if all concurrency heuristics agree 
+	 * that they should be run in parallel.
+	 * 
+	 * @param match1 and match2
+	 * 
+	 * @output true if the two matches should not run in parallel
 	 */
-	def getMessagingSystem() {
-		return Activator.getDefault().getMessaggingSystem();
+	private def cannotRunConcurrently(Match match1, Match match2) {
+		match1.conflictsWith(match2) || concurrencyHeuristics.exists[ch|!ch.canBeConcurrent(match1, match2)]
 	}
-
+	
 	/**
-	 * get plugin id
-	 */
-	def String getPluginID() {
-		return Activator.PLUGIN_ID;
+	 * Return a list of steps filtered by all filtering heuristics
+	 */	
+	private def filterByHeuristics(List<Step<?>> possibleSteps) {
+		filteringHeuristics.fold(possibleSteps, [steps, fh | fh.filter(steps)])
 	}
-
-	/**
-	 * run before start of the engine
-	 */
-	override protected beforeStart() {
-		debug('Running engine setup...')
+	
+	private static class LCC implements LaunchConfigurationContext {
+		
+		val HenshinConcurrentExecutionEngine engine
+		
+		new(HenshinConcurrentExecutionEngine engine) {
+			this.engine = engine
+		}
+		
+		override getMetamodels() {
+			if (engine.modelGraph !== null) {
+				engine.modelGraph.roots.flatMap[eo | eo.eClass.eResource.contents.filter(EPackage)].toList				
+			} else {
+				emptyList
+			}
+		}
+		
+		val pcs = new PropertyChangeSupport(this)
+		
+		override addMetamodelChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener("metamodel", pcl)
+		}
+		
+		def configured() {
+			pcs.firePropertyChange("metamodel", null, metamodels)
+			pcs.firePropertyChange("semantics", null, semantics)
+		}
+		
+		override getSemantics() {
+			engine.semanticRules
+		}
+		
+		override addSemanticsChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener("semantics", pcl)
+		}
+		
 	}
-
-	/**
-	 * execution of the engine done
-	 */
-	override protected finishDispose() {
-	}
-
-	override addFutureAction(IFutureAction arg0) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
+	
+	
 }

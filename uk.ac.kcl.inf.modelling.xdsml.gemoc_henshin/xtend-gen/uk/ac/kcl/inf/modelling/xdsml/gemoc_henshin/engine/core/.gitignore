@@ -30,3 +30,6 @@
 /.HenshinConcurrentRunConfiguration.java._trace
 /HenshinConcurrentRunConfiguration.java
 /.HenshinConcurrentRunConfiguration.xtendbin
+/.HenshinConcurrentExecutionContext.java._trace
+/.HenshinConcurrentExecutionContext.xtendbin
+/HenshinConcurrentExecutionContext.java

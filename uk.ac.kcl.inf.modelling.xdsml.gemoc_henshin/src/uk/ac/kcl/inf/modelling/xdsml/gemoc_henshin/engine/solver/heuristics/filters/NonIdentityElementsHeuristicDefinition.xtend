@@ -31,9 +31,11 @@ class NonIdentityElementsHeuristicDefinition extends FilteringHeuristicDefinitio
 
 	override initaliseControl(Control uiElement, String configData) {
 		val list = uiElement as org.eclipse.swt.widgets.List
-		val namesToSelect = configData.split("@@")
+		if (list.items.size > 0) {
+			val namesToSelect = configData.split("@@")
 
-		list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
+			list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
+		}
 	}
 
 	override encodeConfigInformation(Control uiElement) {

@@ -24,6 +24,7 @@ import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.deciders.DeciderSpecificationExtensionPoint
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
@@ -36,6 +37,7 @@ import org.eclipse.swt.graphics.Font
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Combo
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Group
 import org.eclipse.swt.widgets.Label
@@ -62,6 +64,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	protected var Button _animateButton
 	protected var Text _delayText
 	protected var Button _animationFirstBreak
+	protected var Combo _deciderCombo
 
 	protected var Text modelofexecutionglml_LocationText
 
@@ -120,6 +123,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
 			_delayText.text = Integer.toString(runConfiguration.animationDelay)
 			_animationFirstBreak.selection = runConfiguration.breakStart
+			_deciderCombo.text = runConfiguration.deciderName
 
 			_languageText.text = runConfiguration.languageName
 			updateMetamodels
@@ -138,6 +142,8 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(RunConfiguration.LAUNCH_BREAK_START, _animationFirstBreak.getSelection());
 		// DebugModelID for sequential engine
 		configuration.setAttribute(RunConfiguration.DEBUG_MODEL_ID, Activator.DEBUG_MODEL_ID);
+		
+		configuration.setAttribute(ConcurrentRunConfiguration.LAUNCH_SELECTED_DECIDER, this._deciderCombo.getText());
 	}
 
 	override String getName() '''Main'''
@@ -248,6 +254,16 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 			}
 		})
 		createTextLabelLayout(parent, "(in milliseconds)")
+		
+		createTextLabelLayout(parent, "Decider")
+		_deciderCombo = new Combo(parent, SWT.BORDER)
+		_deciderCombo.layoutData = createStandardLayout
+
+		val deciders = DeciderSpecificationExtensionPoint.specifications.map[name].toList.toArray(#[""])
+		_deciderCombo.items = deciders
+		_deciderCombo.select = 0
+		_deciderCombo.addModifyListener(fBasicModifyListener)
+
 
 		new Label(parent, SWT.NONE).text = ""
 		_animationFirstBreak = new Button(parent, SWT.CHECK)
@@ -369,19 +385,24 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	val SEMANTICS = "semantics"
 
 	def updateMetamodels() {
-		val resourceSet = new XtextResourceSet
-		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(_languageText.text, false), true)
-
-		val oldSemantics = semantics
-		semantics = semanticsResource.contents.head as Module
-
-		val oldmms = metamodels
-		metamodels = semantics.imports
-
-		pcs.firePropertyChange(SEMANTICS, if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
-			if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
-		if (oldmms !== metamodels) {
-			pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+		try {
+			val resourceSet = new XtextResourceSet
+			val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(_languageText.text, false), true)
+	
+			val oldSemantics = semantics
+			semantics = semanticsResource.contents.head as Module
+	
+			val oldmms = metamodels
+			metamodels = semantics.imports
+	
+			pcs.firePropertyChange(SEMANTICS, if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
+				if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
+			if (oldmms !== metamodels) {
+				pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+			}			
+		}
+		catch (Exception e) {
+			e.printStackTrace
 		}
 	}
 
