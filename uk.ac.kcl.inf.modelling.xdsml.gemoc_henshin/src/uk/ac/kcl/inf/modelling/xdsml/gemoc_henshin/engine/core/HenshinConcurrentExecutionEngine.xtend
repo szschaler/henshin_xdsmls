@@ -44,7 +44,6 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	
 	// handling concurrent steps
 	var extension CPAHelper cpa
-	var boolean showConcurrentSteps = true
 	
 	@Accessors
 	var List<ConcurrencyHeuristic> concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
@@ -106,7 +105,12 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 
 		semanticRules = semantics.units.filter(Rule).filter[r|r.checkParameters].toList
 
-		cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
+		try {
+			cpa = new CPAHelper(new HashSet<Rule>(semanticRules))		
+		} catch (Throwable t) {
+			cpa = null
+			System.err.println("Error when trying to calculate critical pairs: " + t.message + ". Ignoring and disabling concurrent steps.")
+		}
 	
 		lcc.configured	
 	}
@@ -117,21 +121,28 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	 * @return a list of possible steps
 	 */
 	override protected computePossibleLogicalSteps() {
+		extension val traceFactory = GenerictraceFactory.eINSTANCE 
+		
 		var possibleLogicalSteps = new ArrayList<Step<?>>()
 
 		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
 
-		// only generate Concurrent Steps if the flag is on
-		if (showConcurrentSteps) {
+		// TODO: For some rule sets we cannot calculate critical pairs. In that case, concurrency analysis is not supported yet.
+		if (cpa !== null) {
 			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
 				if(seq.length > 1) {
-					val parStep = GenerictraceFactory.eINSTANCE.createGenericParallelStep
-					parStep.subSteps.addAll(seq.map[m | new HenshinStep(m)])
-					parStep
+					createGenericParallelStep => [
+						subSteps+= seq.map[m | new HenshinStep(m)]
+					]
 				}].filterNull)
 		}
 
-		possibleLogicalSteps.addAll(atomicMatches.map[m| new HenshinStep(m)])
+		possibleLogicalSteps.addAll(atomicMatches.map[m|
+			// Concurrent engine expects everything to be a parallel step
+			createGenericParallelStep => [
+				subSteps += new HenshinStep(m)
+			]
+		])
 
 		possibleLogicalSteps.filterByHeuristics		
 	}
