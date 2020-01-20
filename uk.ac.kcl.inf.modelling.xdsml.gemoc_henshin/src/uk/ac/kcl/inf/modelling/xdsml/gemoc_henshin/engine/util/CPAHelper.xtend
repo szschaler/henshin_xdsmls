@@ -5,16 +5,16 @@ import java.util.HashMap
 import java.util.List
 import java.util.Map
 import java.util.Set
-import org.eclipse.emf.henshin.cpa.CPAOptions
-import org.eclipse.emf.henshin.cpa.CpaByAGG
-import org.eclipse.emf.henshin.cpa.result.CriticalElement
-import org.eclipse.emf.henshin.cpa.result.CriticalPair
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.emf.henshin.model.Attribute
 import org.eclipse.emf.henshin.model.Edge
 import org.eclipse.emf.henshin.model.GraphElement
 import org.eclipse.emf.henshin.model.Node
 import org.eclipse.emf.henshin.model.Rule
+import org.eclipse.emf.henshin.multicda.cpa.CDAOptions
+import org.eclipse.emf.henshin.multicda.cpa.CpaByAGG
+import org.eclipse.emf.henshin.multicda.cpa.result.CriticalElement
+import org.eclipse.emf.henshin.multicda.cpa.result.CriticalPair
 import org.eclipse.xtend.lib.annotations.Data
 
 /**
@@ -32,9 +32,9 @@ class CPAHelper {
 	new(Set<Rule> rules) {
 		// Run Critical-Pair Analysis
 		val cpa = new CpaByAGG()
-		cpa.init(rules.toList, new CPAOptions())
+		cpa.init(rules, new CDAOptions())
 		var result = cpa.runConflictAnalysis()
-		// FIXME: With Henshin 1.5, can do: val criticalPairs = result.initialCriticalPairs
+		// TODO: We can now also say result.initialCriticalPairs, but somehow that then breaks our concurrency analysis.
 		val criticalPairs = result.criticalPairs
 
 		criticalPairs.forEach [ cp |
