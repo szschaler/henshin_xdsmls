@@ -26,11 +26,11 @@ import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.ConcurrencyHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.FilteringHeuristic
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.HeuristicDefinition.HeuristicsGroup
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.solver.heuristics.LaunchConfigurationContext
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition.StrategyGroup
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.ConcurrencyStrategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringStrategy
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
@@ -46,9 +46,9 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	var extension CPAHelper cpa
 	
 	@Accessors
-	var List<ConcurrencyHeuristic> concurrencyHeuristics = new ArrayList<ConcurrencyHeuristic>()
+	var List<ConcurrencyStrategy> concurrencyHeuristics = new ArrayList<ConcurrencyStrategy>()
 	@Accessors
-	var List<FilteringHeuristic> filteringHeuristics = new ArrayList<FilteringHeuristic>()
+	var List<FilteringStrategy> filteringHeuristics = new ArrayList<FilteringStrategy>()
 	
 	val lcc = new LCC(this)
 
@@ -61,10 +61,10 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 			val h = hd.instantiate
 			h.initialise(config.getConfigDetailFor(hd), lcc)
 			
-			if (hd.group === HeuristicsGroup.FILTERING_HEURISTIC) {
-				filteringHeuristics.add(h as FilteringHeuristic)
+			if (hd.group === StrategyGroup.FILTERING_HEURISTIC) {
+				filteringHeuristics.add(h as FilteringStrategy)
 			} else {
-				concurrencyHeuristics.add(h as ConcurrencyHeuristic)
+				concurrencyHeuristics.add(h as ConcurrencyStrategy)
 			}
 		]
     }
