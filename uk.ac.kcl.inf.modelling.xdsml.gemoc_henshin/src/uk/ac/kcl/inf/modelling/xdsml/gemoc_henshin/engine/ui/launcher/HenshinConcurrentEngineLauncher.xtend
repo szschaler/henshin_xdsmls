@@ -1,4 +1,4 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
 import org.eclipse.core.runtime.CoreException
 import org.eclipse.debug.core.ILaunchConfiguration
