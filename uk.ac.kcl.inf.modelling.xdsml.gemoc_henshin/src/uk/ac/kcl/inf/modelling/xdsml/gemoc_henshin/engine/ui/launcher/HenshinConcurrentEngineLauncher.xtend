@@ -8,6 +8,7 @@ import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentRunConfiguration
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.strategy_selector.StrategySelectionView
 
 class HenshinConcurrentEngineLauncher extends AbstractConcurrentLauncher<HenshinConcurrentRunConfiguration, HenshinConcurrentExecutionContext> {
 
@@ -25,6 +26,6 @@ class HenshinConcurrentEngineLauncher extends AbstractConcurrentLauncher<Henshin
 	}
 
 	override protected getAdditionalViewsIDs() {
-		emptySet
+		#{StrategySelectionView.ID}
 	}
 }
