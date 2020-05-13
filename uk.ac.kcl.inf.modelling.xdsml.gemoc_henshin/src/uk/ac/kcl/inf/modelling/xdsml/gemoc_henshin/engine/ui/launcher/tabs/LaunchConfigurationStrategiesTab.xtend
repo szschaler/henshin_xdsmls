@@ -32,7 +32,7 @@ class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
 	 */
 	new(LaunchConfigurationContext configContext) {
 		this.configContext = configContext
-		uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyRegistry.INSTANCE.strategies.forEach [ sd |
+		StrategyRegistry.INSTANCE.strategies.forEach [ sd |
 			strategySelections.put(sd, false)
 		]
 	}
