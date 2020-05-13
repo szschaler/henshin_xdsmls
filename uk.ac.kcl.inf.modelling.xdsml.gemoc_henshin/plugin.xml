@@ -3,7 +3,7 @@
 <plugin>
 	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
-			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.HenshinConcurrentEngineLauncher"
+			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.HenshinConcurrentEngineLauncher"
 			id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher"
 			modes="run,debug"
 			name="Henshin-Based Concurrent eXecutable Model"
@@ -13,7 +13,7 @@
 	</extension>
 	<extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
 		<launchConfigurationTabGroup
-        class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.LauncherTabGroup"
+        class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.LauncherTabGroup"
         id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher.tabGroup"
         type="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher">
 		</launchConfigurationTabGroup>

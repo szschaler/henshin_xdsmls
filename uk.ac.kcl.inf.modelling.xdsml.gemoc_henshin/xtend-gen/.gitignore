@@ -1,1 +1,3 @@
-/.StepCommand.java._trace
+*.java._trace
+*.xtendbin
+*.java
