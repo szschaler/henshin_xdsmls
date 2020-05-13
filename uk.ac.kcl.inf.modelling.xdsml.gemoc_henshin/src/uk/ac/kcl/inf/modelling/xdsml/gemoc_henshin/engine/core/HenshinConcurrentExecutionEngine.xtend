@@ -46,9 +46,9 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	var extension CPAHelper cpa
 	
 	@Accessors
-	var List<ConcurrencyStrategy> concurrencyHeuristics = new ArrayList<ConcurrencyStrategy>()
+	var List<ConcurrencyStrategy> concurrencyStrategies = new ArrayList<ConcurrencyStrategy>()
 	@Accessors
-	var List<FilteringStrategy> filteringHeuristics = new ArrayList<FilteringStrategy>()
+	var List<FilteringStrategy> filteringStrategies = new ArrayList<FilteringStrategy>()
 	
 	val lcc = new LCC(this)
 
@@ -57,14 +57,14 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		
 		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
 		
-		config.heuristics.forEach[extension hd | 
+		config.getStrategies.forEach[extension hd | 
 			val h = hd.instantiate
 			h.initialise(config.getConfigDetailFor(hd), lcc)
 			
-			if (hd.group === StrategyGroup.FILTERING_HEURISTIC) {
-				filteringHeuristics.add(h as FilteringStrategy)
+			if (hd.group === StrategyGroup.FILTERING_STRATEGY) {
+				filteringStrategies.add(h as FilteringStrategy)
 			} else {
-				concurrencyHeuristics.add(h as ConcurrencyStrategy)
+				concurrencyStrategies.add(h as ConcurrencyStrategy)
 			}
 		]
     }
@@ -144,7 +144,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 			]
 		])
 
-		possibleLogicalSteps.filterByHeuristics		
+		possibleLogicalSteps.filterByStrategies		
 	}
 	
 	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
@@ -230,7 +230,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	
 	/**
 	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
-	 * conflict based on the CPA analysis. Then checks if all concurrency heuristics agree 
+	 * conflict based on the CPA analysis. Then checks if all concurrency strategies agree 
 	 * that they should be run in parallel.
 	 * 
 	 * @param match1 and match2
@@ -238,14 +238,14 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	 * @output true if the two matches should not run in parallel
 	 */
 	private def cannotRunConcurrently(Match match1, Match match2) {
-		match1.conflictsWith(match2) || concurrencyHeuristics.exists[ch|!ch.canBeConcurrent(match1, match2)]
+		match1.conflictsWith(match2) || concurrencyStrategies.exists[ch|!ch.canBeConcurrent(match1, match2)]
 	}
 	
 	/**
-	 * Return a list of steps filtered by all filtering heuristics
+	 * Return a list of steps filtered by all filtering strategies
 	 */	
-	private def filterByHeuristics(List<Step<?>> possibleSteps) {
-		filteringHeuristics.fold(possibleSteps, [steps, fh | fh.filter(steps)])
+	private def filterByStrategies(List<Step<?>> possibleSteps) {
+		filteringStrategies.fold(possibleSteps, [steps, fh | fh.filter(steps)])
 	}
 	
 	private static class LCC implements LaunchConfigurationContext {

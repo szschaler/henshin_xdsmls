@@ -8,14 +8,14 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.filters.Max
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.filters.NonIdentityElementsStrategyDefinition
 
 /**
- * Registry of heuristics descriptions. Eventually to be filled from an extension point.
+ * Registry of strategy descriptions. Eventually to be filled from an extension point.
  * 
  */
 class StrategyRegistry {
 
 	public static val INSTANCE = new StrategyRegistry
 
-	public static val HEURISTICS_CONFIG_KEY = "uk.ac.kcl.inf.xdsml.heuristics"
+	public static val STRATEGIES_CONFIG_KEY = "uk.ac.kcl.inf.xdsml.strategies"
 	
 	private new() {
 		add(new OverlapStrategyDefinition)
@@ -27,11 +27,11 @@ class StrategyRegistry {
 
 	val registry = new HashMap<String, StrategyDefinition>()
 
-	def add(StrategyDefinition heuristic) {
-		registry.put(heuristic.heuristicID, heuristic)
+	def add(StrategyDefinition strategy) {
+		registry.put(strategy.getStrategyID, strategy)
 	}
 
-	def getHeuristics() {
+	def getStrategies() {
 		registry.values
 	}
 

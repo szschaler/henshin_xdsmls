@@ -13,9 +13,9 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringSt
 /**
  * Remove steps that differ only in objects of a specific type -- specify that objects of that type are not considered to have identity (e.g., parts in the PLS example).
  * 
- * This is a filtering heuristic to allow it to interact with concurrency computation to recognise that it is still meaningful to have two potentially concurrent applications 
+ * This is a filtering strategy to allow it to interact with concurrency computation to recognise that it is still meaningful to have two potentially concurrent applications 
  * of assemble (in the PLS case), for example. It's just not meaningful to have four ``different'' atomic assemble steps where there is only one machine. Hence, this is a filtering
- * heuristic that needs to be applied after all possible concurrent executions have been computed.
+ * strategy that needs to be applied after all possible concurrent executions have been computed.
  */
 class NonIdentityElementsStrategy implements FilteringStrategy {
 

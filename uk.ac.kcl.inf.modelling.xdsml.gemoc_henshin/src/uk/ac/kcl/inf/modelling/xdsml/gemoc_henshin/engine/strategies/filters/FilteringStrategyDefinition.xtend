@@ -5,6 +5,6 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDef
 
 abstract class FilteringStrategyDefinition extends StrategyDefinition {
 	new(String ID, String label, Class<? extends Strategy> clazz) {
-		super(ID, label, StrategyGroup.FILTERING_HEURISTIC, clazz)
+		super(ID, label, StrategyGroup.FILTERING_STRATEGY, clazz)
 	}
 }

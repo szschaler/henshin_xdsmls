@@ -10,7 +10,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.Strategy
 
 class MaxNumberOfStepsStrategyDefinition extends FilteringStrategyDefinition {
 	new() {
-		super("uk.ac.kcl.inf.xdsml.heuristics.num_steps", "Max Number of Steps Heuristic", MaxNumberOfStepsStrategy)
+		super("uk.ac.kcl.inf.xdsml.strategies.num_steps", "Max Number of Steps Strategy", MaxNumberOfStepsStrategy)
 	}
 
 	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
@@ -41,14 +41,14 @@ class MaxNumberOfStepsStrategyDefinition extends FilteringStrategyDefinition {
 		}
 	}
 
-	override initialise(Strategy heuristic, String configData, LaunchConfigurationContext lcc) {
-		val h = heuristic as MaxNumberOfStepsStrategy
+	override initialise(Strategy strategy, String configData, LaunchConfigurationContext lcc) {
+		val h = strategy as MaxNumberOfStepsStrategy
 
 		try {
 			val num = Integer.parseInt(configData)
 			h.maxNumberOfSteps = num
 		} catch (NumberFormatException nfe) {
-			System.err.println("Couldn't initalise heuristic: " + nfe.message)
+			System.err.println("Couldn't initalise strategy: " + nfe.message)
 			nfe.printStackTrace
 		}
 	}

@@ -12,7 +12,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.Strategy
 
 class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition {
 	new() {
-		super("uk.ac.kcl.inf.xdsml.heuristics.non_identity_elements", "Non Identity Elements Heuristic",
+		super("uk.ac.kcl.inf.xdsml.strategies.non_identity_elements", "Non Identity Elements Strategy",
 			NonIdentityElementsStrategy)
 	}
 
@@ -44,8 +44,8 @@ class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition 
 		list.selectionIndices.map[i | list.items.get(i)].join("@@")
 	}
 
-	override initialise(Strategy heuristic, String configData, LaunchConfigurationContext lcc) {
-		val h = heuristic as NonIdentityElementsStrategy
+	override initialise(Strategy strategy, String configData, LaunchConfigurationContext lcc) {
+		val h = strategy as NonIdentityElementsStrategy
 
 		lcc.addMetamodelChangeListener([ evt |
 			h.updateMetamodels(evt.newValue as List<EPackage>, configData)

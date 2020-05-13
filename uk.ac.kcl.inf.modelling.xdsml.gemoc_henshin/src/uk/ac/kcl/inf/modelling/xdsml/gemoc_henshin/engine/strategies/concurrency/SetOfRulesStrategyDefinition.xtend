@@ -11,7 +11,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.Strategy
 
 class SetOfRulesStrategyDefinition extends ConcurrencyStrategyDefinition {
 	new() {
-		super("uk.ac.kcl.inf.xdsml.heuristics.set_of_rules", "Set Of Rules Heuristic", SetOfRulesStrategy)
+		super("uk.ac.kcl.inf.xdsml.strategies.set_of_rules", "Set Of Rules Strategy", SetOfRulesStrategy)
 	}
 	
 	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
@@ -42,8 +42,8 @@ class SetOfRulesStrategyDefinition extends ConcurrencyStrategyDefinition {
 		}
 	}
 
-	override initialise(Strategy heuristic, String configData, LaunchConfigurationContext lcc) {
-		val h = heuristic as SetOfRulesStrategy
+	override initialise(Strategy strategy, String configData, LaunchConfigurationContext lcc) {
+		val h = strategy as SetOfRulesStrategy
 
 		lcc.addSemanticsChangeListener([ evt |
 			h.updateSemantics(evt.newValue as List<Rule>, configData)

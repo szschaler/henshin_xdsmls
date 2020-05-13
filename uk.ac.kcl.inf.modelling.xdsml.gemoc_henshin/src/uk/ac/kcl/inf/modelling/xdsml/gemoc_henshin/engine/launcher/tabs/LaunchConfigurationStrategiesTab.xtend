@@ -19,21 +19,21 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyReg
 
 /**
  * 
- * Tab for choosing the step heuristics.
+ * Tab for choosing the step strategies.
  * 
  */
 class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
-	val heuristicSelections = new HashMap<StrategyDefinition, Boolean>
+	val strategySelections = new HashMap<StrategyDefinition, Boolean>
 	val components = new HashMap<StrategyDefinition, Pair<Button, Control>>
 	val LaunchConfigurationContext configContext
 	
 	/**
-	 * get all possible heuristics and add them to the tab so the user can switch them on/off
+	 * Get all possible strategies and add them to the tab so the user can switch them on/off
 	 */
 	new(LaunchConfigurationContext configContext) {
 		this.configContext = configContext
-		uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyRegistry.INSTANCE.heuristics.forEach [ hd |
-			heuristicSelections.put(hd, false)
+		uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyRegistry.INSTANCE.strategies.forEach [ sd |
+			strategySelections.put(sd, false)
 		]
 	}
 
@@ -52,19 +52,19 @@ class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
 	private def createLayout(Composite parent) {
 		val groupmap = new HashMap<StrategyGroup, Group>()
 		
-		groupmap.put(StrategyGroup.CONCURRENCY_HEURISTIC, createGroup(parent, "Concurrency Heuristics"))
-		groupmap.put(StrategyGroup.FILTERING_HEURISTIC, createGroup(parent, "Filtering Heuristics"))
+		groupmap.put(StrategyGroup.CONCURRENCY_STRATEGY, createGroup(parent, "Concurrency Strategies"))
+		groupmap.put(StrategyGroup.FILTERING_STRATEGY, createGroup(parent, "Filtering Strategies"))
 
-		heuristicSelections.keySet.forEach [ hd |
+		strategySelections.keySet.forEach [ hd |
 
 			var parentGroup = groupmap.get(hd.group)
 
 			val checkbox = createCheckButton(parentGroup, hd.humanReadableLabel)
-			checkbox.selection = heuristicSelections.get(hd)
+			checkbox.selection = strategySelections.get(hd)
 			checkbox.addSelectionListener(new SelectionListener() {
 
 				override widgetSelected(SelectionEvent e) {
-					heuristicSelections.put(hd, checkbox.selection)
+					strategySelections.put(hd, checkbox.selection)
 					updateLaunchConfigurationDialog();
 				}
 
@@ -83,47 +83,47 @@ class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
 		]
 	}
 
-	static val HEURISTICS_CONFIG_DATA_KEY = ".configData"
+	static val STRATEGIES_CONFIG_DATA_KEY = ".configData"
 
 	override setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyRegistry.HEURISTICS_CONFIG_KEY, Collections.EMPTY_LIST)
-		StrategyRegistry.INSTANCE.heuristics.forEach [ hd |
-			configuration.removeAttribute(hd.heuristicID + HEURISTICS_CONFIG_DATA_KEY)
+		configuration.setAttribute(StrategyRegistry.STRATEGIES_CONFIG_KEY, Collections.EMPTY_LIST)
+		StrategyRegistry.INSTANCE.strategies.forEach [ hd |
+			configuration.removeAttribute(hd.strategyID + STRATEGIES_CONFIG_DATA_KEY)
 		]
 	}
 
 	override initializeFrom(ILaunchConfiguration configuration) {
 
-		heuristicSelections.keySet.forEach[hd|heuristicSelections.put(hd, false)]
+		strategySelections.keySet.forEach[hd|strategySelections.put(hd, false)]
 
-		val heuristics = configuration.getAttribute(StrategyRegistry.HEURISTICS_CONFIG_KEY, #[])
-		heuristics.forEach [ hid |
-			heuristicSelections.put(StrategyRegistry.INSTANCE.get(hid), true)
+		val strategies = configuration.getAttribute(StrategyRegistry.STRATEGIES_CONFIG_KEY, #[])
+		strategies.forEach [ sid |
+			strategySelections.put(StrategyRegistry.INSTANCE.get(sid), true)
 		]
 
-		heuristicSelections.forEach [ extension hd, selected |
-			val heuristicComponents = components.get(hd)
-			val checkbox = heuristicComponents.key
+		strategySelections.forEach [ extension sd, selected |
+			val strategyComponents = components.get(sd)
+			val checkbox = strategyComponents.key
 			if (checkbox !== null) {
 				checkbox.selection = selected
 			}
 
-			val hComponent = heuristicComponents.value
+			val hComponent = strategyComponents.value
 			if (hComponent !== null) {
-				hComponent.initaliseControl(configuration.getAttribute(hd.heuristicID + HEURISTICS_CONFIG_DATA_KEY, ""))
+				hComponent.initaliseControl(configuration.getAttribute(sd.strategyID + STRATEGIES_CONFIG_DATA_KEY, ""))
 			}
 		]
 	}
 
 	override performApply(ILaunchConfigurationWorkingCopy configuration) {
-		val selectedHeuristics = heuristicSelections.filter[hd, selected|selected].keySet
-		configuration.setAttribute(StrategyRegistry.HEURISTICS_CONFIG_KEY,
-			selectedHeuristics.map[it.heuristicID].toList)
-		selectedHeuristics.forEach [ extension hd |
-			val heuristicComponent = components.get(hd).value
-			if (heuristicComponent !== null) {
-				configuration.setAttribute(hd.heuristicID + HEURISTICS_CONFIG_DATA_KEY,
-					heuristicComponent.encodeConfigInformation())
+		val selectedStrategies = strategySelections.filter[hd, selected|selected].keySet
+		configuration.setAttribute(StrategyRegistry.STRATEGIES_CONFIG_KEY,
+			selectedStrategies.map[it.getStrategyID].toList)
+		selectedStrategies.forEach [ extension hd |
+			val strategyComponent = components.get(hd).value
+			if (strategyComponent !== null) {
+				configuration.setAttribute(hd.getStrategyID + STRATEGIES_CONFIG_DATA_KEY,
+					strategyComponent.encodeConfigInformation())
 			}
 		]
 	}
@@ -133,5 +133,5 @@ class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
 		true
 	}
 
-	override getName() { "Steps Heuristics" }
+	override getName() { "Steps Strategies" }
 }
