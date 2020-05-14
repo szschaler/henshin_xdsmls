@@ -8,20 +8,22 @@ import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.AbstractStrategy
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringStrategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition
 
-class MaxNumberOfStepsStrategy implements FilteringStrategy {
+class MaxNumberOfStepsStrategy extends AbstractStrategy implements FilteringStrategy {
 
 	@Accessors
 	var int maxNumberOfSteps
 
-	new(int maxNumberOfSteps) {
-		super()
+	new(int maxNumberOfSteps, StrategyDefinition definition) {
+		super(definition)
 		this.maxNumberOfSteps = maxNumberOfSteps
 	}
 
-	new() {
-		this(2)
+	new(StrategyDefinition definition) {
+		this(2, definition)
 	}
 
 	override List<Step<?>> filter(List<Step<?>> steps) {

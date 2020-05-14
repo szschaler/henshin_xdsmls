@@ -1,27 +1,89 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.strategy_selector
 
+import java.beans.PropertyChangeListener
+import java.beans.PropertyChangeSupport
 import java.util.HashMap
+import java.util.List
 import org.eclipse.debug.internal.ui.SWTFactory
+import org.eclipse.emf.ecore.EPackage
+import org.eclipse.emf.henshin.model.Module
+import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.executionframework.ui.views.engine.EngineSelectionDependentViewPart
 import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionEngine
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionEvent
 import org.eclipse.swt.events.SelectionListener
+import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Group
+import org.eclipse.swt.widgets.Label
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition.StrategyGroup
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyRegistry
-import org.eclipse.swt.layout.GridData
-import org.eclipse.swt.widgets.Label
 
 class StrategySelectionView extends EngineSelectionDependentViewPart {
-	
+
 	public static val ID = "org.eclipse.gemoc.executionframework.engine.io.views.StrategySelectionView"
 
-	val strategySelections = new HashMap<StrategyDefinition, Boolean>	
+	val strategySelections = new HashMap<StrategyDefinition, Boolean>
+	val components = new HashMap<StrategyDefinition, Pair<Button, Control>>
+
+	// TODO: Implement as a wrapper around the selected engine
+	private static class EngineWrappingLaunchConfigurationContext implements LaunchConfigurationContext {
+		val pcs = new PropertyChangeSupport(this)
+		static val METAMODELS = "metamodels"
+		static val SEMANTICS = "semantics"
+
+		var Module semantics = null
+		var List<EPackage> metamodels = null
+
+		def setEngine(IExecutionEngine<?> engine) {
+			try {
+				val oldSemantics = semantics
+				val oldmms = metamodels
+
+				if (engine instanceof HenshinConcurrentExecutionEngine) {
+					semantics = engine.semantics
+					metamodels = semantics.imports
+				} else {
+					semantics = null
+					metamodels = null
+				}
+
+				pcs.firePropertyChange(SEMANTICS,
+					if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
+					if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
+				if (oldmms !== metamodels) {
+					pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+				}
+			} catch (Exception e) {
+				e.printStackTrace
+			}
+		}
+
+		override getMetamodels() {
+			metamodels
+		}
+
+		override addMetamodelChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener(METAMODELS, pcl)
+		}
+
+		override getSemantics() {
+			if(semantics !== null) semantics.units.filter(Rule).toList else emptyList
+		}
+
+		override addSemanticsChangeListener(PropertyChangeListener pcl) {
+			pcs.addPropertyChangeListener(SEMANTICS, pcl)
+		}
+	}
+
+	val configContext = new EngineWrappingLaunchConfigurationContext
 
 	new() {
 		StrategyRegistry.INSTANCE.strategies.forEach [ sd |
@@ -40,13 +102,13 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 
 		createLayout(content)
 	}
-	
+
 	// TODO: This needs refactoring: currently copied across from LaunchConfigTab	
 	private def createLayout(Composite parent) {
 		createTextLabelLayout(parent, "Update strategy selection below. This will take effect from the next step.")
-		
+
 		val groupmap = new HashMap<StrategyGroup, Group>()
-		
+
 		groupmap.put(StrategyGroup.CONCURRENCY_STRATEGY, createGroup(parent, "Concurrency Strategies"))
 		groupmap.put(StrategyGroup.FILTERING_STRATEGY, createGroup(parent, "Filtering Strategies"))
 
@@ -66,7 +128,7 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 				override widgetDefaultSelected(SelectionEvent e) {}
 			})
 
-//			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext)))
+			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext)))
 		]
 
 		// remove empty groups
@@ -77,27 +139,27 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 			}
 		]
 	}
-	
+
 	protected def createTextLabelLayout(Composite parent, String labelString) {
 		val gd = new GridData(GridData.FILL_HORIZONTAL)
 		parent.setLayoutData(gd)
 		val label = new Label(parent, SWT.NONE)
 		label.setText(labelString)
 	}
-	
+
 	protected def Group createGroup(Composite parent, String text) {
 		val group = new Group(parent, SWT.NULL)
 		group.setText(text)
-		
+
 		val locationLayout = new GridLayout()
 		locationLayout.numColumns = 5
 		locationLayout.marginHeight = 10
 		locationLayout.marginWidth = 10
 		group.setLayout(locationLayout)
-		
+
 		group
 	}
-	
+
 	protected def Button createCheckButton(Composite parent, String label) {
 		SWTFactory.createCheckButton(parent, label, null, false, 1)
 	}
@@ -105,9 +167,33 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 	override setFocus() {
 //		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
-	
+
 	override engineSelectionChanged(IExecutionEngine<?> engine) {
-//		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		configContext.engine = engine
+		if (engine instanceof HenshinConcurrentExecutionEngine) {
+			updateSelectionsFrom (engine)
+		}
 	}
 	
+	private def updateSelectionsFrom (HenshinConcurrentExecutionEngine engine) {
+		strategySelections.keySet.forEach[hd|strategySelections.put(hd, false)]
+
+		val strategies = (engine.concurrencyStrategies + engine.filteringStrategies).groupBy[strategyDefinition]
+		strategies.keySet.forEach[ strategySelections.put(it, true) ]
+
+		strategySelections.forEach [ extension sd, selected |
+			val strategyComponents = components.get(sd)
+			val checkbox = strategyComponents.key
+			if (checkbox !== null) {
+				checkbox.selection = selected
+			}
+
+			val hComponent = strategyComponents.value
+			if (hComponent !== null) {
+				hComponent.initaliseControl(strategies.get(sd)?.head)
+			}
+		]
+		
+	}
+
 }

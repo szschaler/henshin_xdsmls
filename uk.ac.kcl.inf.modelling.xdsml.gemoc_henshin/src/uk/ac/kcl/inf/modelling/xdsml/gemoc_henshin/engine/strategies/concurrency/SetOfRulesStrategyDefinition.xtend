@@ -41,6 +41,15 @@ class SetOfRulesStrategyDefinition extends ConcurrencyStrategyDefinition {
 			list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
 		}
 	}
+	
+	override void initaliseControl(Control uiElement, Strategy strategy) {
+		val list = uiElement as org.eclipse.swt.widgets.List
+		list.setSelection(#[] as int[])
+		
+		if (strategy instanceof SetOfRulesStrategy) {
+			list.selection = strategy.rules.map[name]
+		}
+	}
 
 	override initialise(Strategy strategy, String configData, LaunchConfigurationContext lcc) {
 		val h = strategy as SetOfRulesStrategy

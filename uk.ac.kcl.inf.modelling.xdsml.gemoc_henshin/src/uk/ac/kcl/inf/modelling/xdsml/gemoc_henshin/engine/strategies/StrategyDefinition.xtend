@@ -32,7 +32,7 @@ class StrategyDefinition {
 	}
 
 	def instantiate() {
-		clazz.newInstance
+		clazz.getConstructor(StrategyDefinition).newInstance(this)
 	}
 
 	/**
@@ -58,5 +58,10 @@ class StrategyDefinition {
 	 * Initialise this strategy definition's control from the given configData
 	 */
 	def void initaliseControl(Control uiElement, String configData) {}
+
+	/**
+	 * Initialise this strategy definition's control from the given strategy
+	 */
+	def void initaliseControl(Control uiElement, Strategy strategy) {}
 
 }

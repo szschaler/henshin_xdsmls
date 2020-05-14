@@ -8,7 +8,9 @@ import org.eclipse.gemoc.trace.commons.model.generictrace.GenericParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinStep
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.AbstractStrategy
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringStrategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition
 
 /**
  * Remove steps that differ only in objects of a specific type -- specify that objects of that type are not considered to have identity (e.g., parts in the PLS example).
@@ -17,7 +19,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringSt
  * of assemble (in the PLS case), for example. It's just not meaningful to have four ``different'' atomic assemble steps where there is only one machine. Hence, this is a filtering
  * strategy that needs to be applied after all possible concurrent executions have been computed.
  */
-class NonIdentityElementsStrategy implements FilteringStrategy {
+class NonIdentityElementsStrategy extends AbstractStrategy implements FilteringStrategy {
 
 	/**
 	 * Objects of these types should not be considered to have independent identity. So, while we can require to match multiple, distinct objects in one rule match, two rule matches 
@@ -26,11 +28,13 @@ class NonIdentityElementsStrategy implements FilteringStrategy {
 	@Accessors
 	var List<? extends EClass> nonIdentityTypes
 
-	new() {
+	new(StrategyDefinition definition) {
+		super(definition)
 		nonIdentityTypes = emptyList
 	}
 
-	new(List<? extends EClass> nonIdentityTypes) {
+	new(List<? extends EClass> nonIdentityTypes, StrategyDefinition definition) {
+		super(definition)
 		this.nonIdentityTypes = nonIdentityTypes
 	}
 

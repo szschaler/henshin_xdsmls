@@ -30,6 +30,15 @@ class MaxNumberOfStepsStrategyDefinition extends FilteringStrategyDefinition {
 		}
 	}
 
+	override void initaliseControl(Control uiElement, Strategy strategy) {
+		val txt = uiElement as Text
+		txt.text = ""
+		
+		if (strategy instanceof MaxNumberOfStepsStrategy) {
+			txt.text = strategy.maxNumberOfSteps.toString
+		}
+	}
+
 	override encodeConfigInformation(Control uiElement) {
 		val txt = uiElement as Text
 

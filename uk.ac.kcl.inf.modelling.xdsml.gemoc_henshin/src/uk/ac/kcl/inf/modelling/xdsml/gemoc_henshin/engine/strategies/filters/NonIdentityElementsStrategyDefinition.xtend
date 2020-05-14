@@ -38,6 +38,15 @@ class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition 
 		}
 	}
 
+	override void initaliseControl(Control uiElement, Strategy strategy) {
+		val list = uiElement as org.eclipse.swt.widgets.List
+		list.setSelection(#[] as int[])
+		
+		if (strategy instanceof NonIdentityElementsStrategy) {
+			list.selection = strategy.nonIdentityTypes.map[name]
+		}
+	}
+
 	override encodeConfigInformation(Control uiElement) {
 		val list = uiElement as org.eclipse.swt.widgets.List
 
