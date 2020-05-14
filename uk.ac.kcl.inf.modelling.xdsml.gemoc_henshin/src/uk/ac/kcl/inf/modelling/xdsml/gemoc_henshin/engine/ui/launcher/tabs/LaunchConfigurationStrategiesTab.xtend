@@ -71,7 +71,7 @@ class LaunchConfigurationStrategiesTab extends LaunchConfigurationTab {
 				override widgetDefaultSelected(SelectionEvent e) {}
 			})
 
-			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext)))
+			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext, null)))
 		]
 
 		// remove empty groups

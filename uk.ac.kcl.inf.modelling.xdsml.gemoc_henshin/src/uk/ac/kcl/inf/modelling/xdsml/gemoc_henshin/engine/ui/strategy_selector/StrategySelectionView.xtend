@@ -156,7 +156,9 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 			val checkbox = createCheckButton(parentGroup, sd.humanReadableLabel)
 			checkbox.selection = strategySelections.get(sd)
 
-			val uiControl = sd.getUIControl(parentGroup, configContext)
+			val uiControl = sd.getUIControl(parentGroup, configContext, [
+				sd.updateEngineStrategyDetails()
+			])
 			components.put(sd, new Pair(checkbox, uiControl))
 
 			checkbox.addSelectionListener(new SelectionListener() {
@@ -259,6 +261,15 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 					}
 				}
 			}
+		}
+	}
+	
+	protected def updateEngineStrategyDetails(StrategyDefinition sd) {
+		val isSelected = strategySelections.get(sd)
+		
+		if (isSelected) {
+			// No point updating the detailed strategy config otherwise...
+			sd.updateEngineStrategySelection(isSelected, components.get(sd).value)		
 		}
 	}
 }

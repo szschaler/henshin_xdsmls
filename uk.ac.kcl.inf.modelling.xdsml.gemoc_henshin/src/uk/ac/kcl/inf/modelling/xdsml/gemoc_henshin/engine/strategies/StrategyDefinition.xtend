@@ -47,7 +47,7 @@ class StrategyDefinition {
 	/**
 	 * Provide an optional control to display in a launch tab to allow users to provide additional configuration information for the strategy. 
 	 */
-	def Control getUIControl(Composite parent, LaunchConfigurationContext lcc) { null }
+	def Control getUIControl(Composite parent, LaunchConfigurationContext lcc, StrategyControlUpdateListener scul) { null }
 
 	/**
 	 * Encode the user choice in a string that can be saved in a launch configuration.
