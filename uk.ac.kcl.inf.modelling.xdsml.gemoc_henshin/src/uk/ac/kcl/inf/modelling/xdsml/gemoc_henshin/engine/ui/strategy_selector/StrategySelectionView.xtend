@@ -20,7 +20,10 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Group
 import org.eclipse.swt.widgets.Label
+import org.eclipse.xtend.lib.annotations.Accessors
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.ConcurrencyStrategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringStrategy
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition.StrategyGroup
@@ -33,7 +36,6 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 	val strategySelections = new HashMap<StrategyDefinition, Boolean>
 	val components = new HashMap<StrategyDefinition, Pair<Button, Control>>
 
-	// TODO: Implement as a wrapper around the selected engine
 	private static class EngineWrappingLaunchConfigurationContext implements LaunchConfigurationContext {
 		val pcs = new PropertyChangeSupport(this)
 		static val METAMODELS = "metamodels"
@@ -42,7 +44,11 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 		var Module semantics = null
 		var List<EPackage> metamodels = null
 
+		@Accessors(PUBLIC_GETTER)
+		var IExecutionEngine<?> engine = null
+
 		def setEngine(IExecutionEngine<?> engine) {
+			this.engine = engine
 			try {
 				val oldSemantics = semantics
 				val oldmms = metamodels
@@ -83,6 +89,37 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 		}
 	}
 
+	/**
+	 *  Engine wrapper that ignores requests to send update events. 
+	 * 
+	 * To be used when updating strategies from the selection in the view so that they don't get accidentally updated whenever the engine 
+	 * is switched.
+	 */
+	private static class NonNotifyingEngineWrappingLaunchConfigurationContext implements LaunchConfigurationContext {
+		val EngineWrappingLaunchConfigurationContext delegate
+
+		new(EngineWrappingLaunchConfigurationContext delegate) {
+			this.delegate = delegate
+		}
+
+		override getMetamodels() {
+			delegate.metamodels
+		}
+
+		override addMetamodelChangeListener(PropertyChangeListener pcl) {
+			// Ignore
+		}
+
+		override getSemantics() {
+			delegate.getSemantics
+		}
+
+		override addSemanticsChangeListener(PropertyChangeListener pcl) {
+			// Ignore
+		}
+
+	}
+
 	val configContext = new EngineWrappingLaunchConfigurationContext
 
 	new() {
@@ -112,23 +149,25 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 		groupmap.put(StrategyGroup.CONCURRENCY_STRATEGY, createGroup(parent, "Concurrency Strategies"))
 		groupmap.put(StrategyGroup.FILTERING_STRATEGY, createGroup(parent, "Filtering Strategies"))
 
-		strategySelections.keySet.forEach [ hd |
+		strategySelections.keySet.forEach [ sd |
 
-			var parentGroup = groupmap.get(hd.group)
+			var parentGroup = groupmap.get(sd.group)
 
-			val checkbox = createCheckButton(parentGroup, hd.humanReadableLabel)
-			checkbox.selection = strategySelections.get(hd)
+			val checkbox = createCheckButton(parentGroup, sd.humanReadableLabel)
+			checkbox.selection = strategySelections.get(sd)
+
+			val uiControl = sd.getUIControl(parentGroup, configContext)
+			components.put(sd, new Pair(checkbox, uiControl))
+
 			checkbox.addSelectionListener(new SelectionListener() {
 
 				override widgetSelected(SelectionEvent e) {
-					strategySelections.put(hd, checkbox.selection)
-//					updateLaunchConfigurationDialog();
+					strategySelections.put(sd, checkbox.selection)
+					updateEngineStrategySelection(sd, checkbox.selection, uiControl)
 				}
 
 				override widgetDefaultSelected(SelectionEvent e) {}
 			})
-
-			components.put(hd, new Pair(checkbox, hd.getUIControl(parentGroup, configContext)))
 		]
 
 		// remove empty groups
@@ -164,22 +203,20 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 		SWTFactory.createCheckButton(parent, label, null, false, 1)
 	}
 
-	override setFocus() {
-//		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
+	override setFocus() {}
 
 	override engineSelectionChanged(IExecutionEngine<?> engine) {
-		configContext.engine = engine
+		configContext.setEngine(engine) // need to explictly call setter because Xtend is stupid
 		if (engine instanceof HenshinConcurrentExecutionEngine) {
-			updateSelectionsFrom (engine)
+			updateSelectionsFrom(engine)
 		}
 	}
-	
-	private def updateSelectionsFrom (HenshinConcurrentExecutionEngine engine) {
+
+	private def updateSelectionsFrom(HenshinConcurrentExecutionEngine engine) {
 		strategySelections.keySet.forEach[hd|strategySelections.put(hd, false)]
 
 		val strategies = (engine.concurrencyStrategies + engine.filteringStrategies).groupBy[strategyDefinition]
-		strategies.keySet.forEach[ strategySelections.put(it, true) ]
+		strategies.keySet.forEach[strategySelections.put(it, true)]
 
 		strategySelections.forEach [ extension sd, selected |
 			val strategyComponents = components.get(sd)
@@ -193,7 +230,35 @@ class StrategySelectionView extends EngineSelectionDependentViewPart {
 				hComponent.initaliseControl(strategies.get(sd)?.head)
 			}
 		]
-		
+
 	}
 
+	protected def updateEngineStrategySelection(StrategyDefinition sd, boolean selected, Control control) {
+		if (configContext.engine !== null) {
+			if (configContext.engine instanceof HenshinConcurrentExecutionEngine) {
+				val engine = configContext.engine as HenshinConcurrentExecutionEngine
+				val strategies = (engine.concurrencyStrategies + engine.filteringStrategies).toList
+
+				strategies.filter[strategyDefinition === sd].forEach [
+					if (it instanceof ConcurrencyStrategy) {
+						engine.concurrencyStrategies.remove(it)
+					} else {
+						engine.filteringStrategies.remove(it)
+					}
+				]
+
+				if (selected) {
+					val strategy = sd.instantiate
+					sd.initialise(strategy, sd.encodeConfigInformation(control),
+						new NonNotifyingEngineWrappingLaunchConfigurationContext(configContext))
+
+					if (strategy instanceof ConcurrencyStrategy) {
+						engine.concurrencyStrategies += strategy
+					} else {
+						engine.filteringStrategies += strategy as FilteringStrategy
+					}
+				}
+			}
+		}
+	}
 }
