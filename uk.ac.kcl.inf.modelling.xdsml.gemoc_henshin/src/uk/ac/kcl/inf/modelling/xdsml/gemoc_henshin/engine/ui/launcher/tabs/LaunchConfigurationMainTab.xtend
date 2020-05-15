@@ -1,4 +1,4 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.tabs
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs
 
 import java.beans.PropertyChangeListener
 import java.beans.PropertyChangeSupport

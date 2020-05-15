@@ -10,7 +10,7 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyReg
 
 class HenshinConcurrentRunConfiguration extends ConcurrentRunConfiguration {
 	
-	static val STRATEGIES_CONFIG_DATA_KEY = ".configData"
+	public static val STRATEGIES_CONFIG_DATA_KEY = ".configData"
 	
 	new(ILaunchConfiguration launchConfiguration) throws CoreException {
 		super(launchConfiguration)

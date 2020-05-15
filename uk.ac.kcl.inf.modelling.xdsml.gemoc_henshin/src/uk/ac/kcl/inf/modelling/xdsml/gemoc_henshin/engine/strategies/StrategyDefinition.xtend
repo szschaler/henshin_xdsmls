@@ -32,7 +32,7 @@ class StrategyDefinition {
 	}
 
 	def instantiate() {
-		clazz.newInstance
+		clazz.getConstructor(StrategyDefinition).newInstance(this)
 	}
 
 	/**
@@ -47,7 +47,7 @@ class StrategyDefinition {
 	/**
 	 * Provide an optional control to display in a launch tab to allow users to provide additional configuration information for the strategy. 
 	 */
-	def Control getUIControl(Composite parent, LaunchConfigurationContext lcc) { null }
+	def Control getUIControl(Composite parent, LaunchConfigurationContext lcc, StrategyControlUpdateListener scul) { null }
 
 	/**
 	 * Encode the user choice in a string that can be saved in a launch configuration.
@@ -58,5 +58,10 @@ class StrategyDefinition {
 	 * Initialise this strategy definition's control from the given configData
 	 */
 	def void initaliseControl(Control uiElement, String configData) {}
+
+	/**
+	 * Initialise this strategy definition's control from the given strategy
+	 */
+	def void initaliseControl(Control uiElement, Strategy strategy) {}
 
 }

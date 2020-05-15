@@ -41,6 +41,8 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
 	var EGraph modelGraph
 	var List<Rule> semanticRules
+	@Accessors(PUBLIC_GETTER)
+	var Module semantics
 	
 	// handling concurrent steps
 	var extension CPAHelper cpa
@@ -96,7 +98,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 
 		// Check validity
 		// Assume a direct link to a Henshin file
-		val semantics = semanticsResource.contents.head as Module
+		semantics = semanticsResource.contents.head as Module
 
 		if (!semantics.imports.contains(root.eClass.EPackage)) {
 			throw new IllegalArgumentException(

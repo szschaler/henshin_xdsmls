@@ -7,15 +7,21 @@ import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Text
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.Strategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyControlUpdateListener
 
 class MaxNumberOfStepsStrategyDefinition extends FilteringStrategyDefinition {
 	new() {
 		super("uk.ac.kcl.inf.xdsml.strategies.num_steps", "Max Number of Steps Strategy", MaxNumberOfStepsStrategy)
 	}
 
-	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
+	override getUIControl(Composite parent, LaunchConfigurationContext lcc, StrategyControlUpdateListener scul) {
 		val control = new Text(parent, SWT.SINGLE.bitwiseOr(SWT.BORDER))
 		control.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
+
+		if (scul !== null) {
+			control.addModifyListener[scul.controlUpdated(this)]
+		}
+
 		control
 	}
 
@@ -27,6 +33,15 @@ class MaxNumberOfStepsStrategyDefinition extends FilteringStrategyDefinition {
 			txt.text = num.toString
 		} catch (NumberFormatException nfe) {
 			txt.text = "0"
+		}
+	}
+
+	override void initaliseControl(Control uiElement, Strategy strategy) {
+		val txt = uiElement as Text
+		txt.text = ""
+
+		if (strategy instanceof MaxNumberOfStepsStrategy) {
+			txt.text = strategy.maxNumberOfSteps.toString
 		}
 	}
 

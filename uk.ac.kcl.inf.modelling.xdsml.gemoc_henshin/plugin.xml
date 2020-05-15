@@ -3,7 +3,7 @@
 <plugin>
 	<extension point="org.eclipse.debug.core.launchConfigurationTypes">
 		<launchConfigurationType
-			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.HenshinConcurrentEngineLauncher"
+			delegate="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.HenshinConcurrentEngineLauncher"
 			id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher"
 			modes="run,debug"
 			name="Henshin-Based Concurrent eXecutable Model"
@@ -13,9 +13,19 @@
 	</extension>
 	<extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
 		<launchConfigurationTabGroup
-        class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.LauncherTabGroup"
+        class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.LauncherTabGroup"
         id="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher.tabGroup"
         type="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.launcher">
 		</launchConfigurationTabGroup>
 	</extension>
+ <extension
+       point="org.eclipse.ui.views">
+    <view
+          category="org.eclipse.gemoc.executionframework.ui.category"
+          class="uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.strategy_selector.StrategySelectionView"
+          id="org.eclipse.gemoc.executionframework.engine.io.views.StrategySelectionView"
+          name="Strategy Selection"
+          restorable="true">
+    </view>
+ </extension>
 </plugin>

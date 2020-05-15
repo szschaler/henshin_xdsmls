@@ -9,6 +9,9 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.Strategy
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyControlUpdateListener
+import org.eclipse.swt.events.SelectionListener
+import org.eclipse.swt.events.SelectionEvent
 
 class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition {
 	new() {
@@ -16,7 +19,7 @@ class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition 
 			NonIdentityElementsStrategy)
 	}
 
-	override getUIControl(Composite parent, LaunchConfigurationContext lcc) {
+	override getUIControl(Composite parent, LaunchConfigurationContext lcc, StrategyControlUpdateListener scul) {
 		val control = new org.eclipse.swt.widgets.List(parent, SWT.MULTI.bitwiseOr(SWT.V_SCROLL).bitwiseOr(SWT.BORDER))
 		control.layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false)
 
@@ -25,6 +28,17 @@ class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition 
 		])
 
 		control.updateMetamodels(lcc.metamodels)
+		
+		if (scul !== null) {
+			control.addSelectionListener(new SelectionListener() {
+				
+				override widgetDefaultSelected(SelectionEvent e) { }
+				
+				override widgetSelected(SelectionEvent e) {
+					scul.controlUpdated(NonIdentityElementsStrategyDefinition.this)
+				}				
+			})
+		}
 
 		control
 	}
@@ -35,6 +49,15 @@ class NonIdentityElementsStrategyDefinition extends FilteringStrategyDefinition 
 			val namesToSelect = configData.split("@@")
 
 			list.select(#[0..list.itemCount-1].flatten.filter[namesToSelect.contains(list.items.get(it))])
+		}
+	}
+
+	override void initaliseControl(Control uiElement, Strategy strategy) {
+		val list = uiElement as org.eclipse.swt.widgets.List
+		list.setSelection(#[] as int[])
+		
+		if (strategy instanceof NonIdentityElementsStrategy) {
+			list.selection = strategy.nonIdentityTypes.map[name]
 		}
 	}
 

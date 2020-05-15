@@ -1,14 +1,14 @@
-package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher
+package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup
 import org.eclipse.debug.ui.CommonTab
 import org.eclipse.debug.ui.ILaunchConfigurationDialog
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.tabs.LaunchConfigurationMainTab
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.tabs.LaunchConfigurationBackendsTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationMainTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationBackendsTab
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import java.beans.PropertyChangeListener
 import org.eclipse.emf.henshin.model.Rule
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.launcher.tabs.LaunchConfigurationStrategiesTab
+import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationStrategiesTab
 
 /**
  * 
