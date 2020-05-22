@@ -3,7 +3,6 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 import fr.inria.diverse.melange.adapters.EObjectAdapter
 import java.beans.PropertyChangeListener
 import java.beans.PropertyChangeSupport
-import java.util.ArrayList
 import java.util.HashSet
 import java.util.List
 import java.util.Set
@@ -11,7 +10,6 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.henshin.interpreter.EGraph
 import org.eclipse.emf.henshin.interpreter.Engine
-import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.emf.henshin.interpreter.RuleApplication
 import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl
@@ -19,23 +17,21 @@ import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
 import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractInterpretingConcurrentExecutionEngine
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
-import org.eclipse.gemoc.trace.commons.model.generictrace.GenerictraceFactory
+import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
+import org.eclipse.gemoc.trace.commons.model.trace.ParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.StrategyDefinition.StrategyGroup
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.ConcurrencyStrategy
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.FilteringStrategy
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
  */
-class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
+class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
 	
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
@@ -47,28 +43,28 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	// handling concurrent steps
 	var extension CPAHelper cpa
 	
-	@Accessors
-	var List<ConcurrencyStrategy> concurrencyStrategies = new ArrayList<ConcurrencyStrategy>()
-	@Accessors
-	var List<FilteringStrategy> filteringStrategies = new ArrayList<FilteringStrategy>()
+//	@Accessors
+//	var List<ConcurrencyStrategy> concurrencyStrategies = new ArrayList<ConcurrencyStrategy>()
+//	@Accessors
+//	var List<FilteringStrategy> filteringStrategies = new ArrayList<FilteringStrategy>()
 	
 	val lcc = new LCC(this)
 
 	new(HenshinConcurrentExecutionContext executionContext) {
 		initialize(executionContext)
 		
-		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
-		
-		config.getStrategies.forEach[extension hd | 
-			val h = hd.instantiate
-			h.initialise(config.getConfigDetailFor(hd), lcc)
-			
-			if (hd.group === StrategyGroup.FILTERING_STRATEGY) {
-				filteringStrategies.add(h as FilteringStrategy)
-			} else {
-				concurrencyStrategies.add(h as ConcurrencyStrategy)
-			}
-		]
+//		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
+//		
+//		config.getStrategies.forEach[extension hd | 
+//			val h = hd.instantiate
+//			h.initialise(config.getConfigDetailFor(hd), lcc)
+//			
+//			if (hd.group === StrategyGroup.FILTERING_STRATEGY) {
+//				filteringStrategies.add(h as FilteringStrategy)
+//			} else {
+//				concurrencyStrategies.add(h as ConcurrencyStrategy)
+//			}
+//		]
     }
 
 	/**
@@ -117,37 +113,64 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		lcc.configured	
 	}
 
-	/**
-	 * Compute and create all possible steps by finding rule matches and generate concurrent steps
-	 * 
-	 * @return a list of possible steps
-	 */
-	override protected computePossibleLogicalSteps() {
-		extension val traceFactory = GenerictraceFactory.eINSTANCE 
-		
-		var possibleLogicalSteps = new ArrayList<Step<?>>()
-
-		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
-
-		// TODO: For some rule sets we cannot calculate critical pairs. In that case, concurrency analysis is not supported yet.
-		if (cpa !== null) {
-			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
-				if(seq.length > 1) {
-					createGenericParallelStep => [
-						subSteps+= seq.map[m | new HenshinStep(m)]
-					]
-				}].filterNull)
-		}
-
-		possibleLogicalSteps.addAll(atomicMatches.map[m|
-			// Concurrent engine expects everything to be a parallel step
-			createGenericParallelStep => [
-				subSteps += new HenshinStep(m)
-			]
-		])
-
-		possibleLogicalSteps.filterByStrategies		
+	override getSemanticRules() {
+		semanticRules.map[name].toSet
 	}
+	
+	override getAbstractSyntax() {
+		semantics.imports.toSet
+	}
+
+	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
+		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
+	}
+	
+	override boolean canInitiallyRunConcurrently(Step<?> s1, Step<?> s2) {
+		if (s1 instanceof HenshinStep) {
+			if (s2 instanceof HenshinStep) {
+				if (cpa !== null) {
+					return ! (s1.match.conflictsWith(s2.match))
+				} else {
+					// We don't know whether we can run these steps in parallel, so we're playing it safe
+					return false				
+				}
+			}
+		}
+		
+		throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
+	}
+
+//	/**
+//	 * Compute and create all possible steps by finding rule matches and generate concurrent steps
+//	 * 
+//	 * @return a list of possible steps
+//	 */
+//	override protected computePossibleLogicalSteps() {
+//		extension val traceFactory = GenerictraceFactory.eINSTANCE 
+//		
+//		var possibleLogicalSteps = new ArrayList<Step<?>>()
+//
+//		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
+//
+//		// TODO: For some rule sets we cannot calculate critical pairs. In that case, concurrency analysis is not supported yet.
+//		if (cpa !== null) {
+//			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
+//				if(seq.length > 1) {
+//					createGenericParallelStep => [
+//						subSteps+= seq.map[m | new HenshinStep(m)]
+//					]
+//				}].filterNull)
+//		}
+//
+//		possibleLogicalSteps.addAll(atomicMatches.map[m|
+//			// Concurrent engine expects everything to be a parallel step
+//			createGenericParallelStep => [
+//				subSteps += new HenshinStep(m)
+//			]
+//		])
+//
+//		possibleLogicalSteps.filterByStrategies		
+//	}
 	
 	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
 		val henshinStep = smallStep as HenshinStep
@@ -161,7 +184,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		}
 	}
 
-	override protected doAfterLogicalStepExecution(Step<?> logicalStep) { }
+	override protected doAfterLogicalStepExecution(ParallelStep<?, ?> logicalStep) { }
 	
 	override protected finishDispose() { }
 	
@@ -184,71 +207,71 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		true
 	}
 	
-	/**
-	 * Generate all possible maximally concurrent steps
-	 * 
-	 * @param matchList all current atomic matches
-	 */
-	private def generateConcurrentSteps(List<Match> matchList) {
-		var possibleSequences = new HashSet<Set<Match>>;
+//	/**
+//	 * Generate all possible maximally concurrent steps
+//	 * 
+//	 * @param matchList all current atomic matches
+//	 */
+//	private def generateConcurrentSteps(List<Match> matchList) {
+//		var possibleSequences = new HashSet<Set<Match>>;
+//
+//		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
+//		
+//		possibleSequences
+//	}
 
-		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
-		
-		possibleSequences
-	}
-
-	/**
-	 * Recursively explore all matches, check if they have conflicts and create max valid rule sequence
-	 * 
-	 * @param a list of all matches, a list of lists of all possible sequences, current stack
-	 */
-	private def void createAllStepSequences(List<Match> allMatches, Set<Set<Match>> possibleSequences,
-		HashSet<Match> currentStack) {
-		var foundOne = false;
-		for (Match m : allMatches) {
-			if (!currentStack.contains(m)) {
-				if (!hasConflicts(m, currentStack)) {
-					foundOne = true;
-					currentStack.add(m);
-					var clonedStack = currentStack.clone() as HashSet<Match>;
-					createAllStepSequences(allMatches, possibleSequences, clonedStack);
-					currentStack.remove(m);
-				}
-			}
-		}
-		if (!foundOne) {
-			possibleSequences.add(currentStack);
-		}
-	}
+//	/**
+//	 * Recursively explore all matches, check if they have conflicts and create max valid rule sequence
+//	 * 
+//	 * @param a list of all matches, a list of lists of all possible sequences, current stack
+//	 */
+//	private def void createAllStepSequences(List<Match> allMatches, Set<Set<Match>> possibleSequences,
+//		HashSet<Match> currentStack) {
+//		var foundOne = false;
+//		for (Match m : allMatches) {
+//			if (!currentStack.contains(m)) {
+//				if (!hasConflicts(m, currentStack)) {
+//					foundOne = true;
+//					currentStack.add(m);
+//					var clonedStack = currentStack.clone() as HashSet<Match>;
+//					createAllStepSequences(allMatches, possibleSequences, clonedStack);
+//					currentStack.remove(m);
+//				}
+//			}
+//		}
+//		if (!foundOne) {
+//			possibleSequences.add(currentStack);
+//		}
+//	}
 	
-	/**
-	 * Check if a match has conflicts with a set of other matches
-	 * 
-	 * @param match and a list of matches
-	 */
-	private def hasConflicts(Match match, HashSet<Match> matches) {
-		matches.exists[m|match.cannotRunConcurrently(m)]
-	}
+//	/**
+//	 * Check if a match has conflicts with a set of other matches
+//	 * 
+//	 * @param match and a list of matches
+//	 */
+//	private def hasConflicts(Match match, HashSet<Match> matches) {
+//		matches.exists[m|match.cannotRunConcurrently(m)]
+//	}
 	
-	/**
-	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
-	 * conflict based on the CPA analysis. Then checks if all concurrency strategies agree 
-	 * that they should be run in parallel.
-	 * 
-	 * @param match1 and match2
-	 * 
-	 * @output true if the two matches should not run in parallel
-	 */
-	private def cannotRunConcurrently(Match match1, Match match2) {
-		match1.conflictsWith(match2) || concurrencyStrategies.exists[ch|!ch.canBeConcurrent(match1, match2)]
-	}
+//	/**
+//	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
+//	 * conflict based on the CPA analysis. Then checks if all concurrency strategies agree 
+//	 * that they should be run in parallel.
+//	 * 
+//	 * @param match1 and match2
+//	 * 
+//	 * @output true if the two matches should not run in parallel
+//	 */
+//	private def cannotRunConcurrently(Match match1, Match match2) {
+//		match1.conflictsWith(match2) || concurrencyStrategies.exists[ch|!ch.canBeConcurrent(match1, match2)]
+//	}
 	
-	/**
-	 * Return a list of steps filtered by all filtering strategies
-	 */	
-	private def filterByStrategies(List<Step<?>> possibleSteps) {
-		filteringStrategies.fold(possibleSteps, [steps, fh | fh.filter(steps)])
-	}
+//	/**
+//	 * Return a list of steps filtered by all filtering strategies
+//	 */	
+//	private def filterByStrategies(List<Step<?>> possibleSteps) {
+//		filteringStrategies.fold(possibleSteps, [steps, fh | fh.filter(steps)])
+//	}
 	
 	private static class LCC implements LaunchConfigurationContext {
 		
@@ -286,6 +309,4 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		}
 		
 	}
-	
-	
 }
