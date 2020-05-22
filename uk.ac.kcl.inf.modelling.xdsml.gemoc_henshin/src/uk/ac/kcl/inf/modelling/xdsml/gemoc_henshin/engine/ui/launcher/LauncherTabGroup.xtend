@@ -1,14 +1,13 @@
 package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
+import java.beans.PropertyChangeListener
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup
 import org.eclipse.debug.ui.CommonTab
 import org.eclipse.debug.ui.ILaunchConfigurationDialog
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationMainTab
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationBackendsTab
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
-import java.beans.PropertyChangeListener
-import org.eclipse.emf.henshin.model.Rule
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher.tabs.LaunchConfigurationStrategiesTab
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationBackendsTab
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationMainTab
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.tabs.LaunchConfigurationStrategiesTab
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
 
 /**
  * 
@@ -37,7 +36,7 @@ class LauncherTabGroup extends AbstractLaunchConfigurationTabGroup {
 				override getSemantics() {
 					val semantics = mainTab.semantics
 					
-					if (semantics !== null) semantics.units.filter(Rule).toList else emptyList
+					if (semantics !== null) semantics else emptySet
 				}
 				
 				override addSemanticsChangeListener(PropertyChangeListener pcl) {

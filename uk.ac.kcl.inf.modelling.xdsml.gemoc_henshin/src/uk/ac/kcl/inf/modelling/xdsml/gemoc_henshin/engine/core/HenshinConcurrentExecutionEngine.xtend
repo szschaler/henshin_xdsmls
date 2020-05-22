@@ -17,6 +17,7 @@ import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
 import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractInterpretingConcurrentExecutionEngine
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
@@ -25,7 +26,6 @@ import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
-import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.strategies.LaunchConfigurationContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 
 /**
@@ -283,9 +283,9 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		
 		override getMetamodels() {
 			if (engine.modelGraph !== null) {
-				engine.modelGraph.roots.flatMap[eo | eo.eClass.eResource.contents.filter(EPackage)].toList				
+				engine.modelGraph.roots.flatMap[eo | eo.eClass.eResource.contents.filter(EPackage)].toSet				
 			} else {
-				emptyList
+				emptySet
 			}
 		}
 		
@@ -301,7 +301,7 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		}
 		
 		override getSemantics() {
-			engine.semanticRules
+			engine.semanticRules.map[name].toSet
 		}
 		
 		override addSemanticsChangeListener(PropertyChangeListener pcl) {
