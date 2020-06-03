@@ -107,13 +107,13 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
 	}
 
-	override createClonedSmallStep(GenericSmallStep gss) {
-		if (gss instanceof HenshinStep) {
-			new HenshinStep(gss.match)
+	override createClonedSmallStep(SmallStep<?> ss) {
+		if (ss instanceof HenshinStep) {
+			new HenshinStep(ss.match)
 		}
 	}
 
-	override isEqualSmallStepTo(GenericSmallStep step1, GenericSmallStep step2) {
+	override isEqualSmallStepTo(SmallStep<?> step1, SmallStep<?> step2) {
 		if (step1 instanceof HenshinStep) {
 			if (step2 instanceof HenshinStep) {
 				return step1.match == step2.match
