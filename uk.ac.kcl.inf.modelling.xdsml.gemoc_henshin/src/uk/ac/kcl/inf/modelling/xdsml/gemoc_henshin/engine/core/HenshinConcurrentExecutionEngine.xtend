@@ -123,6 +123,12 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 
 	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
 		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
+	}	
+	
+	override createClonedSmallStep(GenericSmallStep gss) {
+		if (gss instanceof HenshinStep) {
+			new HenshinStep(gss.match)
+		}
 	}
 	
 	override boolean canInitiallyRunConcurrently(Step<?> s1, Step<?> s2) {
@@ -309,4 +315,5 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		}
 		
 	}
+	
 }
