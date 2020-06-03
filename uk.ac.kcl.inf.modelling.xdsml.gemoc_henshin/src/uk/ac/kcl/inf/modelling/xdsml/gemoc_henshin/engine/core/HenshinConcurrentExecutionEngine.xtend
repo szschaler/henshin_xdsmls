@@ -23,7 +23,6 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.Co
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.ParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
-import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
@@ -43,27 +42,11 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 	// handling concurrent steps
 	var extension CPAHelper cpa
 
-//	@Accessors
-//	var List<ConcurrencyStrategy> concurrencyStrategies = new ArrayList<ConcurrencyStrategy>()
-//	@Accessors
-//	var List<FilteringStrategy> filteringStrategies = new ArrayList<FilteringStrategy>()
 	val lcc = new LCC(this)
 
 	new(HenshinConcurrentExecutionContext executionContext) {
+		// TODO: This seems odd. Why does this have to be here rather than in a superclass?
 		initialize(executionContext)
-
-//		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
-//		
-//		config.getStrategies.forEach[extension hd | 
-//			val h = hd.instantiate
-//			h.initialise(config.getConfigDetailFor(hd), lcc)
-//			
-//			if (hd.group === StrategyGroup.FILTERING_STRATEGY) {
-//				filteringStrategies.add(h as FilteringStrategy)
-//			} else {
-//				concurrencyStrategies.add(h as ConcurrencyStrategy)
-//			}
-//		]
 	}
 
 	/**
@@ -140,7 +123,7 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		false
 	}
 
-	override boolean canInitiallyRunConcurrently(Step<?> s1, Step<?> s2) {
+	override boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
 		if (s1 instanceof HenshinStep) {
 			if (s2 instanceof HenshinStep) {
 				if (cpa !== null) {
@@ -155,37 +138,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
 	}
 
-//	/**
-//	 * Compute and create all possible steps by finding rule matches and generate concurrent steps
-//	 * 
-//	 * @return a list of possible steps
-//	 */
-//	override protected computePossibleLogicalSteps() {
-//		extension val traceFactory = GenerictraceFactory.eINSTANCE 
-//		
-//		var possibleLogicalSteps = new ArrayList<Step<?>>()
-//
-//		val atomicMatches = semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].toList
-//
-//		// TODO: For some rule sets we cannot calculate critical pairs. In that case, concurrency analysis is not supported yet.
-//		if (cpa !== null) {
-//			possibleLogicalSteps.addAll(atomicMatches.generateConcurrentSteps.map[seq| 
-//				if(seq.length > 1) {
-//					createGenericParallelStep => [
-//						subSteps+= seq.map[m | new HenshinStep(m)]
-//					]
-//				}].filterNull)
-//		}
-//
-//		possibleLogicalSteps.addAll(atomicMatches.map[m|
-//			// Concurrent engine expects everything to be a parallel step
-//			createGenericParallelStep => [
-//				subSteps += new HenshinStep(m)
-//			]
-//		])
-//
-//		possibleLogicalSteps.filterByStrategies		
-//	}
 	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
 		val henshinStep = smallStep as HenshinStep
 
@@ -222,67 +174,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		true
 	}
 
-//	/**
-//	 * Generate all possible maximally concurrent steps
-//	 * 
-//	 * @param matchList all current atomic matches
-//	 */
-//	private def generateConcurrentSteps(List<Match> matchList) {
-//		var possibleSequences = new HashSet<Set<Match>>;
-//
-//		createAllStepSequences(matchList, possibleSequences, new HashSet<Match>);
-//		
-//		possibleSequences
-//	}
-//	/**
-//	 * Recursively explore all matches, check if they have conflicts and create max valid rule sequence
-//	 * 
-//	 * @param a list of all matches, a list of lists of all possible sequences, current stack
-//	 */
-//	private def void createAllStepSequences(List<Match> allMatches, Set<Set<Match>> possibleSequences,
-//		HashSet<Match> currentStack) {
-//		var foundOne = false;
-//		for (Match m : allMatches) {
-//			if (!currentStack.contains(m)) {
-//				if (!hasConflicts(m, currentStack)) {
-//					foundOne = true;
-//					currentStack.add(m);
-//					var clonedStack = currentStack.clone() as HashSet<Match>;
-//					createAllStepSequences(allMatches, possibleSequences, clonedStack);
-//					currentStack.remove(m);
-//				}
-//			}
-//		}
-//		if (!foundOne) {
-//			possibleSequences.add(currentStack);
-//		}
-//	}
-//	/**
-//	 * Check if a match has conflicts with a set of other matches
-//	 * 
-//	 * @param match and a list of matches
-//	 */
-//	private def hasConflicts(Match match, HashSet<Match> matches) {
-//		matches.exists[m|match.cannotRunConcurrently(m)]
-//	}
-//	/**
-//	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
-//	 * conflict based on the CPA analysis. Then checks if all concurrency strategies agree 
-//	 * that they should be run in parallel.
-//	 * 
-//	 * @param match1 and match2
-//	 * 
-//	 * @output true if the two matches should not run in parallel
-//	 */
-//	private def cannotRunConcurrently(Match match1, Match match2) {
-//		match1.conflictsWith(match2) || concurrencyStrategies.exists[ch|!ch.canBeConcurrent(match1, match2)]
-//	}
-//	/**
-//	 * Return a list of steps filtered by all filtering strategies
-//	 */	
-//	private def filterByStrategies(List<Step<?>> possibleSteps) {
-//		filteringStrategies.fold(possibleSteps, [steps, fh | fh.filter(steps)])
-//	}
 	private static class LCC implements LaunchConfigurationContext {
 
 		val HenshinConcurrentExecutionEngine engine
