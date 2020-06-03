@@ -32,27 +32,26 @@ import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
  */
 class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
-	
+
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
 	var EGraph modelGraph
 	var List<Rule> semanticRules
 	@Accessors(PUBLIC_GETTER)
 	var Module semantics
-	
+
 	// handling concurrent steps
 	var extension CPAHelper cpa
-	
+
 //	@Accessors
 //	var List<ConcurrencyStrategy> concurrencyStrategies = new ArrayList<ConcurrencyStrategy>()
 //	@Accessors
 //	var List<FilteringStrategy> filteringStrategies = new ArrayList<FilteringStrategy>()
-	
 	val lcc = new LCC(this)
 
 	new(HenshinConcurrentExecutionContext executionContext) {
 		initialize(executionContext)
-		
+
 //		val config = executionContext.getRunConfiguration() as HenshinConcurrentRunConfiguration
 //		
 //		config.getStrategies.forEach[extension hd | 
@@ -65,14 +64,14 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //				concurrencyStrategies.add(h as ConcurrencyStrategy)
 //			}
 //		]
-    }
+	}
 
 	/**
 	 * Get the engine  name
 	 * @return a user display name for the engine kind 
 	 */
 	override String engineKindName() '''Henshin Concurrent xDSML Engine'''
-	
+
 	/**
 	 * Here, we extract information about the model that we're asked to run as well as about the language semantics.
 	 * Code mostly copied from the sequential engine(Zschaler), except for where marked
@@ -90,7 +89,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		val entryPoint = _executionContext.runConfiguration.languageName
 		val resourceSet = new XtextResourceSet
 		val semanticsResource = resourceSet.getResource(URI.createPlatformResourceURI(entryPoint, false), true)
-		
 
 		// Check validity
 		// Assume a direct link to a Henshin file
@@ -104,33 +102,44 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		semanticRules = semantics.units.filter(Rule).filter[r|r.checkParameters].toList
 
 		try {
-			cpa = new CPAHelper(new HashSet<Rule>(semanticRules))		
+			cpa = new CPAHelper(new HashSet<Rule>(semanticRules))
 		} catch (Throwable t) {
 			cpa = null
-			System.err.println("Error when trying to calculate critical pairs: " + t.message + ". Ignoring and disabling concurrent steps.")
+			System.err.println("Error when trying to calculate critical pairs: " + t.message +
+				". Ignoring and disabling concurrent steps.")
 		}
-	
-		lcc.configured	
+
+		lcc.configured
 	}
 
 	override getSemanticRules() {
 		semanticRules.map[name].toSet
 	}
-	
+
 	override getAbstractSyntax() {
 		semantics.imports.toSet
 	}
 
 	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
 		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
-	}	
-	
+	}
+
 	override createClonedSmallStep(GenericSmallStep gss) {
 		if (gss instanceof HenshinStep) {
 			new HenshinStep(gss.match)
 		}
 	}
-	
+
+	override isEqualSmallStepTo(GenericSmallStep step1, GenericSmallStep step2) {
+		if (step1 instanceof HenshinStep) {
+			if (step2 instanceof HenshinStep) {
+				return step1.match == step2.match
+			}
+		}
+
+		false
+	}
+
 	override boolean canInitiallyRunConcurrently(Step<?> s1, Step<?> s2) {
 		if (s1 instanceof HenshinStep) {
 			if (s2 instanceof HenshinStep) {
@@ -138,11 +147,11 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 					return ! (s1.match.conflictsWith(s2.match))
 				} else {
 					// We don't know whether we can run these steps in parallel, so we're playing it safe
-					return false				
+					return false
 				}
 			}
 		}
-		
+
 		throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
 	}
 
@@ -177,23 +186,23 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //
 //		possibleLogicalSteps.filterByStrategies		
 //	}
-	
 	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
 		val henshinStep = smallStep as HenshinStep
-		
+
 		ruleRunner.EGraph = modelGraph
 		ruleRunner.rule = henshinStep.match.rule
 		ruleRunner.completeMatch = henshinStep.match
-		
+
 		if (!ruleRunner.execute(null)) {
-				throw new CodeExecutionException('''Couldn't apply rule «henshinStep.match.rule.name».''', henshinStep.mseoccurrence)
+			throw new CodeExecutionException('''Couldn't apply rule «henshinStep.match.rule.name».''',
+				henshinStep.mseoccurrence)
 		}
 	}
 
-	override protected doAfterLogicalStepExecution(ParallelStep<?, ?> logicalStep) { }
-	
-	override protected finishDispose() { }
-	
+	override protected doAfterLogicalStepExecution(ParallelStep<?, ?> logicalStep) {}
+
+	override protected finishDispose() {}
+
 	/**
 	 * Check if a rule has no parameters
 	 * 
@@ -212,7 +221,7 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 
 		true
 	}
-	
+
 //	/**
 //	 * Generate all possible maximally concurrent steps
 //	 * 
@@ -225,7 +234,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //		
 //		possibleSequences
 //	}
-
 //	/**
 //	 * Recursively explore all matches, check if they have conflicts and create max valid rule sequence
 //	 * 
@@ -249,7 +257,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //			possibleSequences.add(currentStack);
 //		}
 //	}
-	
 //	/**
 //	 * Check if a match has conflicts with a set of other matches
 //	 * 
@@ -258,7 +265,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //	private def hasConflicts(Match match, HashSet<Match> matches) {
 //		matches.exists[m|match.cannotRunConcurrently(m)]
 //	}
-	
 //	/**
 //	 * Check if two matches cannot be executed in parallel. First checks if the two matches 
 //	 * conflict based on the CPA analysis. Then checks if all concurrency strategies agree 
@@ -271,49 +277,46 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 //	private def cannotRunConcurrently(Match match1, Match match2) {
 //		match1.conflictsWith(match2) || concurrencyStrategies.exists[ch|!ch.canBeConcurrent(match1, match2)]
 //	}
-	
 //	/**
 //	 * Return a list of steps filtered by all filtering strategies
 //	 */	
 //	private def filterByStrategies(List<Step<?>> possibleSteps) {
 //		filteringStrategies.fold(possibleSteps, [steps, fh | fh.filter(steps)])
 //	}
-	
 	private static class LCC implements LaunchConfigurationContext {
-		
+
 		val HenshinConcurrentExecutionEngine engine
-		
+
 		new(HenshinConcurrentExecutionEngine engine) {
 			this.engine = engine
 		}
-		
+
 		override getMetamodels() {
 			if (engine.modelGraph !== null) {
-				engine.modelGraph.roots.flatMap[eo | eo.eClass.eResource.contents.filter(EPackage)].toSet				
+				engine.modelGraph.roots.flatMap[eo|eo.eClass.eResource.contents.filter(EPackage)].toSet
 			} else {
 				emptySet
 			}
 		}
-		
+
 		val pcs = new PropertyChangeSupport(this)
-		
+
 		override addMetamodelChangeListener(PropertyChangeListener pcl) {
 			pcs.addPropertyChangeListener("metamodel", pcl)
 		}
-		
+
 		def configured() {
 			pcs.firePropertyChange("metamodel", null, metamodels)
 			pcs.firePropertyChange("semantics", null, semantics)
 		}
-		
+
 		override getSemantics() {
 			engine.semanticRules.map[name].toSet
 		}
-		
+
 		override addSemanticsChangeListener(PropertyChangeListener pcl) {
 			pcs.addPropertyChangeListener("semantics", pcl)
 		}
-		
+
 	}
-	
 }
