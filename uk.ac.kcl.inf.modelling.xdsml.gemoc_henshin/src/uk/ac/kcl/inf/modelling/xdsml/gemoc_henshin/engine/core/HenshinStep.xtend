@@ -65,6 +65,8 @@ class HenshinStep extends GenericSmallStepImpl {
 	 * concat the rule names for display purposes of the concurrent steps
 	 * @param a match, string of the rule/s name/s and string of all matched objects or again rule names
 	 */
+	// TODO: Should rethink how we're generating / reusing MSEs
+	// TODO: Should rethink whether we need to make all node targets into parameters, now that these are documented via the footprint
 	def generateMSE(Match match, String name, String name2) {
 		val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
 		mse.setCallerReference(match.mainObject)
