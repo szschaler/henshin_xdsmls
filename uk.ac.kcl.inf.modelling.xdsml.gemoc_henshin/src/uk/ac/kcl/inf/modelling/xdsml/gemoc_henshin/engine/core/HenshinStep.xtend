@@ -4,6 +4,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EcoreFactory
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
+import org.eclipse.gemoc.trace.commons.model.trace.TraceFactory
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
 import org.eclipse.xtend.lib.annotations.Accessors
 
@@ -25,6 +26,25 @@ class HenshinStep extends GenericSmallStepImpl {
 	new(Match match) {
 		super()
 		this.match = match
+
+		footprint = TraceFactory.eINSTANCE.createFootprint => [
+			val rule = match.rule
+			val accessedNodes = rule.lhs.nodes
+
+			// TODO: Should probably include edges, too.
+			accesses += accessedNodes.map[n|match.getNodeTarget(n)]
+
+			val changedNodes = accessedNodes.filter [ n |
+				val image = rule.mappings.getImage(n, rule.rhs)
+				// TODO: Should consider edge changes, too.
+				(image === null) || (image.attributes.exists[a|rule.mappings.getOrigin(a).value != a.value])
+			]
+			// TODO: Should probably include edges, too.
+			changes += changedNodes.map[n|match.getNodeTarget(n)]
+
+			val newNodes = rule.rhs.nodes.filter[n|rule.mappings.getOrigin(n) === null]
+			instantiations += newNodes.map[eClass]
+		]
 	}
 
 	/**
