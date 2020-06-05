@@ -43,7 +43,7 @@ class HenshinStep extends GenericSmallStepImpl {
 			changes += changedNodes.map[n|match.getNodeTarget(n)]
 
 			val newNodes = rule.rhs.nodes.filter[n|rule.mappings.getOrigin(n) === null]
-			instantiations += newNodes.map[eClass]
+			instantiations += newNodes.map[type]
 		]
 	}
 
