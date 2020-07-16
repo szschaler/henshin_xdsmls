@@ -23,6 +23,7 @@ import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.Co
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.ParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
+import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
@@ -107,20 +108,26 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
 	}
 
-	override createClonedSmallStep(SmallStep<?> ss) {
-		if (ss instanceof HenshinStep) {
-			new HenshinStep(ss.match)
-		}
-	}
-
-	override isEqualSmallStepTo(SmallStep<?> step1, SmallStep<?> step2) {
-		if (step1 instanceof HenshinStep) {
-			if (step2 instanceof HenshinStep) {
-				return step1.match == step2.match
+	private static class HenshinStepFactory extends StepFactory {
+		override createClonedInnerStep(Step<?> ss) {
+			if (ss instanceof HenshinStep) {
+				new HenshinStep(ss.match)
 			}
 		}
-
-		false
+	
+		override isEqualInnerStepTo(Step<?> step1, Step<?> step2) {
+			if (step1 instanceof HenshinStep) {
+				if (step2 instanceof HenshinStep) {
+					return step1.match == step2.match
+				}
+			}
+	
+			false
+		}		
+	}
+	
+	override createStepFactory() {
+		new HenshinStepFactory
 	}
 
 	override boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
