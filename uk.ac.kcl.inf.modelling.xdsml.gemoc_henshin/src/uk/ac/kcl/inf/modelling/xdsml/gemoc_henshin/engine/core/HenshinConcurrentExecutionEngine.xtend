@@ -130,25 +130,21 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		new HenshinStepFactory
 	}
 
+	private var int varCounter = 0
+	private def String freshName() '''var_«varCounter++»'''
+
 	override protected computeInitialLogicalSteps() {
 		val steps = computePossibleSmallSteps
 
 		val symbolicSteps = new Model
 
-		val stepVars = steps.map[s|new SmallStepVariable("", symbolicSteps, s)]
+		val stepVars = steps.map[s|new SmallStepVariable(freshName, symbolicSteps, s)].toList
 		
 		val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
 
 
 		// Build the or combination of all small steps
-		symbolicSteps.addClausesBoolOrArrayEqualTrue(stepVars)
-//		stepVars.fold(null as ReExpression) [ acc, ssv |
-//			if (acc !== null) {
-//				acc.or(ssv)
-//			} else {
-//				ssv
-//			}
-//		].decompose.post
+		symbolicSteps.addClauses(or(stepVars))
 
 		// where steps exclude each other because of CPA, add exclusion constraints
 		if (cpa !== null) {
@@ -158,7 +154,6 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 						val s1Var = varMap.get(s1)
 						val s2Var = varMap.get(s2)
 						
-//						s1Var.eq(1).imp(s2Var.eq(0)).and(s2Var.eq(1).imp(s1Var.eq(0))).decompose.post
 						symbolicSteps.addClausesAtMostOne(#[s1Var, s2Var])
 					}
 				]
@@ -173,18 +168,22 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 	}
 
 	private def boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
-		if (s1 instanceof HenshinStep) {
-			if (s2 instanceof HenshinStep) {
-				if (cpa !== null) {
-					return ! (s1.match.conflictsWith(s2.match))
-				} else {
-					// We don't know whether we can run these steps in parallel, so we're playing it safe
-					return false
+		if (s1 !== s2) {				
+			if (s1 instanceof HenshinStep) {
+				if (s2 instanceof HenshinStep) {
+					if (cpa !== null) {
+						return ! (s1.match.conflictsWith(s2.match))
+					} else {
+						// We don't know whether we can run these steps in parallel, so we're playing it safe
+						return false
+					}
 				}
 			}
+			
+			throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
+		} else {
+			return true
 		}
-
-		throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
 	}
 
 	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
