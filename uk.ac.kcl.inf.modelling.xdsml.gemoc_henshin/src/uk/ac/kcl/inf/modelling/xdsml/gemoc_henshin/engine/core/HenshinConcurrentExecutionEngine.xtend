@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport
 import java.util.HashSet
 import java.util.List
 import java.util.Set
+import org.chocosolver.solver.Model
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.henshin.interpreter.EGraph
@@ -20,6 +21,7 @@ import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractInterpretingConcurrentExecutionEngine
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
+import org.eclipse.gemoc.execution.concurrent.symbolic.SmallStepVariable
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.ParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
@@ -27,6 +29,7 @@ import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
+import org.chocosolver.solver.expression.discrete.relational.ReExpression
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
@@ -104,33 +107,68 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		semantics.imports.toSet
 	}
 
-	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
-		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
-	}
-
 	private static class HenshinStepFactory extends StepFactory {
 		override createClonedInnerStep(Step<?> ss) {
 			if (ss instanceof HenshinStep) {
 				new HenshinStep(ss.match)
 			}
 		}
-	
+
 		override isEqualInnerStepTo(Step<?> step1, Step<?> step2) {
 			if (step1 instanceof HenshinStep) {
 				if (step2 instanceof HenshinStep) {
 					return step1.match == step2.match
 				}
 			}
-	
+
 			false
-		}		
+		}
 	}
-	
+
 	override createStepFactory() {
 		new HenshinStepFactory
 	}
 
-	override boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
+	override protected computeInitialLogicalSteps() {
+		val steps = computePossibleSmallSteps
+
+		val symbolicSteps = new Model
+
+		val stepVars = steps.map[s|new SmallStepVariable("", symbolicSteps, s)]
+		
+		val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
+
+		// Build the or combination of all small steps
+		stepVars.fold(null as ReExpression) [ acc, ssv |
+			if (acc !== null) {
+				acc.or(ssv)
+			} else {
+				ssv
+			}
+		].extension.post
+
+		// where steps exclude each other because of CPA, add exclusion constraints
+		if (cpa !== null) {
+			steps.forEach[s1 |
+				steps.forEach[s2 |
+					if (!canInitiallyRunConcurrently(s1, s2)) {
+						val s1Var = varMap.get(s1)
+						val s2Var = varMap.get(s2)
+						
+						s1Var.eq(1).imp(s2Var.eq(0)).and(s2Var.eq(1).imp(s1Var.eq(0))).extension.post
+					}
+				]
+			]
+		}
+		
+		symbolicSteps
+	}
+
+	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
+		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
+	}
+
+	private def boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
 		if (s1 instanceof HenshinStep) {
 			if (s2 instanceof HenshinStep) {
 				if (cpa !== null) {
