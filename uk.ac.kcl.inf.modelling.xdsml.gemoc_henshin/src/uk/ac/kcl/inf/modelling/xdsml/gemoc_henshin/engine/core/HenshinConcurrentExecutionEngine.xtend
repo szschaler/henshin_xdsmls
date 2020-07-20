@@ -30,6 +30,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
 import org.chocosolver.solver.expression.discrete.relational.ReExpression
+import static org.chocosolver.solver.constraints.nary.cnf.LogOp.*
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
@@ -138,14 +139,16 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		
 		val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
 
+
 		// Build the or combination of all small steps
-		stepVars.fold(null as ReExpression) [ acc, ssv |
-			if (acc !== null) {
-				acc.or(ssv)
-			} else {
-				ssv
-			}
-		].extension.post
+		symbolicSteps.addClausesBoolOrArrayEqualTrue(stepVars)
+//		stepVars.fold(null as ReExpression) [ acc, ssv |
+//			if (acc !== null) {
+//				acc.or(ssv)
+//			} else {
+//				ssv
+//			}
+//		].decompose.post
 
 		// where steps exclude each other because of CPA, add exclusion constraints
 		if (cpa !== null) {
@@ -155,7 +158,8 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 						val s1Var = varMap.get(s1)
 						val s2Var = varMap.get(s2)
 						
-						s1Var.eq(1).imp(s2Var.eq(0)).and(s2Var.eq(1).imp(s1Var.eq(0))).extension.post
+//						s1Var.eq(1).imp(s2Var.eq(0)).and(s2Var.eq(1).imp(s1Var.eq(0))).decompose.post
+						symbolicSteps.addClausesAtMostOne(#[s1Var, s2Var])
 					}
 				]
 			]
