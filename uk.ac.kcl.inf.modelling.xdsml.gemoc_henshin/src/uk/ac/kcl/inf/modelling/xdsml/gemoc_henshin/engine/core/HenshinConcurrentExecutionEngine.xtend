@@ -116,14 +116,14 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 			}
 		}
 
-		override isEqualInnerStepTo(Step<?> step1, Step<?> step2) {
+		override compare(Step<?> step1, Step<?> step2) {
 			if (step1 instanceof HenshinStep) {
 				if (step2 instanceof HenshinStep) {
-					return step1.match == step2.match
+					if (step1.match == step2.match) return 0
 				}
 			}
 
-			false
+			return -1
 		}
 	}
 
