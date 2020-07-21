@@ -19,7 +19,8 @@ import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
 import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractInterpretingConcurrentExecutionEngine
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine.StepFactory
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
 import org.eclipse.gemoc.execution.concurrent.symbolic.SmallStepVariable
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
@@ -29,13 +30,13 @@ import org.eclipse.gemoc.trace.commons.model.trace.Step
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.util.CPAHelper
-import org.chocosolver.solver.expression.discrete.relational.ReExpression
+
 import static org.chocosolver.solver.constraints.nary.cnf.LogOp.*
 
 /**
  * Henshin Concurrent Execution Engine implementation class that handles the main workflow
  */
-class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
+class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine<HenshinConcurrentExecutionContext, HenshinConcurrentRunConfiguration> {
 
 	val Engine henshinEngine = new EngineImpl
 	val RuleApplication ruleRunner = new RuleApplicationImpl(henshinEngine)
@@ -130,7 +131,7 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		new HenshinStepFactory
 	}
 
-	private var int varCounter = 0
+	var int varCounter = 0
 	private def String freshName() '''var_«varCounter++»'''
 
 	override protected computeInitialLogicalSteps() {
@@ -163,7 +164,7 @@ class HenshinConcurrentExecutionEngine extends AbstractInterpretingConcurrentExe
 		symbolicSteps
 	}
 
-	override Set<? extends GenericSmallStep> computePossibleSmallSteps() {
+	private def Set<? extends GenericSmallStep> computePossibleSmallSteps() {
 		semanticRules.flatMap[r|henshinEngine.findMatches(r, modelGraph, null)].map[new HenshinStep(it)].toSet
 	}
 
