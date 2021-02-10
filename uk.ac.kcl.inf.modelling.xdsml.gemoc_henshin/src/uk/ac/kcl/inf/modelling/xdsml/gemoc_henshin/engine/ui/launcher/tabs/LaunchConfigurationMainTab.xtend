@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener
 import java.beans.PropertyChangeSupport
 import java.util.HashSet
 import java.util.List
+import java.util.Set
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IResource
@@ -381,7 +382,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implemen
 		}
 	}
 	
-	override getSemantics() { getRuleNameSet(semantics) }
+	override Set<String> getSemantics() { getRuleNameSet(semantics) }
 	
 	private def getRuleNameSet(Module semantics) {
 		if(semantics !== null) semantics.units.filter(Rule).map[name].toSet else emptySet
