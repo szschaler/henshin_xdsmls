@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener
 import java.beans.PropertyChangeSupport
 import java.util.HashSet
 import java.util.List
+import java.util.Set
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IResource
@@ -23,7 +24,8 @@ import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.ConcurrentRunConfiguration
+import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
+import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ConcurrentRunConfiguration
 import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.deciders.DeciderSpecificationExtensionPoint
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
@@ -42,18 +44,10 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Group
 import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Text
-import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtext.resource.XtextResourceSet
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.Activator
 
-/**
- * Bit annoying: had to copy this from javaengine, as that plugin doesn't export it.
- * Main tab to let the user specify input to the engine
- * such as model/language/animator
- * 
- */
-class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
-
+class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements LaunchConfigurationContext {
 	protected var Composite _parent
 
 	protected var Text _modelLocationText
@@ -70,9 +64,7 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
 	protected var IProject _modelProject
 
-	@Accessors(PUBLIC_GETTER)
 	var List<EPackage> metamodels
-	@Accessors(PUBLIC_GETTER)
 	var Module semantics
 
 	override void createControl(Composite parent) {
@@ -282,24 +274,11 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 		new GridData(SWT.FILL, SWT.CENTER, true, false)
 	}
 
-//		/**
-//		 *  caches the current model resource in order to avoid to reload it many times
-//		 *  use {@link getModel()} in order to access it.
-//		 */
-//		private var Resource currentModelResource;
-//
-//		private def Resource getModel() {
-//			val URI modelURI = URI.createPlatformResourceURI(_modelLocationText.getText(), true);
-//			if (currentModelResource === null || !(currentModelResource.URI == modelURI)) {
-//				currentModelResource = PlainK3ExecutionEngine.loadModel(modelURI);
-//			}
-//			return currentModelResource;
-//		}
 	override boolean isValid(ILaunchConfiguration config) {
 		setErrorMessage(null)
 		setMessage(null)
 		val IWorkspace workspace = ResourcesPlugin.workspace
-		val String modelName = _modelLocationText.text.trim()
+		val String modelName = _modelLocationText.text.trim
 		if (modelName.length() > 0) {
 
 			val IResource modelIResource = workspace.root.findMember(modelName)
@@ -381,8 +360,6 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 	}
 
 	val pcs = new PropertyChangeSupport(this)
-	val METAMODELS = "metamodels"
-	val SEMANTICS = "semantics"
 
 	def updateMetamodels() {
 		try {
@@ -395,22 +372,35 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 			val oldmms = metamodels
 			metamodels = semantics.imports
 	
-			pcs.firePropertyChange(SEMANTICS, if(oldSemantics !== null) oldSemantics.units.filter(Rule).toList else emptyList,
-				if(semantics !== null) semantics.units.filter(Rule).toList else emptyList)
+			pcs.firePropertyChange(SEMANTICS, getRuleNameSet(oldSemantics), getRuleNameSet(semantics))
 			if (oldmms !== metamodels) {
-				pcs.firePropertyChange(METAMODELS, oldmms, metamodels)
+				pcs.firePropertyChange(METAMODELS, getMetamodelsSet(oldmms), getMetamodelsSet(metamodels))
 			}			
 		}
 		catch (Exception e) {
 			e.printStackTrace
 		}
 	}
+	
+	override Set<String> getSemantics() { getRuleNameSet(semantics) }
+	
+	private def getRuleNameSet(Module semantics) {
+		if(semantics !== null) semantics.units.filter(Rule).map[name].toSet else emptySet
+	}
 
-	def addMetamodelListener(PropertyChangeListener pcl) {
+	override getMetamodels() {
+		getMetamodelsSet(metamodels)
+	}
+
+	private def getMetamodelsSet(List<EPackage> mms) {
+		if (mms !== null) mms.toSet.unmodifiableView else emptySet
+	}
+
+	override addMetamodelChangeListener(PropertyChangeListener pcl) {
 		pcs.addPropertyChangeListener(METAMODELS, pcl)
 	}
 
-	def addSemanticsListener(PropertyChangeListener pcl) {
+	override addSemanticsChangeListener(PropertyChangeListener pcl) {
 		pcs.addPropertyChangeListener(SEMANTICS, pcl)
 	}
 }

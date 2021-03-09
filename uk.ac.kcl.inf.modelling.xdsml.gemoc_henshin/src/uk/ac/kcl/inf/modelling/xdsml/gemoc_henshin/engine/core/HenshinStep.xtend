@@ -4,6 +4,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EcoreFactory
 import org.eclipse.emf.henshin.interpreter.Match
 import org.eclipse.gemoc.trace.commons.model.generictrace.impl.GenericSmallStepImpl
+import org.eclipse.gemoc.trace.commons.model.trace.TraceFactory
 import org.eclipse.gemoc.trace.commons.model.trace.TracePackage
 import org.eclipse.xtend.lib.annotations.Accessors
 
@@ -25,6 +26,25 @@ class HenshinStep extends GenericSmallStepImpl {
 	new(Match match) {
 		super()
 		this.match = match
+
+		footprint = TraceFactory.eINSTANCE.createFootprint => [
+			val rule = match.rule
+			val accessedNodes = rule.lhs.nodes
+
+			// TODO: Should probably include edges, too.
+			accesses += accessedNodes.map[n|match.getNodeTarget(n)]
+
+			val changedNodes = accessedNodes.filter [ n |
+				val image = rule.mappings.getImage(n, rule.rhs)
+				// TODO: Should consider edge changes, too.
+				(image === null) || (image.attributes.exists[a|rule.mappings.getOrigin(a).value != a.value])
+			]
+			// TODO: Should probably include edges, too.
+			changes += changedNodes.map[n|match.getNodeTarget(n)]
+
+			val newNodes = rule.rhs.nodes.filter[n|rule.mappings.getOrigin(n) === null]
+			instantiations += newNodes.map[type]
+		]
 	}
 
 	/**
@@ -45,6 +65,8 @@ class HenshinStep extends GenericSmallStepImpl {
 	 * concat the rule names for display purposes of the concurrent steps
 	 * @param a match, string of the rule/s name/s and string of all matched objects or again rule names
 	 */
+	// TODO: Should rethink how we're generating / reusing MSEs
+	// TODO: Should rethink whether we need to make all node targets into parameters, now that these are documented via the footprint
 	def generateMSE(Match match, String name, String name2) {
 		val mse = TracePackage::eINSTANCE.traceFactory.createGenericMSE()
 		mse.setCallerReference(match.mainObject)
