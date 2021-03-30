@@ -13,9 +13,12 @@ This repository contains a concurrent execution engine that implements support f
 
 ## Features
 
-Annotating any LHS node with `Target` will make the match of that node the target of the rule application for purposes of the GEMOC debugger. This will make for better representation in the GEMOC stack trace. Only LHS nodes and no multi-nodes can be annotated at this point. Not annotating any node with `Target` may mean that Sirius diagrams do not update when stepping through a DSML model in the debugger.
+Annotating any LHS node with `Target` will make the match of that node the target of the rule application for purposes of the GEMOC debugger. This will make for better representation in the GEMOC stack trace. Only LHS nodes and no multi-nodes can be annotated at this point. *Not annotating any node with `Target` may mean that Sirius diagrams do not update when stepping through a DSML model in the debugger.*
 
-The current version of the engine includes both the atomic steps version and the maximally concurrent rules(a maximum sequence of rules that can be run together). The feature can be disabled with `showSequenceRules` flag in the launcher.
+The engine integrates with GEMOC's concurrency strategies framework allowing filtering and exploration of the concurrency model dynamically throughout a debug session. A paper is under preparation and a video demo can be found here:
+
+[![image](https://user-images.githubusercontent.com/7057319/112985703-6d30db00-9158-11eb-9669-77a6a1f900b4.png)](https://uncloud.univ-nantes.fr/index.php/s/dz5aM8FRrDMtz3c?dir=undefined&openfile=471125365)
+
 
 ## Publications
 
