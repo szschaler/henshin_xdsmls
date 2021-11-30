@@ -139,26 +139,28 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 
 		val symbolicSteps = new Model
 
-		val stepVars = steps.map[s|new SmallStepVariable(freshName, symbolicSteps, s)].toList
-		
-		val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
-
-
-		// Build the or combination of all small steps
-		symbolicSteps.addClauses(or(stepVars))
-
-		// where steps exclude each other because of CPA, add exclusion constraints
-		if (cpa !== null) {
-			steps.forEach[s1 |
-				steps.forEach[s2 |
-					if (!canInitiallyRunConcurrently(s1, s2)) {
-						val s1Var = varMap.get(s1)
-						val s2Var = varMap.get(s2)
-						
-						symbolicSteps.addClausesAtMostOne(#[s1Var, s2Var])
-					}
+		if (steps.size > 0) {
+			val stepVars = steps.map[s|new SmallStepVariable(freshName, symbolicSteps, s)].toList
+			
+			val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
+	
+	
+			// Build the or combination of all small steps
+			symbolicSteps.addClauses(or(stepVars))
+	
+			// where steps exclude each other because of CPA, add exclusion constraints
+			if (cpa !== null) {
+				steps.forEach[s1 |
+					steps.forEach[s2 |
+						if (!canInitiallyRunConcurrently(s1, s2)) {
+							val s1Var = varMap.get(s1)
+							val s2Var = varMap.get(s2)
+							
+							symbolicSteps.addClausesAtMostOne(#[s1Var, s2Var])
+						}
+					]
 				]
-			]
+			}			
 		}
 		
 		symbolicSteps
