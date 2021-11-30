@@ -74,7 +74,12 @@ class CPAHelper {
 	 * Check if the elements marked as overlapping by the given critical element also overlap in the two matches
 	 */
 	private def boolean hasMatchingOverlap(CriticalElement ce, Match m1, Match m2) {
-		ce.elementInFirstRule.hasMatchingOverlap(m1, ce.elementInSecondRule, m2)
+		if ((ce.elementInFirstRule === null) || (ce.elementInSecondRule === null)) {
+			// FIXME: Not sure why this would even happen, but it does seem to occur. Possibly a Henshin bug?
+			false
+		} else {
+			ce.elementInFirstRule.hasMatchingOverlap(m1, ce.elementInSecondRule, m2)			
+		}
 	}
 
 	private dispatch def boolean hasMatchingOverlap(GraphElement ge1, Match m1, GraphElement ge2, Match m2) {
