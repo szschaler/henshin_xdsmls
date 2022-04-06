@@ -6,10 +6,14 @@ This repository contains a concurrent execution engine that implements support f
 
 1. Install the nightly build of [GEMOC Studio](http://gemoc.org/studio.html)
 2. Run GEMOC Studio and install [Henshin](https://www.eclipse.org/henshin/) following their normal installation procedure
-3. Clone this repository and import all projects into your GEMOC Studio
-4. Clone one of the example repositories ([banking](https://github.com/szschaler/banking_language), [production line system](https://github.com/szschaler/pls_language)) and import all projects except the `.design`, `.henshin`, and the `.example` projects.
-5. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. You may have to set a non-default working directory on the `Arguments` tab.
-6. In the second instance of GEMOC Studio import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
+3. For the moment, you will also need to import the following projects from the https://github.com/gemoc/gemoc-studio-execution-moccml repository into your workspace and check out the `concurrency-analysis` branch. This will eventually be resolved when these changes are correctly integrated into the latest GEMOC Studio version.
+   - org.eclipse.gemoc.execution.concurrent.ccsljavaengine
+   - org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui
+   - org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api
+4. Clone this repository and import all projects into your GEMOC Studio
+5. Clone one of the example repositories ([banking](https://github.com/szschaler/banking_language), [production line system](https://github.com/szschaler/pls_language)) and import all projects except the `.design`, `.henshin`, and the `.example` projects.
+6. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. You may have to set a non-default working directory on the `Arguments` tab.
+7. In the second instance of GEMOC Studio import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
 
 ## Features
 
