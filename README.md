@@ -4,9 +4,9 @@ This repository contains a concurrent execution engine that implements support f
 
 ## Installation
 
-1. Install the nightly build of [GEMOC Studio](http://gemoc.org/studio.html)
+1. Install the nightly build of [GEMOC Studio](http://gemoc.org/studio.html) -- for the moment, you have to use the version available [here](https://ci.eclipse.org/gemoc/job/gemoc-studio-integration/job/concurrency-analysis/lastSuccessfulBuild/artifact/gemoc-studio/gemoc_studio/releng/org.eclipse.gemoc.gemoc_studio.updatesite/target/products/)
 2. Run GEMOC Studio and install [Henshin](https://www.eclipse.org/henshin/) following their normal installation procedure
-3. For the moment, you will also need to import the following projects from the https://github.com/gemoc/gemoc-studio-execution-moccml repository into your workspace and check out the `concurrency-analysis` branch. This will eventually be resolved when these changes are correctly integrated into the latest GEMOC Studio version.
+3. (You should no longer need this step, but just in case...) For the moment, you will also need to import the following projects from the https://github.com/gemoc/gemoc-studio-execution-moccml repository into your workspace and check out the `concurrency-analysis` branch. This will eventually be resolved when these changes are correctly integrated into the latest GEMOC Studio version.
    - org.eclipse.gemoc.execution.concurrent.ccsljavaengine
    - org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui
    - org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api
