@@ -4,16 +4,12 @@ This repository contains a concurrent execution engine that implements support f
 
 ## Installation
 
-1. Install the nightly build of [GEMOC Studio](http://gemoc.org/studio.html) -- for the moment, you have to use the version available [here](https://ci.eclipse.org/gemoc/job/gemoc-studio-integration/job/concurrency-analysis/lastSuccessfulBuild/artifact/gemoc-studio/gemoc_studio/releng/org.eclipse.gemoc.gemoc_studio.updatesite/target/products/)
+1. Install the nightly build of [GEMOC Studio](http://gemoc.org/studio.html)
 2. Run GEMOC Studio and install [Henshin](https://www.eclipse.org/henshin/) following their normal installation procedure
-3. (You should no longer need this step, but just in case...) For the moment, you will also need to import the following projects from the https://github.com/gemoc/gemoc-studio-execution-moccml repository into your workspace and check out the `concurrency-analysis` branch. This will eventually be resolved when these changes are correctly integrated into the latest GEMOC Studio version.
-   - org.eclipse.gemoc.execution.concurrent.ccsljavaengine
-   - org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui
-   - org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api
-4. Clone this repository and import all projects into your GEMOC Studio
-5. Clone one of the example repositories ([banking](https://github.com/szschaler/banking_language), [production line system](https://github.com/szschaler/pls_language)) and import all projects except the `.design`, `.henshin`, and the `.example` projects.
-6. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. You may have to set a non-default working directory on the `Arguments` tab.
-7. In the second instance of GEMOC Studio import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
+3. Clone this repository and import all projects into your GEMOC Studio
+4. Clone one of the example repositories ([banking](https://github.com/szschaler/banking_language), [production line system](https://github.com/szschaler/pls_language)) and import all projects except the `.design`, `.henshin`, and the `.example` projects.
+5. Run a runtime instance of GEMOC Studio -> Go to Debug or Run Configurations: Eclipse Application: New_configuration. Make sure it's a new workspace. You may have to set a non-default working directory on the `Arguments` tab.
+6. In the second instance of GEMOC Studio import the `.design`, `.henshin`, and the `.example` projects from the example project. Inspect them and follow the instructions in the example project readme to run the debugger.
 
 ## Features
 
@@ -26,5 +22,6 @@ The engine integrates with GEMOC's concurrency strategies framework allowing fil
 
 ## Publications
 
-1. Steffen Zschaler: Adding a HenshinEngine to GEMOC Studio: An experience report. GEMOC Workshop 2018.
+1. Zschaler, S. Adding a HenshinEngine to GEMOC Studio: An experience report. GEMOC Workshop 2018.
 [pdf](http://www.steffen-zschaler.de/download.php?type=pdf&id=123) [slides](http://gemoc.org/pub/20181015-GEMOC18/gemoc18-zschaler-slides.pdf)
+2. Zschaler, S., Bousse, E., Deantoni, J. et al. A generic framework for representing and analyzing model concurrency. Softw Syst Model 22, 1319–1340 (2023). https://doi.org/10.1007/s10270-022-01073-2

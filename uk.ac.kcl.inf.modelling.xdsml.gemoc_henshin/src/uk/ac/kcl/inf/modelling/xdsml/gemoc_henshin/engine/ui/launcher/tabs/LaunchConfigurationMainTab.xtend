@@ -24,10 +24,10 @@ import org.eclipse.gemoc.commons.eclipse.emf.URIHelper
 import org.eclipse.gemoc.commons.eclipse.ui.dialogs.SelectAnyIFileDialog
 import org.eclipse.gemoc.dsl.debug.ide.launch.AbstractDSLLaunchConfigurationDelegate
 import org.eclipse.gemoc.dsl.debug.ide.sirius.ui.launch.AbstractDSLLaunchConfigurationDelegateSiriusUI
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ConcurrentRunConfiguration
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.extensions.deciders.DeciderSpecificationExtensionPoint
+import org.eclipse.gemoc.executionframework.engine.concurrency.ConcurrentRunConfiguration
+import org.eclipse.gemoc.executionframework.engine.concurrency.deciders.DeciderSpecificationExtensionPoint
 import org.eclipse.gemoc.executionframework.engine.core.RunConfiguration
+import org.eclipse.gemoc.executionframework.engine.ui.concurrency.strategies.LaunchConfigurationContext
 import org.eclipse.gemoc.xdsmlframework.ui.utils.dialogs.SelectAIRDIFileDialog
 import org.eclipse.jface.dialogs.Dialog
 import org.eclipse.swt.SWT
@@ -403,4 +403,13 @@ class LaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implemen
 	override addSemanticsChangeListener(PropertyChangeListener pcl) {
 		pcs.addPropertyChangeListener(SEMANTICS, pcl)
 	}
+	
+	override getEngine() {
+		throw new UnsupportedOperationException("No engine at this point")
+	}
+	
+	override getModelRoot() {
+		throw new UnsupportedOperationException("No model at this point")
+	}
+	
 }

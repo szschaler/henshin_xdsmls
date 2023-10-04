@@ -3,9 +3,9 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 import org.eclipse.core.runtime.CoreException
 import org.eclipse.core.runtime.IConfigurationElement
 import org.eclipse.core.runtime.InvalidRegistryObjectException
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.commons.BaseConcurrentModelExecutionContext
 import org.eclipse.gemoc.executionframework.engine.commons.DefaultExecutionPlatform
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
+import org.eclipse.gemoc.executionframework.engine.concurrency.BaseConcurrentModelExecutionContext
 import org.eclipse.gemoc.executionframework.extensions.sirius.modelloader.DefaultModelLoader
 import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import org.eclipse.gemoc.xdsmlframework.api.core.IExecutionPlatform
