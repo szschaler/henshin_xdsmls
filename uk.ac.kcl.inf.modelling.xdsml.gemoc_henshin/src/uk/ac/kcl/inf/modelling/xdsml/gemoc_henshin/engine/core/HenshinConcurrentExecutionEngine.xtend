@@ -263,7 +263,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		}
 
 		override getModelRoot() {
-			return engine.executionContext.resourceModel.contents.get(0)
+			return engine.executionContext.resourceModel.contents.head
 		}
 
 	}
