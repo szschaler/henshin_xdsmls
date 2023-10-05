@@ -2,8 +2,8 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.ui.launcher
 
 import org.eclipse.core.runtime.CoreException
 import org.eclipse.debug.core.ILaunchConfiguration
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.launcher.AbstractConcurrentLauncher
 import org.eclipse.gemoc.executionframework.engine.commons.EngineContextException
+import org.eclipse.gemoc.executionframework.engine.ui.concurrency.launcher.AbstractConcurrentLauncher
 import org.eclipse.gemoc.xdsmlframework.api.core.ExecutionMode
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionContext
 import uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core.HenshinConcurrentExecutionEngine

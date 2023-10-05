@@ -2,7 +2,7 @@ package uk.ac.kcl.inf.modelling.xdsml.gemoc_henshin.engine.core
 
 import org.eclipse.core.runtime.CoreException
 import org.eclipse.debug.core.ILaunchConfiguration
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.ConcurrentRunConfiguration
+import org.eclipse.gemoc.executionframework.engine.concurrency.ConcurrentRunConfiguration
 
 class HenshinConcurrentRunConfiguration extends ConcurrentRunConfiguration {
 	

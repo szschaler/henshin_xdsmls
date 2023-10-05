@@ -18,11 +18,10 @@ import org.eclipse.emf.henshin.interpreter.impl.RuleApplicationImpl
 import org.eclipse.emf.henshin.model.Module
 import org.eclipse.emf.henshin.model.ParameterKind
 import org.eclipse.emf.henshin.model.Rule
-import org.eclipse.gemoc.execution.concurrent.ccsljavaengine.ui.strategies.LaunchConfigurationContext
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.core.AbstractConcurrentExecutionEngine.StepFactory
-import org.eclipse.gemoc.execution.concurrent.ccsljavaxdsml.api.dsa.executors.CodeExecutionException
-import org.eclipse.gemoc.execution.concurrent.symbolic.SmallStepVariable
+import org.eclipse.gemoc.executionframework.engine.concurrency.AbstractConcurrentExecutionEngine
+import org.eclipse.gemoc.executionframework.engine.concurrency.ConcurrentStepException
+import org.eclipse.gemoc.executionframework.engine.concurrency.SmallStepVariable
+import org.eclipse.gemoc.executionframework.engine.ui.concurrency.strategies.LaunchConfigurationContext
 import org.eclipse.gemoc.trace.commons.model.generictrace.GenericSmallStep
 import org.eclipse.gemoc.trace.commons.model.trace.ParallelStep
 import org.eclipse.gemoc.trace.commons.model.trace.SmallStep
@@ -119,7 +118,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		override compare(Step<?> step1, Step<?> step2) {
 			if (step1 instanceof HenshinStep) {
 				if (step2 instanceof HenshinStep) {
-					if (step1.match == step2.match) return 0
+					if(step1.match == step2.match) return 0
 				}
 			}
 
@@ -132,6 +131,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	}
 
 	var int varCounter = 0
+
 	private def String freshName() '''var_«varCounter++»'''
 
 	override protected computeInitialLogicalSteps() {
@@ -141,28 +141,27 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 
 		if (steps.size > 0) {
 			val stepVars = steps.map[s|new SmallStepVariable(freshName, symbolicSteps, s)].toList
-			
+
 			val varMap = stepVars.groupBy[associatedSmallStep].mapValues[head]
-	
-	
+
 			// Build the or combination of all small steps
 			symbolicSteps.addClauses(or(stepVars))
-	
+
 			// where steps exclude each other because of CPA, add exclusion constraints
 			if (cpa !== null) {
-				steps.forEach[s1 |
-					steps.forEach[s2 |
+				steps.forEach [ s1 |
+					steps.forEach [ s2 |
 						if (!canInitiallyRunConcurrently(s1, s2)) {
 							val s1Var = varMap.get(s1)
 							val s2Var = varMap.get(s2)
-							
+
 							symbolicSteps.addClausesAtMostOne(#[s1Var, s2Var])
 						}
 					]
 				]
-			}			
+			}
 		}
-		
+
 		symbolicSteps
 	}
 
@@ -171,7 +170,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 	}
 
 	private def boolean canInitiallyRunConcurrently(SmallStep<?> s1, SmallStep<?> s2) {
-		if (s1 !== s2) {				
+		if (s1 !== s2) {
 			if (s1 instanceof HenshinStep) {
 				if (s2 instanceof HenshinStep) {
 					if (cpa !== null) {
@@ -182,14 +181,14 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 					}
 				}
 			}
-			
+
 			throw new IllegalArgumentException("Expecting both arguments to be HenshinSteps.")
 		} else {
 			return true
 		}
 	}
 
-	override protected executeSmallStep(SmallStep<?> smallStep) throws CodeExecutionException {
+	override protected executeSmallStep(SmallStep<?> smallStep) {
 		val henshinStep = smallStep as HenshinStep
 
 		ruleRunner.EGraph = modelGraph
@@ -197,8 +196,7 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 		ruleRunner.completeMatch = henshinStep.match
 
 		if (!ruleRunner.execute(null)) {
-			throw new CodeExecutionException('''Couldn't apply rule «henshinStep.match.rule.name».''',
-				henshinStep.mseoccurrence)
+			throw new ConcurrentStepException('''Couldn't apply rule «henshinStep.match.rule.name».''')
 		}
 	}
 
@@ -258,6 +256,14 @@ class HenshinConcurrentExecutionEngine extends AbstractConcurrentExecutionEngine
 
 		override addSemanticsChangeListener(PropertyChangeListener pcl) {
 			pcs.addPropertyChangeListener("semantics", pcl)
+		}
+
+		override getEngine() {
+			return engine
+		}
+
+		override getModelRoot() {
+			return engine.executionContext.resourceModel.contents.head
 		}
 
 	}
